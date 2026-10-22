@@ -16,7 +16,8 @@ import {
   PieChart, 
   X, 
   Trash2, 
-  FileText 
+  FileText,
+  Check
 } from 'lucide-react';
 
 interface ServiceViewProps {
@@ -137,16 +138,16 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
     .slice(0, 6);
 
   return (
-    <div className="space-y-5 pb-24 md:pb-8 pt-2">
+    <div className="space-y-5 pb-24 md:pb-8 pt-2 text-zinc-900 dark:text-zinc-100 transition-colors">
       {/* Sticky Vehicle Filter Pill Bar */}
-      <div className="bg-white/95 backdrop-blur-md -mx-4 md:mx-0 px-4 md:px-0 py-2 border-b md:border-b-0 border-zinc-200">
+      <div className="bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md -mx-4 md:mx-0 px-4 md:px-0 py-2 border-b md:border-b-0 border-zinc-200 dark:border-zinc-800 transition-colors">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
           <button
             onClick={() => setSelectedVehicleId('all')}
             className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
               selectedVehicleId === 'all'
-                ? 'bg-zinc-950 text-yellow-400 shadow-sm'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200'
+                ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-sm'
+                : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
             }`}
           >
             Semua Unit ({vehicles.length})
@@ -160,8 +161,8 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                 onClick={() => setSelectedVehicleId(veh.id)}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                   isSelected
-                    ? 'bg-zinc-950 text-yellow-400 shadow-sm'
-                    : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200'
+                    ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-sm'
+                    : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
                 }`}
               >
                 <span>{veh.name}</span>
@@ -175,10 +176,10 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black uppercase tracking-wider text-zinc-900">
+          <h2 className="text-xl font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
             Buku Servis Digital & Suku Cadang
           </h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             {selectedVehicle
               ? `Riwayat perawatan untuk ${selectedVehicle.name} (${selectedVehicle.plateNumber})`
               : 'Semua riwayat pemeliharaan berkala & penggantian sparepart armada'}
@@ -188,10 +189,10 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onExportPdf}
-            className="flex items-center gap-1.5 py-2 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold rounded-2xl transition cursor-pointer"
+            className="flex items-center gap-1.5 py-2 px-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-2xl transition cursor-pointer shadow-xs"
             title="Download PDF Sertifikat Servis Kendaraan"
           >
-            <Download className="w-4 h-4 text-zinc-700" />
+            <Download className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             <span className="hidden sm:inline">Export PDF</span>
           </button>
 
@@ -206,27 +207,27 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
       </div>
 
       {/* Service Expense KPI Summary Card */}
-      <div className="bg-white text-zinc-900 rounded-3xl p-5 border-2 border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-4 border-b-yellow-400">
+      <div className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-4 border-b-yellow-400 transition-colors">
         <div>
-          <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
             Total Biaya Pemeliharaan Armada
           </span>
-          <div className="mt-1 font-mono font-black text-2xl md:text-3xl text-zinc-950">
+          <div className="mt-1 font-mono font-black text-2xl md:text-3xl text-zinc-950 dark:text-zinc-100">
             Rp {totalExpenseOnService.toLocaleString('id-ID')}
           </div>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
             Mencakup {filteredRecords.length} transaksi servis berkala & perbaikan darurat
           </p>
         </div>
 
         {/* View Switcher: List Transaksi Servis vs Sheet Analitik */}
-        <div className="grid grid-cols-2 p-1 bg-zinc-100 rounded-2xl border border-zinc-200 text-xs font-bold">
+        <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 text-xs font-bold">
           <button
             onClick={() => setViewMode('history_list')}
             className={`py-2 px-3 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === 'history_list'
-                ? 'bg-white text-zinc-950 shadow-xs'
-                : 'text-zinc-500 hover:text-zinc-900'
+                ? 'bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
             <FileCheck className="w-3.5 h-3.5" />
@@ -238,7 +239,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
             className={`py-2 px-3 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === 'analytics'
                 ? 'bg-yellow-400 text-zinc-950 shadow-xs'
-                : 'text-zinc-500 hover:text-zinc-900'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
@@ -272,42 +273,42 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                   <div
                     key={record.id}
                     onClick={() => setSelectedRecordForDetail(record)}
-                    className="bg-white rounded-3xl border-2 border-zinc-200 hover:border-zinc-900 transition-all p-4.5 shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between group active:scale-[0.99]"
+                    className="bg-white dark:bg-zinc-900 rounded-3xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-900 dark:hover:border-yellow-400 transition-all p-4.5 shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between group active:scale-[0.99]"
                   >
                     <div>
                       {/* Top Plate & Date */}
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-lg bg-zinc-950 text-white font-mono font-bold text-[11px]">
+                          <span className="px-2.5 py-0.5 rounded-lg bg-zinc-950 dark:bg-zinc-800 text-white font-mono font-bold text-[11px] border border-zinc-800 dark:border-zinc-700">
                             {veh?.plateNumber || 'Unit'}
                           </span>
                           <span
                             className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase ${
                               isUnexpected
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                : 'bg-zinc-100 text-zinc-700'
+                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
                             }`}
                           >
                             {isUnexpected ? 'Tak Terduga' : 'Berkala'}
                           </span>
                         </div>
-                        <span className="text-xs text-zinc-400 font-mono">{record.date}</span>
+                        <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">{record.date}</span>
                       </div>
 
                       {/* Title */}
-                      <h4 className="font-extrabold text-sm md:text-base text-zinc-900 group-hover:text-black leading-snug">
+                      <h4 className="font-extrabold text-sm md:text-base text-zinc-900 dark:text-zinc-100 group-hover:text-black dark:group-hover:text-white leading-snug">
                         {record.title}
                       </h4>
 
                       {/* Workshop & Odometer */}
-                      <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500">
+                      <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
                         <span className="flex items-center gap-1">
-                          <Store className="w-3.5 h-3.5 text-zinc-400" />
+                          <Store className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
                           <span>{record.workshopName}</span>
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1 font-mono">
-                          <Gauge className="w-3.5 h-3.5 text-zinc-400" />
+                          <Gauge className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
                           <span>{record.odometerKm.toLocaleString('id-ID')} KM</span>
                         </span>
                       </div>
@@ -318,7 +319,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                           record.itemizedDetails.slice(0, 3).map((item, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-0.5 bg-zinc-100 text-zinc-800 text-[10px] font-medium rounded-lg border border-zinc-200"
+                              className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-medium rounded-lg border border-zinc-200 dark:border-zinc-700"
                             >
                               {item.name}
                             </span>
@@ -327,16 +328,16 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                           record.replacedParts.slice(0, 3).map((p, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-0.5 bg-zinc-100 text-zinc-800 text-[10px] font-medium rounded-lg border border-zinc-200"
+                              className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10px] font-medium rounded-lg border border-zinc-200 dark:border-zinc-700"
                             >
                               {p}
                             </span>
                           ))
                         ) : (
-                          <span className="text-[10px] text-zinc-400 italic">Pemeriksaan umum</span>
+                          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 italic">Pemeriksaan umum</span>
                         )}
                         {partsCount > 3 && (
-                          <span className="text-[10px] text-zinc-400 font-bold">
+                          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold">
                             +{partsCount - 3} lainnya
                           </span>
                         )}
@@ -344,17 +345,17 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                     </div>
 
                     {/* Bottom Cost & Open Detail Action */}
-                    <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between">
+                    <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                       <div>
-                        <span className="text-[10px] text-zinc-400 uppercase font-bold block">
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-bold block">
                           Total Biaya
                         </span>
-                        <span className="font-mono font-black text-base text-zinc-950">
+                        <span className="font-mono font-black text-base text-zinc-950 dark:text-zinc-100">
                           Rp {record.cost.toLocaleString('id-ID')}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-xs font-bold text-yellow-600 group-hover:text-zinc-950 transition-colors">
+                      <div className="flex items-center gap-1 text-xs font-bold text-yellow-600 dark:text-yellow-400 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors">
                         <span>Lihat Rincian & Sparepart</span>
                         <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                       </div>
@@ -371,10 +372,10 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
       {viewMode === 'analytics' && (
         <div className="space-y-5 animate-fade-in">
           {/* Filter Rentang Waktu Bar */}
-          <div className="bg-white border-2 border-zinc-200 rounded-3xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-zinc-500" />
-              <span className="text-xs font-black uppercase tracking-wider text-zinc-900">
+              <Calendar className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+              <span className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                 Rentang Waktu Analitik
               </span>
             </div>
@@ -394,8 +395,8 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                     onClick={() => setTimeRange(pill.id as any)}
                     className={`py-1.5 px-3 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                       isSelected
-                        ? 'bg-zinc-950 text-yellow-400 shadow-xs'
-                        : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600'
+                        ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-xs'
+                        : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
                     }`}
                   >
                     {pill.label}
@@ -407,50 +408,50 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
 
           {/* Key Analytics Metric Cards (4 Cards Grid) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            <div className="bg-white rounded-3xl p-4 border-2 border-zinc-200 border-b-4 border-b-yellow-400 shadow-sm">
-              <div className="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-yellow-400 shadow-sm transition-colors">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
                 <span>Biaya Servis</span>
-                <Wallet className="w-4 h-4 text-zinc-700" />
+                <Wallet className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
               </div>
-              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950">
+              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950 dark:text-zinc-100">
                 Rp {totalAnalyticsCost.toLocaleString('id-ID')}
               </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">Dalam rentang terpilih</p>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Dalam rentang terpilih</p>
             </div>
 
-            <div className="bg-white rounded-3xl p-4 border-2 border-zinc-200 border-b-4 border-b-zinc-900 shadow-sm">
-              <div className="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-yellow-400 shadow-sm transition-colors">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
                 <span>Rata-Rata / Kunjungan</span>
-                <TrendingUp className="w-4 h-4 text-yellow-600" />
+                <TrendingUp className="w-4 h-4 text-yellow-500" />
               </div>
-              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950">
+              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950 dark:text-zinc-100">
                 Rp {avgCostPerService.toLocaleString('id-ID')}
               </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">Nilai rata per nota servis</p>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Nilai rata per nota servis</p>
             </div>
 
-            <div className="bg-white rounded-3xl p-4 border-2 border-zinc-200 border-b-4 border-b-zinc-900 shadow-sm">
-              <div className="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-yellow-400 shadow-sm transition-colors">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
                 <span>Frekuensi Servis</span>
-                <Wrench className="w-4 h-4 text-zinc-700" />
+                <Wrench className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
               </div>
-              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950">
-                {analyticsRecords.length} <span className="text-xs font-normal text-zinc-500">Kunjungan</span>
+              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950 dark:text-zinc-100">
+                {analyticsRecords.length} <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">Kunjungan</span>
               </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">
                 {routineRecords.length} Rutin • {unexpectedRecords.length} Darurat • {registeredPartsCount} Part Aktif
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl p-4 border-2 border-zinc-200 border-b-4 border-b-zinc-900 shadow-sm">
-              <div className="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-yellow-400 shadow-sm transition-colors">
+              <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
                 <span>Rasio Darurat</span>
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
               </div>
-              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950">
-                {unexpectedPct}% <span className="text-xs font-normal text-zinc-500">Biaya Darurat</span>
+              <div className="mt-2 font-mono font-black text-lg md:text-xl text-zinc-950 dark:text-zinc-100">
+                {unexpectedPct}% <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">Biaya Darurat</span>
               </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">
                 {unexpectedPct > 35 ? '⚠️ Rasio darurat tinggi' : '✓ Rasio terkendali'}
               </p>
             </div>
@@ -470,14 +471,14 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
           ) : (
             <div className="space-y-5">
               {/* Graphic Chart 1: Tren Pengeluaran Servis Bulanan (Bar Chart) */}
-              <div className="bg-white border-2 border-zinc-200 rounded-3xl p-5 md:p-6 shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-100">
+              <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 md:p-6 shadow-sm space-y-4 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800">
                   <div>
-                    <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-zinc-900" />
+                    <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-zinc-900 dark:text-yellow-400" />
                       <span>Grafik Tren Pengeluaran Servis Bulanan</span>
                     </h3>
-                    <p className="text-xs text-zinc-500 mt-0.5">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                       Visualisasi pengeluaran servis berkala vs perbaikan darurat per bulan
                     </p>
                   </div>
@@ -485,18 +486,18 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                   <div className="flex items-center gap-3 text-xs font-bold">
                     <span className="flex items-center gap-1.5">
                       <span className="w-3 h-3 rounded-md bg-yellow-400"></span>
-                      <span className="text-zinc-700">Berkala / Rutin</span>
+                      <span className="text-zinc-700 dark:text-zinc-300">Berkala / Rutin</span>
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="w-3 h-3 rounded-md bg-zinc-900"></span>
-                      <span className="text-zinc-700">Tak Terduga</span>
+                      <span className="w-3 h-3 rounded-md bg-zinc-900 dark:bg-zinc-600"></span>
+                      <span className="text-zinc-700 dark:text-zinc-300">Tak Terduga</span>
                     </span>
                   </div>
                 </div>
 
                 {/* Vertical Bar Chart Visualizer */}
                 <div className="pt-6 pb-2">
-                  <div className="h-56 flex items-end gap-3 sm:gap-6 px-2 border-b border-zinc-200">
+                  <div className="h-56 flex items-end gap-3 sm:gap-6 px-2 border-b border-zinc-200 dark:border-zinc-800">
                     {monthlyData.map((item, idx) => {
                       const totalBarPct = Math.max(Math.round((item.totalCost / maxMonthlyCost) * 100), 12);
                       const routineShare = item.totalCost > 0 ? (item.routineCost / item.totalCost) * 100 : 0;
@@ -506,23 +507,23 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                         <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
                           {/* Value Tooltip Label */}
                           <div className="opacity-80 group-hover:opacity-100 transition-opacity mb-2 text-center">
-                            <span className="font-mono font-bold text-[10px] md:text-xs text-zinc-900 block whitespace-nowrap">
+                            <span className="font-mono font-bold text-[10px] md:text-xs text-zinc-900 dark:text-zinc-100 block whitespace-nowrap">
                               Rp {(item.totalCost / 1000).toLocaleString('id-ID')}k
                             </span>
-                            <span className="text-[9px] text-zinc-400 font-mono hidden sm:block">
+                            <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono hidden sm:block">
                               {item.count}x servis
                             </span>
                           </div>
 
                           {/* Stacked Bar */}
                           <div
-                            className="w-full max-w-[48px] rounded-xl overflow-hidden flex flex-col justify-end bg-zinc-100 border border-zinc-200 shadow-xs transition-all duration-300 group-hover:brightness-95"
+                            className="w-full max-w-[48px] rounded-xl overflow-hidden flex flex-col justify-end bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-xs transition-all duration-300 group-hover:brightness-95"
                             style={{ height: `${totalBarPct}%` }}
                             title={`${item.monthLabel}: Total Rp ${item.totalCost.toLocaleString('id-ID')} (Rutin: Rp ${item.routineCost.toLocaleString('id-ID')}, Darurat: Rp ${item.unexpectedCost.toLocaleString('id-ID')})`}
                           >
                             {item.unexpectedCost > 0 && (
                               <div
-                                className="w-full bg-zinc-900 transition-all duration-300"
+                                className="w-full bg-zinc-900 dark:bg-zinc-600 transition-all duration-300"
                                 style={{ height: `${unexpectedShare}%` }}
                               />
                             )}
@@ -535,7 +536,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                           </div>
 
                           {/* X-axis Label */}
-                          <span className="mt-2 text-[10px] md:text-xs font-bold text-zinc-600 font-mono uppercase tracking-tight">
+                          <span className="mt-2 text-[10px] md:text-xs font-bold text-zinc-600 dark:text-zinc-400 font-mono uppercase tracking-tight">
                             {item.monthLabel}
                           </span>
                         </div>
@@ -548,10 +549,10 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
               {/* Graphic Chart 2: Komposisi Biaya & Breakdown Suku Cadang Terbanyak */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
                 {/* Left: Rasio Rutin vs Tak Terduga */}
-                <div className="lg:col-span-5 bg-white border-2 border-zinc-200 rounded-3xl p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-                    <h4 className="text-xs font-black uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
-                      <PieChart className="w-4 h-4 text-zinc-700" />
+                <div className="lg:col-span-5 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
+                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                      <PieChart className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
                       <span>Rasio Jenis Pemeliharaan</span>
                     </h4>
                     <span className="text-[11px] font-mono text-zinc-400">
@@ -568,18 +569,18 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                       </span>
                       <span className="text-zinc-900 flex items-center gap-1">
                         Tak Terduga ({unexpectedPct}%)
-                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-900"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-900 dark:bg-zinc-600"></span>
                       </span>
                     </div>
 
-                    <div className="h-4 w-full bg-zinc-100 rounded-xl overflow-hidden p-0.5 border border-zinc-200 flex gap-0.5">
+                    <div className="h-4 w-full bg-zinc-100 dark:bg-zinc-800 rounded-xl overflow-hidden p-0.5 border border-zinc-200 dark:border-zinc-700 flex gap-0.5">
                       <div
                         className="h-full bg-yellow-400 rounded-l-lg transition-all duration-500"
                         style={{ width: `${routinePct}%` }}
                         title={`Servis Berkala: Rp ${routineCost.toLocaleString('id-ID')}`}
                       />
                       <div
-                        className="h-full bg-zinc-900 rounded-r-lg transition-all duration-500"
+                        className="h-full bg-zinc-900 dark:bg-zinc-600 rounded-r-lg transition-all duration-500"
                         style={{ width: `${unexpectedPct}%` }}
                         title={`Tak Terduga: Rp ${unexpectedCost.toLocaleString('id-ID')}`}
                       />
@@ -588,48 +589,48 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
 
                   {/* Breakdown Cards */}
                   <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="p-3 bg-yellow-50/60 border border-yellow-200 rounded-2xl">
-                      <span className="text-[10px] font-black uppercase text-yellow-800 block">
+                    <div className="p-3 bg-yellow-50/60 dark:bg-yellow-950/40 border border-yellow-200 dark:border-yellow-800 rounded-2xl">
+                      <span className="text-[10px] font-black uppercase text-yellow-800 dark:text-yellow-400 block">
                         Servis Berkala
                       </span>
-                      <span className="font-mono font-black text-sm text-zinc-950 mt-1 block">
+                      <span className="font-mono font-black text-sm text-zinc-950 dark:text-zinc-100 mt-1 block">
                         Rp {routineCost.toLocaleString('id-ID')}
                       </span>
-                      <span className="text-[10px] text-zinc-500 mt-0.5 block">
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 block">
                         {routineRecords.length} kali perawatan
                       </span>
                     </div>
 
-                    <div className="p-3 bg-zinc-100 border border-zinc-200 rounded-2xl">
-                      <span className="text-[10px] font-black uppercase text-zinc-700 block">
+                    <div className="p-3 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl">
+                      <span className="text-[10px] font-black uppercase text-zinc-700 dark:text-zinc-300 block">
                         Biaya Darurat
                       </span>
-                      <span className="font-mono font-black text-sm text-zinc-950 mt-1 block">
+                      <span className="font-mono font-black text-sm text-zinc-950 dark:text-zinc-100 mt-1 block">
                         Rp {unexpectedCost.toLocaleString('id-ID')}
                       </span>
-                      <span className="text-[10px] text-zinc-500 mt-0.5 block">
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 block">
                         {unexpectedRecords.length} kali perbaikan
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-zinc-500 leading-relaxed bg-zinc-50 p-3 rounded-2xl border border-zinc-200">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed bg-zinc-50 dark:bg-zinc-800/60 p-3 rounded-2xl border border-zinc-200 dark:border-zinc-700">
                     💡 <strong>Tips Efisiensi:</strong> Perawatan berkala tepat waktu mencegah kerusakan komponen besar yang memicu lonjakan biaya darurat hingga 3x lipat.
                   </p>
                 </div>
 
                 {/* Right: Top 6 Suku Cadang & Biaya Servis Terbesar */}
-                <div className="lg:col-span-7 bg-white border-2 border-zinc-200 rounded-3xl p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-                    <h4 className="text-xs font-black uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
-                      <Wrench className="w-4 h-4 text-zinc-700" />
+                <div className="lg:col-span-7 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
+                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                      <Wrench className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
                       <span>Komponen & Pengeluaran Servis Terbanyak</span>
                     </h4>
-                    <span className="text-[11px] font-mono text-zinc-400">Peringkat Biaya</span>
+                    <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">Peringkat Biaya</span>
                   </div>
 
                   {topItemsList.length === 0 ? (
-                    <div className="p-6 text-center text-zinc-400 text-xs">
+                    <div className="p-6 text-center text-zinc-400 dark:text-zinc-500 text-xs">
                       Belum ada rincian komponen yang tersimpan.
                     </div>
                   ) : (
@@ -640,29 +641,29 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                           <div key={idx} className="space-y-1.5">
                             <div className="flex items-center justify-between text-xs">
                               <div className="flex items-center gap-2">
-                                <span className="w-5 h-5 rounded-lg bg-zinc-100 text-zinc-800 font-mono font-black text-[10px] flex items-center justify-center shrink-0">
+                                <span className="w-5 h-5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-mono font-black text-[10px] flex items-center justify-center shrink-0">
                                   #{idx + 1}
                                 </span>
-                                <span className="font-extrabold text-zinc-900">{item.name}</span>
-                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-zinc-100 text-zinc-600 uppercase font-bold">
+                                <span className="font-extrabold text-zinc-900 dark:text-zinc-100">{item.name}</span>
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase font-bold">
                                   {item.category === 'sparepart' ? 'Part' : item.category === 'jasa' ? 'Jasa' : 'Darurat'}
                                 </span>
-                                <span className="text-[10px] text-zinc-400 font-mono">
+                                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">
                                   ({item.count}x)
                                 </span>
                               </div>
 
                               <div className="text-right">
-                                <span className="font-mono font-black text-xs text-zinc-950">
+                                <span className="font-mono font-black text-xs text-zinc-950 dark:text-zinc-100">
                                   Rp {item.totalCost.toLocaleString('id-ID')}
                                 </span>
-                                <span className="text-[10px] text-zinc-400 font-mono ml-1.5">
+                                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono ml-1.5">
                                   {pctOfTotal}%
                                 </span>
                               </div>
                             </div>
 
-                            <div className="w-full h-2 bg-zinc-100 rounded-full overflow-hidden p-0.5 border border-zinc-200">
+                            <div className="w-full h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-200 dark:border-zinc-700">
                               <div
                                 className="h-full rounded-full bg-yellow-400 transition-all duration-500"
                                 style={{ width: `${Math.min(pctOfTotal, 100)}%` }}
@@ -806,18 +807,18 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900">
-      <div className="w-full max-w-2xl bg-white border-2 border-zinc-900 rounded-3xl p-5 md:p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
+      <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 md:p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
         {/* Header Modal */}
-        <div className="flex items-start justify-between pb-3 border-b border-zinc-200">
+        <div className="flex items-start justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-lg bg-zinc-950 text-white font-mono font-black text-xs">
+              <span className="px-2.5 py-0.5 rounded-lg bg-zinc-950 dark:bg-zinc-800 text-white font-mono font-black text-xs border border-zinc-800 dark:border-zinc-700">
                 {vehicle?.plateNumber || 'Unit'}
               </span>
-              <span className="text-xs text-zinc-500 font-bold">{vehicle?.name}</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">{vehicle?.name}</span>
             </div>
-            <h3 className="font-black text-base md:text-lg text-zinc-900">
+            <h3 className="font-black text-base md:text-lg text-zinc-900 dark:text-zinc-100">
               Detail & Formulir Buku Servis
             </h3>
           </div>
@@ -825,24 +826,24 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition cursor-pointer"
+            className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* 2 TABS NAVIGATION */}
-        <div className="flex p-1 bg-zinc-100 rounded-2xl border border-zinc-200 text-xs font-bold my-4">
+        <div className="flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 text-xs font-bold my-4">
           <button
             type="button"
             onClick={() => setActiveTab('info')}
             className={`flex-1 py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'info'
-                ? 'bg-white text-zinc-950 shadow-xs'
-                : 'text-zinc-500 hover:text-zinc-900'
+                ? 'bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
-            <FileText className="w-4 h-4 text-zinc-700" />
+            <FileText className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             <span>Tab 1: Informasi Dasar</span>
           </button>
 
@@ -852,7 +853,7 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             className={`flex-1 py-2.5 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'parts'
                 ? 'bg-yellow-400 text-zinc-950 shadow-xs'
-                : 'text-zinc-500 hover:text-zinc-900'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
             <Wrench className="w-4 h-4 stroke-[2.5]" />
@@ -869,13 +870,13 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             <div className="space-y-3.5 text-xs animate-fade-in">
               {/* Jenis Servis Switcher */}
               <div>
-                <label className="block font-bold text-zinc-700 mb-1">Kategori Perawatan</label>
-                <div className="grid grid-cols-2 p-1 bg-zinc-100 rounded-xl border border-zinc-200 font-bold">
+                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Kategori Perawatan</label>
+                <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 font-bold">
                   <button
                     type="button"
                     onClick={() => setType('routine')}
                     className={`py-2 rounded-lg transition ${
-                      type === 'routine' ? 'bg-white text-zinc-950 shadow-xs' : 'text-zinc-500'
+                      type === 'routine' ? 'bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-100 shadow-xs' : 'text-zinc-500 dark:text-zinc-400'
                     }`}
                   >
                     Servis Berkala Rutin
@@ -884,7 +885,7 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                     type="button"
                     onClick={() => setType('unexpected')}
                     className={`py-2 rounded-lg transition flex items-center justify-center gap-1.5 ${
-                      type === 'unexpected' ? 'bg-yellow-400 text-zinc-950 shadow-xs' : 'text-zinc-500'
+                      type === 'unexpected' ? 'bg-yellow-400 text-zinc-950 shadow-xs' : 'text-zinc-500 dark:text-zinc-400'
                     }`}
                   >
                     <AlertTriangle className="w-3.5 h-3.5" />
@@ -895,14 +896,14 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
               {/* Judul Servis */}
               <div>
-                <label className="block font-bold text-zinc-900 mb-1">
+                <label className="block font-bold text-zinc-900 dark:text-zinc-100 mb-1">
                   Judul Pekerjaan Servis <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                   required
                 />
               </div>
@@ -910,22 +911,22 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               {/* Tanggal & Odometer */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-zinc-700 mb-1">Tanggal Pengerjaan</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Tanggal Pengerjaan</label>
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-zinc-700 mb-1">Odometer Terkini (KM)</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Odometer Terkini (KM)</label>
                   <input
                     type="number"
                     value={odometerKm}
                     onChange={(e) => setOdometerKm(Number(e.target.value))}
-                    className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     required
                   />
                 </div>
@@ -934,21 +935,21 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               {/* Bengkel & Biaya Keseluruhan */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-zinc-700 mb-1">Nama Bengkel / Penyedia</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nama Bengkel / Penyedia</label>
                   <input
                     type="text"
                     value={workshopName}
                     onChange={(e) => setWorkshopName(e.target.value)}
                     placeholder="Contoh: AHASS, Auto2000, Bengkel Mandiri"
-                    className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-zinc-700 mb-1">Grand Total Biaya (Rp)</label>
-                  <div className="w-full px-3 py-2.5 bg-yellow-50/60 border-2 border-yellow-400 rounded-xl text-zinc-950 font-mono font-black text-sm">
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Grand Total Biaya (Rp)</label>
+                  <div className="w-full px-3 py-2.5 bg-yellow-50/60 dark:bg-yellow-950/40 border-2 border-yellow-400 dark:border-yellow-600 rounded-xl text-zinc-950 dark:text-yellow-400 font-mono font-black text-sm">
                     Rp {totalCalculatedCost.toLocaleString('id-ID')}
                   </div>
-                  <span className="text-[10px] text-zinc-400 mt-0.5 block">
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5 block">
                     *Terkalkulasi otomatis dari rincian Tab 2
                   </span>
                 </div>
@@ -956,13 +957,13 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
               {/* Catatan / Keluhan */}
               <div>
-                <label className="block font-bold text-zinc-700 mb-1">Catatan Teknisi / Kronologi Perbaikan</label>
+                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Catatan Teknisi / Kronologi Perbaikan</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Catatan diagnosa mekanik, kendala yang ditemukan, garansi servis..."
                   rows={3}
-                  className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                 />
               </div>
             </div>
@@ -974,8 +975,8 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           {activeTab === 'parts' && (
             <div className="space-y-4 text-xs animate-fade-in">
               {/* Tambah Komponen Baru Bar */}
-              <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-2">
-                <span className="font-extrabold text-xs text-zinc-900 block">
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl space-y-2">
+                <span className="font-extrabold text-xs text-zinc-900 dark:text-zinc-100 block">
                   Tambah Komponen / Suku Cadang yang Diservis
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
@@ -985,14 +986,14 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                       placeholder="Nama sparepart (misal: Oli Mesin SPX2)"
                       value={newItemName}
                       onChange={(e) => setNewItemName(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     />
                   </div>
                   <div className="sm:col-span-3">
                     <select
                       value={newItemCategory}
                       onChange={(e) => setNewItemCategory(e.target.value as any)}
-                      className="w-full px-2 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-medium focus:outline-none focus:border-zinc-900"
+                      className="w-full px-2 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     >
                       <option value="sparepart">Suku Cadang</option>
                       <option value="jasa">Jasa Pasang</option>
@@ -1005,7 +1006,7 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                       placeholder="Biaya (Rp)"
                       value={newItemCost || ''}
                       onChange={(e) => setNewItemCost(Number(e.target.value))}
-                      className="w-full px-2 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      className="w-full px-2 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     />
                   </div>
                   <div className="sm:col-span-1 flex items-center">
@@ -1022,16 +1023,16 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               </div>
 
               {/* List of Itemized Spareparts */}
-              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 no-scrollbar">
                 {items.length === 0 ? (
-                  <div className="p-6 text-center text-zinc-400 bg-zinc-50 border border-dashed border-zinc-200 rounded-2xl">
+                  <div className="p-6 text-center text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-800/40 border border-dashed border-zinc-200 dark:border-zinc-700 rounded-2xl">
                     Belum ada sparepart yang dimasukkan. Gunakan formulir di atas untuk merincikan komponen.
                   </div>
                 ) : (
                   items.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-3 bg-white border border-zinc-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs"
+                      className="p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs"
                     >
                       <div className="flex-1 flex items-center gap-2">
                         <span
@@ -1039,7 +1040,7 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                             item.category === 'sparepart'
                               ? 'bg-yellow-400'
                               : item.category === 'jasa'
-                              ? 'bg-zinc-950'
+                              ? 'bg-zinc-950 dark:bg-zinc-400'
                               : 'bg-red-500'
                           }`}
                         ></span>
@@ -1047,9 +1048,9 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                           type="text"
                           value={item.name}
                           onChange={(e) => handleUpdateItem(idx, 'name', e.target.value)}
-                          className="font-bold text-zinc-900 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-zinc-900 focus:outline-none px-1 py-0.5 flex-1"
+                          className="font-bold text-zinc-900 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-zinc-300 dark:hover:border-zinc-600 focus:border-zinc-900 dark:focus:border-yellow-400 focus:outline-none px-1 py-0.5 flex-1"
                         />
-                        <span className="px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded-md text-[10px] uppercase font-mono shrink-0">
+                        <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded-md text-[10px] uppercase font-mono shrink-0">
                           {item.category}
                         </span>
                       </div>
@@ -1061,14 +1062,14 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                             type="number"
                             value={item.cost}
                             onChange={(e) => handleUpdateItem(idx, 'cost', Number(e.target.value))}
-                            className="font-mono font-black text-zinc-950 bg-zinc-50 border border-zinc-200 rounded-lg px-2 py-1 w-28 text-right focus:outline-none focus:border-zinc-900"
+                            className="font-mono font-black text-zinc-950 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 w-28 text-right focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                           />
                         </div>
 
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(idx)}
-                          className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 transition cursor-pointer"
+                          className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
                           title="Hapus komponen ini"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1080,16 +1081,16 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               </div>
 
               {/* Subtotal Financial Box */}
-              <div className="p-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-1.5 font-mono text-xs">
-                <div className="flex justify-between text-zinc-500">
+              <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl space-y-1.5 font-mono text-xs">
+                <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
                   <span>Subtotal Sparepart Fisik:</span>
                   <span>Rp {partsSubtotal.toLocaleString('id-ID')}</span>
                 </div>
-                <div className="flex justify-between text-zinc-500">
+                <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
                   <span>Subtotal Jasa / Teknisi:</span>
                   <span>Rp {laborSubtotal.toLocaleString('id-ID')}</span>
                 </div>
-                <div className="flex justify-between font-black text-sm text-zinc-950 pt-2 border-t border-zinc-200">
+                <div className="flex justify-between font-black text-sm text-zinc-950 dark:text-zinc-100 pt-2 border-t border-zinc-200 dark:border-zinc-700">
                   <span>Grand Total Seluruhnya:</span>
                   <span>Rp {totalCalculatedCost.toLocaleString('id-ID')}</span>
                 </div>
@@ -1098,11 +1099,11 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           )}
 
           {/* MODAL ACTION BUTTONS */}
-          <div className="pt-3 border-t border-zinc-200 flex items-center justify-between gap-3">
+          <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={() => onDelete(record.id)}
-              className="py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
+              className="py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Hapus Servis</span>
@@ -1112,7 +1113,7 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs transition cursor-pointer"
+                className="py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs transition cursor-pointer"
               >
                 Batal
               </button>

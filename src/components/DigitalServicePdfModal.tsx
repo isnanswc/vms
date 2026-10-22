@@ -1,13 +1,13 @@
 import React from 'react';
 import type { Vehicle, ServiceRecord, SparePart } from '../types';
-import { X, Printer, ShieldCheck, CheckCircle2, Car, Award } from 'lucide-react';
+import { X, Printer, ShieldCheck, Award } from 'lucide-react';
 
 interface DigitalServicePdfModalProps {
   isOpen: boolean;
   onClose: () => void;
   vehicles: Vehicle[];
   serviceRecords: ServiceRecord[];
-  spareParts: SparePart[];
+  spareParts?: SparePart[];
 }
 
 export const DigitalServicePdfModal: React.FC<DigitalServicePdfModalProps> = ({
@@ -15,11 +15,26 @@ export const DigitalServicePdfModal: React.FC<DigitalServicePdfModalProps> = ({
   onClose,
   vehicles,
   serviceRecords,
-  spareParts,
 }) => {
   if (!isOpen) return null;
 
-  const targetVehicle = vehicles[0]; // Primary vehicle (Vario 125)
+  const targetVehicle = vehicles[0]; // Primary vehicle
+  if (!targetVehicle) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/90 backdrop-blur-md animate-fade-in">
+        <div className="w-full max-w-sm bg-zinc-900 border border-zinc-700 rounded-3xl p-6 text-center text-white">
+          <p className="font-bold text-sm">Belum ada unit kendaraan di garasi.</p>
+          <button
+            onClick={onClose}
+            className="mt-4 px-4 py-2 bg-yellow-400 text-zinc-950 font-bold text-xs rounded-xl cursor-pointer"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const targetRecords = serviceRecords.filter((r) => r.vehicleId === targetVehicle.id);
 
   return (

@@ -36,6 +36,29 @@ export function App() {
   const [isAddingVehiclePage, setIsAddingVehiclePage] = useState(false);
   const [isViewingProfile, setIsViewingProfile] = useState(false);
 
+  // Dark Mode Theme State
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('vms_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('vms_theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // Application Data States (Persistent IndexedDB + LocalStorage)
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => loadInitialData('vehicles', INITIAL_VEHICLES));
   const [fuelLogs, setFuelLogs] = useState<FuelLog[]>(() => loadInitialData('fuelLogs', INITIAL_FUEL_LOGS));
@@ -83,6 +106,16 @@ export function App() {
 
   const handleUpdateVehicle = (updatedVehicle: Vehicle) => {
     setVehicles(vehicles.map((v) => (v.id === updatedVehicle.id ? updatedVehicle : v)));
+  };
+
+  const handleDeleteVehicle = (vehicleId: string) => {
+    setVehicles(vehicles.filter((v) => v.id !== vehicleId));
+    setSpareParts(spareParts.filter((p) => p.vehicleId !== vehicleId));
+    setFuelLogs(fuelLogs.filter((l) => l.vehicleId !== vehicleId));
+    setServiceRecords(serviceRecords.filter((s) => s.vehicleId !== vehicleId));
+    if (selectedVehicleIdForDetail === vehicleId) {
+      setSelectedVehicleIdForDetail(null);
+    }
   };
 
   const handleAddFuelLog = (newLog: FuelLog) => {
@@ -339,7 +372,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 flex font-sans">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex font-sans transition-colors">
       {/* Permanent Desktop Sidebar (Hidden on Mobile) */}
       <Sidebar
         activeTab={activeTab}
@@ -354,17 +387,20 @@ export function App() {
       />
 
       {/* Main Content Column */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white min-h-screen relative">
+      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-zinc-950 min-h-screen relative transition-colors">
         {/* Top Fleet Header */}
         <Header
           urgentCount={urgentCount}
           profile={userProfile}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
           onOpenAlerts={() => {
             navigateTo({ tab: 'service', isProfile: false, isAdding: false, vehicleId: null });
           }}
           onOpenProfile={() => {
             navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
           }}
+          onOpenAiSettings={() => setIsAiSettingsOpen(true)}
         />
 
         {/* Main View Area (Responsive up to 7xl on desktop) */}
@@ -396,6 +432,7 @@ export function App() {
               onOpenAiChat={handleOpenAiChatWithPrompt}
               onAddTaxPayment={handleAddTaxPayment}
               onUpdateVehicle={handleUpdateVehicle}
+              onDeleteVehicle={handleDeleteVehicle}
             />
           ) : (
             /* VIEW D: STANDARD TAB VIEWS */
@@ -420,6 +457,7 @@ export function App() {
                   vehicles={vehicles}
                   onAddVehicle={() => navigateTo({ isAdding: true, isProfile: false, vehicleId: null })}
                   onSelectVehicle={(veh) => navigateTo({ vehicleId: veh.id, isAdding: false, isProfile: false })}
+                  onDeleteVehicle={handleDeleteVehicle}
                 />
               )}
 

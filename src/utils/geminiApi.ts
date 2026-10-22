@@ -119,7 +119,7 @@ export async function callGeminiWithFallback(
         },
         generationConfig: {
           temperature: 0.35,
-          maxOutputTokens: 2400,
+          maxOutputTokens: 8192,
         },
       };
 
@@ -137,7 +137,12 @@ export async function callGeminiWithFallback(
       }
 
       const resData = await res.json();
-      const generatedText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+      // Concatenate all content parts to ensure responses never get truncated if multi-part
+      const partsArray = resData.candidates?.[0]?.content?.parts || [];
+      const generatedText = partsArray
+        .map((p: any) => p.text || '')
+        .join('')
+        .trim();
 
       if (!generatedText) {
         throw new Error(`Model ${model} mengembalikan respons kosong.`);
@@ -222,7 +227,7 @@ Catatan wajib: Sediakan DAFTAR LENGKAP 8 hingga 12 suku cadang esensial pabrikan
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.2,
-          maxOutputTokens: 2000,
+          maxOutputTokens: 8192,
           responseMimeType: 'application/json',
         },
       }),
@@ -233,7 +238,8 @@ Catatan wajib: Sediakan DAFTAR LENGKAP 8 hingga 12 suku cadang esensial pabrikan
     }
 
     const data = await res.json();
-    let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const partsArray = data.candidates?.[0]?.content?.parts || [];
+    let rawText = partsArray.map((p: any) => p.text || '').join('').trim();
     if (!rawText) return null;
 
     // Clean JSON formatting if markdown wraps it

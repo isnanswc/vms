@@ -97,28 +97,28 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-md bg-white border-2 border-zinc-900 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900">
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-yellow-400 text-zinc-950">
               <Fuel className="w-4 h-4 stroke-[2.5]" />
             </div>
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900">
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900 dark:text-white">
               Catat Pengisian BBM
             </h3>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100">
+          <button onClick={onClose} className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-3 text-xs">
           <div>
-            <label className="block font-bold text-zinc-800 mb-1">Pilih Kendaraan</label>
+            <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Pilih Kendaraan</label>
             <select
               value={vehicleId}
               onChange={(e) => setVehicleId(e.target.value)}
-              className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
+              className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
             >
               {vehicles.length === 0 ? (
                 <option value="">Belum ada kendaraan di garasi</option>
@@ -134,20 +134,20 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block font-bold text-zinc-800 mb-1">Tanggal</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Tanggal</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
               />
             </div>
             <div>
-              <label className="block font-bold text-zinc-800 mb-1">Jenis BBM</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Jenis BBM</label>
               <select
                 value={fuelType}
                 onChange={(e) => setFuelType(e.target.value as FuelType)}
-                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
               >
                 <option value="Pertalite">Pertalite</option>
                 <option value="Pertamax">Pertamax</option>
@@ -160,35 +160,35 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block font-bold text-zinc-800 mb-1">Total Biaya (Rp)</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Total Biaya (Rp)</label>
               <input
                 type="number"
                 value={totalCost}
                 onChange={(e) => setTotalCost(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                 required
               />
             </div>
             <div>
-              <label className="block font-bold text-zinc-800 mb-1">Volume (Liter)</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Volume (Liter)</label>
               <input
                 type="number"
                 step="0.01"
                 value={liters}
                 onChange={(e) => setLiters(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-zinc-800 mb-1">Odometer Terkini (KM)</label>
+            <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Odometer Terkini (KM)</label>
             <input
               type="number"
               value={odometerKm}
               onChange={(e) => setOdometerKm(Number(e.target.value))}
-              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
               required
             />
           </div>
@@ -196,12 +196,12 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
           {/* SPBU Location & GPS button */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block font-bold text-zinc-800">Lokasi SPBU</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200">Lokasi SPBU</label>
               <button
                 type="button"
                 onClick={handleGetGpsLocation}
                 disabled={isLocating}
-                className="text-[10px] text-zinc-900 hover:text-black font-bold flex items-center gap-1 px-2 py-0.5 bg-yellow-400 hover:bg-yellow-300 rounded-lg cursor-pointer transition shadow-xs"
+                className="text-[10px] text-zinc-950 font-bold flex items-center gap-1 px-2 py-0.5 bg-yellow-400 hover:bg-yellow-300 rounded-lg cursor-pointer transition shadow-xs"
               >
                 {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Navigation className="w-3 h-3" />}
                 <span>{isLocating ? 'Mencari GPS...' : 'Ambil Lokasi GPS'}</span>
@@ -212,10 +212,10 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
               placeholder="Contoh: SPBU Pertamina 31.124 Cilandak"
               value={stationName}
               onChange={(e) => setStationName(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
             />
             {gpsLocation && (
-              <span className="text-[10px] text-emerald-600 font-mono mt-1 block">
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono mt-1 block">
                 ✓ Koordinat tersimpan: {gpsLocation.latitude}, {gpsLocation.longitude}
               </span>
             )}
@@ -223,7 +223,7 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
 
           <button
             type="submit"
-            className="w-full py-3 mt-2 bg-zinc-950 hover:bg-zinc-800 text-white font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
+            className="w-full py-3 mt-2 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
           >
             Simpan Log Pengisian
           </button>

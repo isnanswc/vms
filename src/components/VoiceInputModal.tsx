@@ -225,33 +225,33 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-sm animate-fade-in text-zinc-900">
-      <div className="w-full max-w-md bg-white border-2 border-zinc-900 rounded-3xl p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto no-scrollbar">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto no-scrollbar">
         {/* Top Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 shadow-xs">
               <Mic className={`w-4 h-4 stroke-[2.5] ${isRecording ? 'animate-pulse' : ''}`} />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900">
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900 dark:text-white">
                 Speech to Text AI
               </h3>
-              <p className="text-[11px] text-zinc-500 font-mono">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
                 {isRecording ? '● Mendengarkan suara Anda...' : '○ Perekaman dijeda'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition cursor-pointer"
+            className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* SOUND VIBRATION ANIMATION AREA */}
-        <div className="my-4 p-5 bg-zinc-950 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+        <div className="my-4 p-5 bg-zinc-950 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden shadow-inner border border-zinc-800">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-400/20 via-transparent to-transparent pointer-events-none"></div>
 
           {/* Sound Wave Vibration Bars */}
@@ -287,7 +287,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
 
         {/* LIVE TEXT PREVIEW BOX (EDITABLE) */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-bold text-zinc-700">
+          <div className="flex items-center justify-between text-xs font-bold text-zinc-700 dark:text-zinc-300">
             <span className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
               <span>Pratinjau Hasil Suara (Bisa Diedit):</span>
@@ -296,7 +296,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-[11px] text-zinc-500 hover:text-zinc-900 flex items-center gap-1 cursor-pointer"
+                className="text-[11px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 cursor-pointer"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Reset</span>
@@ -314,7 +314,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
                   ? 'Bicaralah sekarang, teks otomatis terketik di sini (atau pilih pertanyaan di bawah)...'
                   : 'Ketik pesan atau pilih pertanyaan suara cepat di bawah...'
               }
-              className="w-full p-3.5 bg-zinc-50 rounded-2xl border-2 border-zinc-300 focus:border-zinc-900 focus:bg-white text-xs text-zinc-900 font-medium leading-relaxed focus:outline-none transition resize-none shadow-2xs"
+              className="w-full p-3.5 bg-zinc-50 dark:bg-zinc-800 rounded-2xl border-2 border-zinc-300 dark:border-zinc-700 focus:border-zinc-900 dark:focus:border-yellow-400 text-xs text-zinc-900 dark:text-white font-medium leading-relaxed focus:outline-none transition resize-none shadow-2xs"
             />
             <div className="absolute right-2.5 bottom-2.5 text-[10px] text-zinc-400 flex items-center gap-1 pointer-events-none">
               <Edit3 className="w-3 h-3" />
@@ -324,8 +324,8 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
 
           {/* Error Notice */}
           {errorNotice && (
-            <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 flex items-start gap-1.5">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800 text-[11px] text-amber-900 dark:text-amber-300 flex items-start gap-1.5">
+              <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <span>{errorNotice}</span>
             </div>
           )}
@@ -333,7 +333,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
 
         {/* QUICK VOICE PROMPTS */}
         <div className="mt-3.5 space-y-1.5">
-          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block">
             Pertanyaan Suara Instan:
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -342,9 +342,9 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => setTranscript(promptText)}
-                className="p-2 text-left bg-zinc-50 hover:bg-yellow-50 border border-zinc-200 hover:border-yellow-400 rounded-xl text-[11px] text-zinc-700 hover:text-zinc-950 font-medium transition cursor-pointer flex items-center gap-1.5"
+                className="p-2 text-left bg-zinc-50 dark:bg-zinc-800 hover:bg-yellow-50 dark:hover:bg-zinc-700/80 border border-zinc-200 dark:border-zinc-700 hover:border-yellow-400 dark:hover:border-yellow-400 rounded-xl text-[11px] text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white font-medium transition cursor-pointer flex items-center gap-1.5"
               >
-                <Volume2 className="w-3 h-3 text-yellow-600 shrink-0" />
+                <Volume2 className="w-3 h-3 text-yellow-600 dark:text-yellow-400 shrink-0" />
                 <span className="line-clamp-1">{promptText}</span>
               </button>
             ))}
@@ -352,12 +352,12 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
         </div>
 
         {/* BOTTOM ACTION BUTTONS */}
-        <div className="mt-5 grid grid-cols-2 gap-2 pt-3 border-t border-zinc-100">
+        <div className="mt-5 grid grid-cols-2 gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
           {isRecording ? (
             <button
               type="button"
               onClick={handleStopRecording}
-              className="py-3 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer"
+              className="py-3 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <MicOff className="w-4 h-4 text-red-500" />
               <span>Jeda Bicara</span>
@@ -366,9 +366,9 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
             <button
               type="button"
               onClick={handleResumeRecording}
-              className="py-3 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer"
+              className="py-3 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Mic className="w-4 h-4 text-yellow-600" />
+              <Mic className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
               <span>Mulai Bicara</span>
             </button>
           )}
@@ -383,6 +383,8 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
             <span>Kirim ke AI</span>
           </button>
         </div>
+      </div>
+    </div>
       </div>
     </div>
   );

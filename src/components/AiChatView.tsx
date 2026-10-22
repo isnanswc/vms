@@ -230,7 +230,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col md:flex-row w-full h-[100dvh] max-h-[100dvh] bg-white text-zinc-900 overflow-hidden animate-tech-chat-enter">
+    <div className="fixed inset-0 z-50 flex flex-col md:flex-row w-full h-[100dvh] max-h-[100dvh] bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-hidden animate-tech-chat-enter transition-colors">
       {/* Sleek Futuristic Glowing Accent Strip */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-500 via-amber-300 to-yellow-500 z-50 shadow-xs shadow-yellow-400/50" />
       {/* Hidden File Inputs */}
@@ -264,43 +264,43 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
             className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
             onClick={() => setIsDrawerOpen(false)}
           />
-          <div className="relative flex flex-col w-[85%] max-w-xs bg-zinc-50 h-full shadow-2xl z-10 animate-fade-in border-r border-zinc-200">
-            <div className="p-4 border-b border-zinc-200 flex items-center justify-between bg-white">
+          <div className="relative flex flex-col w-[85%] max-w-xs bg-zinc-50 dark:bg-zinc-900 h-full shadow-2xl z-10 animate-fade-in border-r border-zinc-200 dark:border-zinc-800">
+            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 font-black text-xs shadow-xs">
                   AI
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-xs uppercase tracking-wider text-zinc-900">
+                  <h3 className="font-extrabold text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                     Riwayat Chat
                   </h3>
-                  <p className="text-[10px] text-zinc-400 font-mono">Sessions ({sessions.length})</p>
+                  <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">Sessions ({sessions.length})</p>
                 </div>
               </div>
 
               <button
                 onClick={() => setIsDrawerOpen(false)}
-                className="p-1.5 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition cursor-pointer"
+                className="p-1.5 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-3 bg-white border-b border-zinc-100">
+            <div className="p-3 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800">
               <button
                 onClick={() => {
                   onNewChat();
                   setIsDrawerOpen(false);
                 }}
-                className="w-full py-3 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                className="w-full py-3 px-3 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
               >
-                <Plus className="w-4 h-4 text-yellow-400 stroke-[3]" />
+                <Plus className="w-4 h-4 text-yellow-400 dark:text-zinc-950 stroke-[3]" />
                 <span>Buat Chat Baru</span>
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1.5 no-scrollbar">
-              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 px-2 py-1 block">
+              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 px-2 py-1 block">
                 Percakapan Tersimpan
               </span>
 
@@ -315,26 +315,26 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                     }}
                     className={`p-3 rounded-2xl border transition cursor-pointer text-left ${
                       isActive
-                        ? 'bg-white border-yellow-400 text-zinc-950 shadow-sm'
-                        : 'bg-transparent border-transparent hover:bg-zinc-200/60 text-zinc-700'
+                        ? 'bg-white dark:bg-zinc-800 border-yellow-400 text-zinc-950 dark:text-zinc-100 shadow-sm'
+                        : 'bg-transparent border-transparent hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <h4 className="font-bold text-xs truncate max-w-[170px]">{session.title}</h4>
-                      <span className="text-[9px] text-zinc-400 font-mono shrink-0">
+                      <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0">
                         {session.updatedAt}
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-500 truncate mt-1">{session.lastMessage}</p>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-1">{session.lastMessage}</p>
                   </div>
                 );
               })}
             </div>
 
-            <div className="p-3 border-t border-zinc-200 bg-white text-xs text-zinc-500 space-y-1">
+            <div className="p-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-500 dark:text-zinc-400 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-zinc-800 text-[11px] flex items-center gap-1">
-                  <Layers className="w-3.5 h-3.5 text-yellow-600" />
+                <span className="font-bold text-zinc-800 dark:text-zinc-200 text-[11px] flex items-center gap-1">
+                  <Layers className="w-3.5 h-3.5 text-yellow-500" />
                   <span>3 Slot Fallback</span>
                 </span>
                 <button
@@ -342,18 +342,18 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                     setIsDrawerOpen(false);
                     onOpenSettings();
                   }}
-                  className="text-[10px] text-yellow-700 font-bold hover:underline"
+                  className="text-[10px] text-yellow-600 dark:text-yellow-400 font-bold hover:underline"
                 >
                   Ubah
                 </button>
               </div>
-              <div className="text-[10px] font-mono text-zinc-700 truncate font-bold">
+              <div className="text-[10px] font-mono text-zinc-700 dark:text-zinc-300 truncate font-bold">
                 1. {settings.fallbackSlots?.[0] || settings.selectedModel || 'gemini-2.5-flash'}
               </div>
-              <div className="text-[10px] font-mono text-zinc-400 truncate">
+              <div className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 truncate">
                 2. {settings.fallbackSlots?.[1] || 'gemini-2.0-flash'}
               </div>
-              <div className="text-[10px] font-mono text-zinc-400 truncate">
+              <div className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 truncate">
                 3. {settings.fallbackSlots?.[2] || 'gemini-1.5-flash'}
               </div>
             </div>
@@ -362,23 +362,23 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
       )}
 
       {/* DESKTOP PERMANENT LEFT CHAT SESSIONS SIDEBAR (Hidden on Mobile) */}
-      <aside className="hidden md:flex flex-col w-72 lg:w-80 bg-zinc-50 border-r border-zinc-200 h-full shrink-0 select-none">
-        <div className="p-4 border-b border-zinc-200 flex items-center justify-between">
+      <aside className="hidden md:flex flex-col w-72 lg:w-80 bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 h-full shrink-0 select-none transition-colors">
+        <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 font-black text-xs shadow-xs">
               AI
             </div>
             <div>
-              <h3 className="font-extrabold text-xs uppercase tracking-wider text-zinc-900">
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                 Riwayat Chat
               </h3>
-              <p className="text-[10px] text-zinc-400 font-mono">Sessions Archive</p>
+              <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">Sessions Archive</p>
             </div>
           </div>
 
           <button
             onClick={onBackToHome}
-            className="p-1.5 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200 transition cursor-pointer"
+            className="p-1.5 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition cursor-pointer"
             title="Kembali ke Dashboard Garasi"
           >
             <X className="w-4 h-4" />
@@ -388,15 +388,15 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         <div className="p-3">
           <button
             onClick={onNewChat}
-            className="w-full py-3 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            className="w-full py-3 px-3 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-yellow-400 stroke-[3]" />
+            <Plus className="w-4 h-4 text-yellow-400 dark:text-zinc-950 stroke-[3]" />
             <span>Buat Chat Baru</span>
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 space-y-1.5 no-scrollbar">
-          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 px-2 py-1 block">
+          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 px-2 py-1 block">
             Percakapan Tersimpan
           </span>
 
@@ -408,56 +408,56 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                 onClick={() => onSelectSession(session.id)}
                 className={`p-3 rounded-2xl border transition cursor-pointer text-left ${
                   isActive
-                    ? 'bg-white border-yellow-400 text-zinc-950 shadow-sm'
-                    : 'bg-transparent border-transparent hover:bg-zinc-200/60 text-zinc-700'
+                    ? 'bg-white dark:bg-zinc-800 border-yellow-400 text-zinc-950 dark:text-zinc-100 shadow-sm'
+                    : 'bg-transparent border-transparent hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <h4 className="font-bold text-xs truncate max-w-[170px]">{session.title}</h4>
-                  <span className="text-[9px] text-zinc-400 font-mono shrink-0">
+                  <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0">
                     {session.updatedAt}
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 truncate mt-1">{session.lastMessage}</p>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-1">{session.lastMessage}</p>
               </div>
             );
           })}
         </div>
 
-        <div className="p-3.5 border-t border-zinc-200 bg-white text-xs text-zinc-500 space-y-1">
+        <div className="p-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-500 dark:text-zinc-400 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="font-bold text-zinc-800 text-[11px] flex items-center gap-1">
-              <Layers className="w-3.5 h-3.5 text-yellow-600" />
+            <span className="font-bold text-zinc-800 dark:text-zinc-200 text-[11px] flex items-center gap-1">
+              <Layers className="w-3.5 h-3.5 text-yellow-500" />
               <span>3 Slot Fallback Active</span>
             </span>
             <button
               onClick={onOpenSettings}
-              className="text-[10px] text-yellow-700 font-bold hover:underline cursor-pointer"
+              className="text-[10px] text-yellow-600 dark:text-yellow-400 font-bold hover:underline cursor-pointer"
             >
               Ubah
             </button>
           </div>
-          <div className="text-[10px] font-mono text-zinc-800 truncate font-bold">
+          <div className="text-[10px] font-mono text-zinc-800 dark:text-zinc-200 truncate font-bold">
             1. {settings.fallbackSlots?.[0] || settings.selectedModel || 'gemini-2.5-flash'}
           </div>
-          <div className="text-[10px] font-mono text-zinc-400 truncate">
+          <div className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 truncate">
             2. {settings.fallbackSlots?.[1] || 'gemini-2.0-flash'}
           </div>
-          <div className="text-[10px] font-mono text-zinc-400 truncate">
+          <div className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 truncate">
             3. {settings.fallbackSlots?.[2] || 'gemini-1.5-flash'}
           </div>
         </div>
       </aside>
 
       {/* MAIN CHAT AREA (Mobile + Desktop Center) */}
-      <div className="flex-1 flex flex-col h-full min-w-0 bg-white overflow-hidden">
+      <div className="flex-1 flex flex-col h-full min-w-0 bg-white dark:bg-zinc-950 overflow-hidden transition-colors">
         {/* Top Header */}
-        <header className="shrink-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-4 py-3 flex items-center justify-between shadow-xs">
+        <header className="shrink-0 z-30 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2">
             {/* Drawer Button for Mobile */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="md:hidden p-2 rounded-xl text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition cursor-pointer"
+              className="md:hidden p-2 rounded-xl text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               title="Buka Riwayat Percakapan"
             >
               <Menu className="w-5 h-5" />
@@ -465,16 +465,16 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-sm md:text-base text-zinc-900 tracking-tight">
+                <span className="font-black text-sm md:text-base text-zinc-900 dark:text-zinc-100 tracking-tight">
                   {currentSession.title}
                 </span>
                 <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
               </div>
-              <p className="text-[11px] text-zinc-500 font-mono flex items-center gap-1.5 flex-wrap">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono flex items-center gap-1.5 flex-wrap">
                 <span>Fleet Intelligence</span>
                 <span>•</span>
-                <span className="text-zinc-800 font-bold">{settings.fallbackSlots?.[0] || settings.selectedModel}</span>
-                <span className="text-[9px] px-1.5 py-0.2 bg-yellow-100 border border-yellow-300 text-zinc-950 font-bold rounded-md flex items-center gap-1">
+                <span className="text-zinc-800 dark:text-zinc-200 font-bold">{settings.fallbackSlots?.[0] || settings.selectedModel}</span>
+                <span className="text-[9px] px-1.5 py-0.2 bg-yellow-100 dark:bg-yellow-950/60 border border-yellow-300 dark:border-yellow-800 text-zinc-950 dark:text-yellow-400 font-bold rounded-md flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping"></span>
                   3 Slot Fallback
                 </span>
@@ -485,7 +485,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
           <div className="flex items-center gap-1.5">
             <button
               onClick={onNewChat}
-              className="p-2 rounded-xl text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition cursor-pointer"
+              className="p-2 rounded-xl text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               title="Percakapan Baru"
             >
               <Plus className="w-5 h-5 stroke-[2.5]" />
@@ -493,7 +493,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
             <button
               onClick={onOpenSettings}
-              className="p-2 rounded-xl text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition cursor-pointer"
+              className="p-2 rounded-xl text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               title="Pengaturan Model AI"
             >
               <Settings className="w-5 h-5" />
@@ -501,7 +501,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
             <button
               onClick={onBackToHome}
-              className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition cursor-pointer ml-1"
+              className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer ml-1"
               title="Kembali ke Dashboard"
             >
               <X className="w-5 h-5" />
@@ -510,16 +510,16 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         </header>
 
         {/* Message Stream (Max Width Centered for Desktop Ergonomics) */}
-        <div ref={chatScrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 md:p-6 space-y-4 bg-zinc-50/50 touch-pan-y">
+        <div ref={chatScrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 md:p-6 space-y-4 bg-zinc-50/50 dark:bg-zinc-950 touch-pan-y transition-colors">
           <div className="max-w-3xl mx-auto space-y-4">
             <div className="text-center py-4">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-3xl bg-yellow-400 text-zinc-950 shadow-md shadow-yellow-400/20 mb-2">
                 <Sparkles className="w-7 h-7 stroke-[2.2] animate-sparkle-loop" />
               </div>
-              <h2 className="text-base font-black text-zinc-900 tracking-tight">
+              <h2 className="text-base font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
                 Fleet Intelligence Assistant
               </h2>
-              <p className="text-xs text-zinc-500 max-w-sm mx-auto mt-0.5">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mt-0.5">
                 Bicara lewat suara, ketik pertanyaan armada, atau kirim foto spedometer & struk SPBU.
               </p>
             </div>
@@ -535,7 +535,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                   <div
                     className={`w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 text-xs font-bold shadow-xs ${
                       isUser
-                        ? 'bg-zinc-950 text-white'
+                        ? 'bg-zinc-950 dark:bg-yellow-400 text-white dark:text-zinc-950'
                         : 'bg-yellow-400 text-zinc-950'
                     }`}
                   >
@@ -545,8 +545,8 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                   <div
                     className={`max-w-[85%] md:max-w-[75%] rounded-3xl p-4 text-xs md:text-sm leading-relaxed shadow-xs ${
                       isUser
-                        ? 'bg-zinc-950 text-white rounded-tr-none'
-                        : 'bg-white text-zinc-800 border border-zinc-200 rounded-tl-none'
+                        ? 'bg-zinc-950 dark:bg-zinc-800 text-white rounded-tr-none'
+                        : 'bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 rounded-tl-none'
                     }`}
                   >
                     {msg.attachment && (
@@ -558,8 +558,8 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                             className="w-full max-h-60 object-cover rounded-xl"
                           />
                         ) : (
-                          <div className="p-3 bg-zinc-100 text-zinc-800 flex items-center gap-2 rounded-xl">
-                            <FileText className="w-4 h-4 text-yellow-600" />
+                          <div className="p-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 flex items-center gap-2 rounded-xl">
+                            <FileText className="w-4 h-4 text-yellow-500" />
                             <span className="font-mono text-xs truncate">{msg.attachment.name}</span>
                           </div>
                         )}
@@ -570,7 +570,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
                     <div
                       className={`text-[10px] mt-1.5 font-mono text-right ${
-                        isUser ? 'text-zinc-400' : 'text-zinc-400'
+                        isUser ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-400 dark:text-zinc-500'
                       }`}
                     >
                       {msg.timestamp}
@@ -581,8 +581,8 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
             })}
 
             {isAiTyping && (
-              <div className="flex items-center gap-2 text-xs text-zinc-500 pl-11">
-                <div className="flex items-center gap-1 p-2 bg-white rounded-xl border border-zinc-200 shadow-xs">
+              <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 pl-11">
+                <div className="flex items-center gap-1 p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-bounce"></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-bounce [animation-delay:0.2s]"></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-bounce [animation-delay:0.4s]"></span>
@@ -595,7 +595,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
         {/* Pending Attachment Preview */}
         {pendingAttachment && (
-          <div className="shrink-0 max-w-3xl w-full mx-auto p-3 bg-yellow-50 border-t border-yellow-200 flex items-center justify-between text-xs">
+          <div className="shrink-0 max-w-3xl w-full mx-auto p-3 bg-yellow-50 dark:bg-yellow-950/40 border-t border-yellow-200 dark:border-yellow-800 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2.5">
               {pendingAttachment.type === 'image' ? (
                 <img
@@ -604,18 +604,18 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                   className="w-12 h-12 object-cover rounded-xl border border-yellow-300 shadow-xs"
                 />
               ) : (
-                <FileText className="w-6 h-6 text-yellow-600" />
+                <FileText className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
               )}
               <div>
-                <span className="font-bold text-zinc-900 block truncate max-w-sm">
+                <span className="font-bold text-zinc-900 dark:text-zinc-100 block truncate max-w-sm">
                   {pendingAttachment.name || 'Lampiran'}
                 </span>
-                <span className="text-[11px] text-zinc-500">Siap dikirim dengan prompt Anda</span>
+                <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Siap dikirim dengan prompt Anda</span>
               </div>
             </div>
             <button
               onClick={() => setPendingAttachment(null)}
-              className="p-1.5 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-yellow-200 transition"
+              className="p-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-yellow-200 dark:hover:bg-yellow-900/60 transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -624,11 +624,11 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
         {/* Attachment Popover Menu */}
         {isAttachMenuOpen && (
-          <div className="shrink-0 max-w-3xl w-full mx-auto p-3 bg-white border-t border-zinc-200 grid grid-cols-4 gap-2 shadow-lg animate-fade-in">
+          <div className="shrink-0 max-w-3xl w-full mx-auto p-3 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-4 gap-2 shadow-lg animate-fade-in">
             <button
               type="button"
               onClick={() => cameraInputRef.current?.click()}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 border border-zinc-200 hover:border-yellow-400 text-zinc-800 transition cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 hover:border-yellow-400 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 transition cursor-pointer"
             >
               <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 mb-1">
                 <Camera className="w-4 h-4 stroke-[2.5]" />
@@ -639,7 +639,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
             <button
               type="button"
               onClick={() => galleryInputRef.current?.click()}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 border border-zinc-200 hover:border-yellow-400 text-zinc-800 transition cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 hover:border-yellow-400 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 transition cursor-pointer"
             >
               <div className="p-2 rounded-xl bg-zinc-900 text-white mb-1">
                 <ImageIcon className="w-4 h-4" />
@@ -653,7 +653,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                 setIsAttachMenuOpen(false);
                 setIsVoiceModalOpen(true);
               }}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 border border-zinc-200 hover:border-yellow-400 text-zinc-800 transition cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 hover:border-yellow-400 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 transition cursor-pointer"
             >
               <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 mb-1">
                 <Mic className="w-4 h-4 stroke-[2.5]" />
@@ -664,9 +664,9 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
             <button
               type="button"
               onClick={() => docInputRef.current?.click()}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 border border-zinc-200 hover:border-yellow-400 text-zinc-800 transition cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-50 hover:bg-yellow-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 hover:border-yellow-400 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 transition cursor-pointer"
             >
-              <div className="p-2 rounded-xl bg-zinc-100 text-zinc-800 border border-zinc-300 mb-1">
+              <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-600 mb-1">
                 <FileText className="w-4 h-4" />
               </div>
               <span className="text-xs font-bold">File PDF</span>
@@ -675,7 +675,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         )}
 
         {/* Input Bar (Centered Desktop Layout) */}
-        <div className="shrink-0 bg-white border-t border-zinc-200 p-3 md:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="shrink-0 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 p-3 md:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-colors">
           <div className="max-w-3xl mx-auto flex items-center gap-2">
             <button
               type="button"
@@ -683,7 +683,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
               className={`p-3 rounded-2xl transition cursor-pointer shrink-0 ${
                 isAttachMenuOpen
                   ? 'bg-yellow-400 text-zinc-950 rotate-45 shadow-md'
-                  : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
+                  : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'
               }`}
               title="Lampirkan Gambar, File, atau Suara"
             >
@@ -696,13 +696,13 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              className="flex-1 px-4 py-3 bg-zinc-100 border border-zinc-200 rounded-2xl text-xs md:text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 focus:bg-white transition"
+              className="flex-1 px-4 py-3 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-xs md:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 focus:bg-white dark:focus:bg-zinc-900 transition"
             />
 
             <button
               type="button"
               onClick={() => setIsVoiceModalOpen(true)}
-              className="p-3 rounded-2xl bg-zinc-100 hover:bg-yellow-100 text-zinc-800 hover:text-zinc-950 transition cursor-pointer shrink-0"
+              className="p-3 rounded-2xl bg-zinc-100 hover:bg-yellow-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 transition cursor-pointer shrink-0"
               title="Bicara (Speech to Text)"
             >
               <Mic className="w-4 h-4 stroke-[2.5]" />

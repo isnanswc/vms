@@ -92,20 +92,20 @@ export const ScanModal: React.FC<ScanModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-md bg-white border-2 border-zinc-900 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900 dark:text-zinc-100">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-yellow-400 text-zinc-950">
               <Camera className="w-4 h-4 stroke-[2.5]" />
             </div>
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900">
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900 dark:text-white">
               AI Vision Scanner
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition"
+            className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -114,13 +114,13 @@ export const ScanModal: React.FC<ScanModalProps> = ({
         {/* Vehicle Selection & Scan Type Switcher */}
         <div className="mt-3 space-y-2.5">
           <div>
-            <label className="block text-[11px] font-bold text-zinc-700 mb-1">
+            <label className="block text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1">
               Target Unit Kendaraan
             </label>
             <select
               value={selectedVehicleId}
               onChange={(e) => setSelectedVehicleId(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 text-xs focus:outline-none focus:border-zinc-900"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white text-xs focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
             >
               {vehicles.map((v) => (
                 <option key={v.id} value={v.id}>
@@ -130,14 +130,14 @@ export const ScanModal: React.FC<ScanModalProps> = ({
             </select>
           </div>
 
-          <div className="grid grid-cols-2 p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs font-bold">
+          <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-800/80 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-bold">
             <button
               type="button"
               onClick={() => setScanType('odometer')}
               className={`py-2 rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 scanType === 'odometer'
-                  ? 'bg-white text-zinc-900 shadow-xs'
-                  : 'text-zinc-500 hover:text-zinc-900'
+                  ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <Gauge className="w-3.5 h-3.5" />
@@ -148,8 +148,8 @@ export const ScanModal: React.FC<ScanModalProps> = ({
               onClick={() => setScanType('receipt')}
               className={`py-2 rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 scanType === 'receipt'
-                  ? 'bg-white text-zinc-900 shadow-xs'
-                  : 'text-zinc-500 hover:text-zinc-900'
+                  ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <Fuel className="w-3.5 h-3.5" />
@@ -173,22 +173,22 @@ export const ScanModal: React.FC<ScanModalProps> = ({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full py-8 border-2 border-dashed border-zinc-300 hover:border-zinc-900 rounded-2xl bg-zinc-50 hover:bg-yellow-50/50 flex flex-col items-center justify-center gap-2 text-zinc-500 hover:text-zinc-900 transition cursor-pointer"
+              className="w-full py-8 border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-yellow-400 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 hover:bg-yellow-50/50 dark:hover:bg-zinc-800 flex flex-col items-center justify-center gap-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition cursor-pointer"
             >
-              <div className="p-3 rounded-full bg-white border border-zinc-200 text-yellow-500 shadow-xs">
+              <div className="p-3 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-yellow-500 shadow-xs">
                 <Camera className="w-6 h-6 stroke-[2.5]" />
               </div>
               <div className="text-center">
-                <span className="font-bold text-xs block text-zinc-900">
+                <span className="font-bold text-xs block text-zinc-900 dark:text-white">
                   Buka Kamera / Ambil Gambar
                 </span>
-                <span className="text-[10px] text-zinc-400">
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                   {scanType === 'odometer' ? 'Arahkan ke angka spedometer' : 'Arahkan ke struk SPBU'}
                 </span>
               </div>
             </button>
           ) : (
-            <div className="relative rounded-2xl overflow-hidden border border-zinc-200 shadow-sm">
+            <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 shadow-sm">
               <img
                 src={imagePreview}
                 alt="Captured"
@@ -207,11 +207,11 @@ export const ScanModal: React.FC<ScanModalProps> = ({
 
         {/* AI Analysis State */}
         {isProcessing && (
-          <div className="mt-4 p-4 rounded-2xl bg-yellow-50 border border-yellow-300 flex items-center gap-3">
-            <Loader2 className="w-5 h-5 text-yellow-600 animate-spin" />
+          <div className="mt-4 p-4 rounded-2xl bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-300 dark:border-yellow-700/50 flex items-center gap-3">
+            <Loader2 className="w-5 h-5 text-yellow-600 dark:text-yellow-400 animate-spin" />
             <div className="text-xs">
-              <p className="font-bold text-zinc-900">AI Sedang Membaca Gambar...</p>
-              <p className="text-[10px] text-zinc-600">
+              <p className="font-bold text-zinc-900 dark:text-white">AI Sedang Membaca Gambar...</p>
+              <p className="text-[10px] text-zinc-600 dark:text-zinc-400">
                 Mengekstrak angka odometer & detail struk secara presisi.
               </p>
             </div>
@@ -220,34 +220,34 @@ export const ScanModal: React.FC<ScanModalProps> = ({
 
         {/* AI Recognition Result Confirmation */}
         {aiResult && !isProcessing && (
-          <div className="mt-4 p-3.5 rounded-2xl bg-zinc-50 text-zinc-900 border border-zinc-200 space-y-2.5 shadow-xs">
-            <div className="flex items-center gap-1.5 text-xs font-black uppercase text-zinc-800">
+          <div className="mt-4 p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 space-y-2.5 shadow-xs">
+            <div className="flex items-center gap-1.5 text-xs font-black uppercase text-zinc-800 dark:text-zinc-200">
               <Sparkles className="w-4 h-4 text-yellow-500" />
               <span>Hasil Analisis AI Gemini:</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-white p-2 rounded-xl border border-zinc-200">
-                <span className="text-[10px] text-zinc-500 font-bold block">Odometer Terdeteksi</span>
-                <span className="font-mono font-black text-sm text-zinc-900">
+              <div className="bg-white dark:bg-zinc-900 p-2 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold block">Odometer Terdeteksi</span>
+                <span className="font-mono font-black text-sm text-zinc-900 dark:text-yellow-400">
                   {aiResult.odometer?.toLocaleString('id-ID')} KM
                 </span>
               </div>
 
               {scanType === 'receipt' && (
                 <>
-                  <div className="bg-white p-2 rounded-xl border border-zinc-200">
-                    <span className="text-[10px] text-zinc-500 font-bold block">Total Biaya</span>
-                    <span className="font-mono font-black text-sm text-zinc-900">
+                  <div className="bg-white dark:bg-zinc-900 p-2 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold block">Total Biaya</span>
+                    <span className="font-mono font-black text-sm text-zinc-900 dark:text-yellow-400">
                       Rp {aiResult.cost?.toLocaleString('id-ID')}
                     </span>
                   </div>
-                  <div className="bg-white p-2 rounded-xl border border-zinc-200 col-span-2 flex justify-between items-center">
+                  <div className="bg-white dark:bg-zinc-900 p-2 rounded-xl border border-zinc-200 dark:border-zinc-700 col-span-2 flex justify-between items-center">
                     <div>
-                      <span className="text-[10px] text-zinc-500 font-bold block">Bahan Bakar</span>
-                      <span className="font-bold text-xs text-zinc-900">{aiResult.fuelType}</span>
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold block">Bahan Bakar</span>
+                      <span className="font-bold text-xs text-zinc-900 dark:text-white">{aiResult.fuelType}</span>
                     </div>
-                    <span className="font-mono font-bold text-xs text-zinc-700">
+                    <span className="font-mono font-bold text-xs text-zinc-700 dark:text-zinc-300">
                       {aiResult.liters} Liter
                     </span>
                   </div>
@@ -265,6 +265,8 @@ export const ScanModal: React.FC<ScanModalProps> = ({
             </button>
           </div>
         )}
+      </div>
+    </div>
       </div>
     </div>
   );

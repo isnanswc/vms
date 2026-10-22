@@ -690,18 +690,18 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 pb-24 md:pb-8 pt-1 animate-fade-in text-zinc-900 max-w-6xl mx-auto">
+    <div className="space-y-6 pb-24 md:pb-8 pt-1 animate-fade-in text-zinc-900 dark:text-zinc-100 max-w-6xl mx-auto transition-colors">
       {/* Top Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 py-2 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold transition cursor-pointer"
+          className="flex items-center gap-1.5 py-2 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Batal & Kembali</span>
         </button>
 
-        <h2 className="text-sm md:text-base font-black uppercase tracking-wider text-zinc-900 flex items-center gap-2">
+        <h2 className="text-sm md:text-base font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-yellow-500 fill-yellow-400" />
           <span>Tambah Unit Armada (AI Assisted)</span>
         </h2>
@@ -710,15 +710,15 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
       {/* ======================================================== */}
       {/* STEP 1: INITIAL SEARCH / PROMPT BAR                      */}
       {/* ======================================================== */}
-      <div className="bg-white border-2 border-zinc-900 rounded-3xl p-5 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block">
             Langkah 1: Identifikasi Kendaraan
           </span>
-          <h3 className="text-sm font-black text-zinc-900 mt-0.5">
+          <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-100 mt-0.5">
             Ketik nama atau model kendaraan apapun di dunia
           </h3>
-          <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">
             AI akan menganalisa spesifikasi teknis, tangki BBM, serta memetakan daftar lengkap 8-12 suku cadang resmi bawaan pabrik.
           </p>
         </div>
@@ -727,7 +727,7 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
           <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
-              <Search className="w-5 h-5 text-yellow-600" />
+              <Search className="w-5 h-5 text-yellow-500" />
             </div>
             <input
               type="text"
@@ -735,7 +735,7 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
               value={searchQuery}
               onChange={(e) => handleQueryChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleDeepAiAnalysis()}
-              className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border-2 border-zinc-300 focus:border-zinc-900 rounded-2xl text-xs text-zinc-900 font-bold placeholder-zinc-400 focus:outline-none transition shadow-xs"
+              className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-700 focus:border-zinc-900 dark:focus:border-yellow-400 rounded-2xl text-xs text-zinc-900 dark:text-zinc-100 font-bold placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition shadow-xs"
             />
           </div>
 
@@ -743,16 +743,16 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
             type="button"
             onClick={handleDeepAiAnalysis}
             disabled={isDeepAiAnalyzing || !searchQuery.trim()}
-            className="py-3.5 px-5 bg-zinc-950 hover:bg-zinc-800 disabled:opacity-40 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0"
+            className="py-3.5 px-5 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 disabled:opacity-40 text-white dark:text-zinc-950 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0"
           >
             {isDeepAiAnalyzing ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-yellow-400" />
+                <RefreshCw className="w-4 h-4 animate-spin text-yellow-400 dark:text-zinc-950" />
                 <span>AI Menganalisa...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <Sparkles className="w-4 h-4 text-yellow-400 dark:text-zinc-950 fill-current" />
                 <span>Analisis dengan Gemini AI</span>
               </>
             )}
@@ -761,21 +761,21 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
 
         {/* AI Notice Badge */}
         {aiMessageNotice && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs font-bold flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{aiMessageNotice}</span>
           </div>
         )}
 
         {/* AI Suggestions / Recommendations */}
         {aiSuggestions.length > 0 && !hasSelectedModel && (
-          <div className="pt-2 border-t border-zinc-100 space-y-2 animate-fade-in">
-            <div className="flex items-center justify-between text-xs text-zinc-600 font-bold px-1">
+          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2 animate-fade-in">
+            <div className="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-300 font-bold px-1">
               <span className="flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5 text-yellow-600" />
+                <Cpu className="w-3.5 h-3.5 text-yellow-500" />
                 <span>AI Menemukan Spesifikasi & Suku Cadang Terkait. Pilih model Anda:</span>
               </span>
-              <span className="text-[10px] text-zinc-400 font-mono">
+              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">
                 {aiSuggestions.length} Opsi
               </span>
             </div>
@@ -785,28 +785,28 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                 <div
                   key={idx}
                   onClick={() => handleSelectModel(spec)}
-                  className="p-3.5 bg-zinc-50 hover:bg-yellow-50/80 border-2 border-zinc-200 hover:border-yellow-400 rounded-2xl transition cursor-pointer flex items-center justify-between group active:scale-98"
+                  className="p-3.5 bg-zinc-50 dark:bg-zinc-800/80 hover:bg-yellow-50/80 dark:hover:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 hover:border-yellow-400 dark:hover:border-yellow-400 rounded-2xl transition cursor-pointer flex items-center justify-between group active:scale-98"
                 >
                   <div className="min-w-0 pr-2">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-extrabold text-xs text-zinc-900 group-hover:text-black truncate">
+                      <h4 className="font-extrabold text-xs text-zinc-900 dark:text-zinc-100 group-hover:text-black dark:group-hover:text-white truncate">
                         {spec.name} ({spec.year})
                       </h4>
-                      <span className="text-[9px] px-2 py-0.2 bg-zinc-200 group-hover:bg-yellow-200 text-zinc-800 font-bold rounded-full uppercase shrink-0">
+                      <span className="text-[9px] px-2 py-0.2 bg-zinc-200 dark:bg-zinc-700 group-hover:bg-yellow-200 text-zinc-800 dark:text-zinc-200 font-bold rounded-full uppercase shrink-0">
                         {spec.category}
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">{spec.notes}</p>
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-600 mt-1 flex-wrap">
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1">{spec.notes}</p>
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 mt-1 flex-wrap">
                       <span>⛽ {spec.tankCapacityLiters}L ({spec.fuelType})</span>
                       <span>•</span>
-                      <span className="font-bold text-yellow-800 bg-yellow-100 px-1.5 py-0.2 rounded border border-yellow-200">
+                      <span className="font-bold text-yellow-800 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-950/60 px-1.5 py-0.2 rounded border border-yellow-200 dark:border-yellow-800">
                         ⚡ {spec.defaultParts.length} Suku Cadang Lengkap
                       </span>
                     </div>
                   </div>
 
-                  <div className="p-2 rounded-xl bg-white group-hover:bg-yellow-400 text-zinc-900 transition-colors shadow-xs shrink-0">
+                  <div className="p-2 rounded-xl bg-white dark:bg-zinc-700 group-hover:bg-yellow-400 text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-950 transition-colors shadow-xs shrink-0">
                     <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                   </div>
                 </div>
@@ -822,16 +822,16 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
       {hasSelectedModel && (
         <form onSubmit={handleFinalSave} className="space-y-4 animate-fade-in">
           {/* AI Success Banner */}
-          <div className="p-4 bg-yellow-50 border-2 border-yellow-400 rounded-3xl flex items-center justify-between gap-3">
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-950/40 border-2 border-yellow-400 dark:border-yellow-700 rounded-3xl flex items-center justify-between gap-3 transition-colors">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-2xl bg-yellow-400 text-zinc-950">
                 <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
               </div>
               <div className="text-xs">
-                <span className="font-black text-sm text-zinc-900 block">
+                <span className="font-black text-sm text-zinc-900 dark:text-zinc-100 block">
                   Model Berhasil Dianalisa: {name} ({year})
                 </span>
-                <span className="text-zinc-500">
+                <span className="text-zinc-500 dark:text-zinc-400">
                   {parts.length} komponen suku cadang pabrikan telah dipetakan secara otomatis. Anda dapat mengedit field di bawah.
                 </span>
               </div>
@@ -840,7 +840,7 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
             <button
               type="button"
               onClick={() => setHasSelectedModel(false)}
-              className="text-xs font-bold text-zinc-800 hover:text-black underline cursor-pointer shrink-0"
+              className="text-xs font-bold text-zinc-800 dark:text-yellow-400 hover:text-black dark:hover:text-yellow-300 underline cursor-pointer shrink-0"
             >
               Ganti Model
             </button>
@@ -849,21 +849,21 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
           {/* Form Fields: 2 Columns on Desktop */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Section 1: Data Identitas & STNK (6 Cols) */}
-            <div className="lg:col-span-6 bg-white border-2 border-zinc-200 rounded-3xl p-5 shadow-sm space-y-4">
-              <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 flex items-center gap-1.5 pb-2 border-b border-zinc-100">
-                <Layers className="w-4 h-4 text-yellow-600" />
+            <div className="lg:col-span-6 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
+              <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                <Layers className="w-4 h-4 text-yellow-500" />
                 <span>1. Identitas Kendaraan & Legalitas</span>
               </h4>
 
               <div className="space-y-3 text-xs">
                 {/* Nama Model */}
                 <div>
-                  <label className="block font-bold text-zinc-700 mb-1">Nama / Merk Kendaraan</label>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nama / Merk Kendaraan</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     required
                   />
                 </div>
@@ -871,23 +871,23 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                 {/* Plat Nomor & Tahun */}
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Nomor Polisi (Plat)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Polisi (Plat)</label>
                     <input
                       type="text"
                       placeholder="B 1234 XYZ"
                       value={plateNumber}
                       onChange={(e) => setPlateNumber(e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono font-black focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-black focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Tahun Perakitan</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Tahun Perakitan</label>
                     <input
                       type="number"
                       value={year}
                       onChange={(e) => setYear(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       required
                     />
                   </div>
@@ -896,11 +896,11 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                 {/* Kategori & BBM */}
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Kategori Kendaraan</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Kategori Kendaraan</label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as any)}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     >
                       <option value="motor">Sepeda Motor</option>
                       <option value="mobil">Mobil Penumpang / Niaga</option>
@@ -908,11 +908,11 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Jenis Bahan Bakar</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jenis Bahan Bakar</label>
                     <select
                       value={fuelType}
                       onChange={(e) => setFuelType(e.target.value as any)}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     >
                       <option value="Pertalite">Pertalite</option>
                       <option value="Pertamax">Pertamax</option>
@@ -928,47 +928,47 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                 {/* Odometer Saat Ini & Kapasitas Tangki */}
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Odometer Terkini (KM)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Odometer Terkini (KM)</label>
                     <input
                       type="number"
                       value={currentOdometerKm}
                       onChange={(e) => setCurrentOdometerKm(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Kapasitas Tangki (Liter)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Kapasitas Tangki (Liter)</label>
                     <input
                       type="number"
                       step="0.1"
                       value={tankCapacityLiters}
                       onChange={(e) => setTankCapacityLiters(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       required
                     />
                   </div>
                 </div>
 
                 {/* Legalitas Pajak STNK */}
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-100">
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Jatuh Tempo Pajak Tahunan (PKB)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jatuh Tempo Pajak Tahunan (PKB)</label>
                     <input
                       type="date"
                       value={stnkExpiryDate}
                       onChange={(e) => setStnkExpiryDate(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Jatuh Tempo Plat 5 Tahun (Kaleng)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jatuh Tempo Plat 5 Tahun (Kaleng)</label>
                     <input
                       type="date"
                       value={stnkFiveYearExpiryDate}
                       onChange={(e) => setStnkFiveYearExpiryDate(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       required
                     />
                   </div>
@@ -976,21 +976,21 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Estimasi Biaya Pajak Tahunan (Rp)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Estimasi Biaya Pajak Tahunan (Rp)</label>
                     <input
                       type="number"
                       value={stnkTaxCostAnnual}
                       onChange={(e) => setStnkTaxCostAnnual(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Biaya Plat 5 Tahun (Rp)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Biaya Plat 5 Tahun (Rp)</label>
                     <input
                       type="number"
                       value={stnkTaxCostFiveYear}
                       onChange={(e) => setStnkTaxCostFiveYear(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     />
                   </div>
                 </div>
@@ -998,23 +998,23 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                 {/* No STNK & Rangka (Opsional) */}
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Nomor Seri STNK (Opsional)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Seri STNK (Opsional)</label>
                     <input
                       type="text"
                       placeholder="Contoh: 08392104-JKT"
                       value={stnkNumber}
                       onChange={(e) => setStnkNumber(e.target.value)}
-                      className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono text-[11px] focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-zinc-700 mb-1">Nomor Rangka / VIN (Opsional)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Rangka / VIN (Opsional)</label>
                     <input
                       type="text"
                       placeholder="MH1JF31..."
                       value={chassisNumber}
                       onChange={(e) => setChassisNumber(e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono text-[11px] focus:outline-none focus:border-zinc-900"
+                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     />
                   </div>
                 </div>
@@ -1022,14 +1022,14 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
             </div>
 
             {/* Section 2: Pemetaan Sparepart Lengkap oleh AI (6 Cols) */}
-            <div className="lg:col-span-6 bg-white border-2 border-zinc-200 rounded-3xl p-5 shadow-sm space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+            <div className="lg:col-span-6 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
+              <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
                 <div>
-                  <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
-                    <Wrench className="w-4 h-4 text-yellow-600" />
+                  <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <Wrench className="w-4 h-4 text-yellow-500" />
                     <span>2. Suku Cadang Lengkap Hasil Analisa AI ({parts.length})</span>
                   </h4>
-                  <p className="text-[11px] text-zinc-500">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                     Semua komponen ini dapat Anda ubah interval kilometer atau estimasi harganya.
                   </p>
                 </div>
@@ -1037,9 +1037,9 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                 <button
                   type="button"
                   onClick={handleAddCustomPart}
-                  className="flex items-center gap-1 py-1.5 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-bold rounded-xl transition cursor-pointer"
+                  className="flex items-center gap-1 py-1.5 px-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-bold rounded-xl transition cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5 text-zinc-900" />
+                  <Plus className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-100" />
                   <span>+ Tambah Part</span>
                 </button>
               </div>
@@ -1049,19 +1049,19 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                 {parts.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-2 text-xs hover:border-yellow-400 transition"
+                    className="p-3 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-2xl space-y-2 text-xs hover:border-yellow-400 dark:hover:border-yellow-400 transition"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <input
                         type="text"
                         value={p.name}
                         onChange={(e) => handleUpdatePart(p.id, 'name', e.target.value)}
-                        className="flex-1 font-bold text-zinc-900 bg-white border border-zinc-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-zinc-900"
+                        className="flex-1 font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       />
                       <button
                         type="button"
                         onClick={() => handleDeletePart(p.id)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 transition cursor-pointer"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
                         title="Hapus komponen ini"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1070,21 +1070,21 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
 
                     <div className="grid grid-cols-2 gap-2 text-[11px]">
                       <div>
-                        <span className="text-zinc-500 block mb-0.5">Interval Ganti (KM)</span>
+                        <span className="text-zinc-500 dark:text-zinc-400 block mb-0.5">Interval Ganti (KM)</span>
                         <input
                           type="number"
                           value={p.intervalKm}
                           onChange={(e) => handleUpdatePart(p.id, 'intervalKm', Number(e.target.value))}
-                          className="w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 focus:outline-none focus:border-zinc-900"
+                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                         />
                       </div>
                       <div>
-                        <span className="text-zinc-500 block mb-0.5">Estimasi Biaya (Rp)</span>
+                        <span className="text-zinc-500 dark:text-zinc-400 block mb-0.5">Estimasi Biaya (Rp)</span>
                         <input
                           type="number"
                           value={p.costEstimate}
                           onChange={(e) => handleUpdatePart(p.id, 'costEstimate', Number(e.target.value))}
-                          className="w-full bg-white border border-zinc-200 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 focus:outline-none focus:border-zinc-900"
+                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                         />
                       </div>
                     </div>
@@ -1106,6 +1106,9 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
           </div>
         </form>
       )}
+    </div>
+  );
+};
     </div>
   );
 };

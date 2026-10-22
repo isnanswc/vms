@@ -1,5 +1,6 @@
 import React from 'react';
 import { LayoutDashboard, CarFront, Fuel, Wrench, MessageSquare } from 'lucide-react';
+import { AiChatLineIcon } from './AiChatLineIcon';
 
 export type TabType = 'dashboard' | 'vehicles' | 'fuel' | 'service' | 'chat';
 
@@ -23,7 +24,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 pb-[env(safe-area-inset-bottom)] shadow-lg">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 pb-[env(safe-area-inset-bottom)] shadow-lg transition-colors">
       <div className="max-w-md mx-auto grid grid-cols-5 px-1 py-1.5">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -39,12 +40,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               >
                 <div className={`p-2 rounded-2xl transition-all shadow-md ${
                   isActive
-                    ? 'bg-zinc-950 text-yellow-400 scale-110 shadow-zinc-900/30'
+                    ? 'bg-zinc-950 dark:bg-zinc-900 text-yellow-400 scale-110 shadow-zinc-900/30 border border-yellow-400/40'
                     : 'bg-yellow-400 text-zinc-950 hover:bg-yellow-300'
                 }`}>
-                  <Icon className="w-5 h-5 stroke-[2.5] animate-sparkle-loop" />
+                  <AiChatLineIcon isActive={isActive} className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-bold text-zinc-900 mt-1">
+                <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-200 mt-1">
                   Chat AI
                 </span>
               </button>
@@ -57,8 +58,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               onClick={() => onChangeTab(item.id)}
               className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer ${
                 isActive
-                  ? 'text-zinc-950 font-black'
-                  : 'text-zinc-400 hover:text-zinc-700'
+                  ? 'text-zinc-950 dark:text-zinc-100 font-black'
+                  : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               {isActive && (
@@ -68,7 +69,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               <div className="relative">
                 <Icon
                   className={`w-5 h-5 transition-transform duration-200 ${
-                    isActive ? 'scale-110 stroke-[2.5] text-zinc-950' : 'stroke-[1.8]'
+                    isActive ? 'scale-110 stroke-[2.5] text-zinc-950 dark:text-yellow-400' : 'stroke-[1.8]'
                   }`}
                 />
 
@@ -79,7 +80,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 )}
               </div>
 
-              <span className={`text-[10px] tracking-tight mt-1 ${isActive ? 'font-bold text-zinc-950' : ''}`}>
+              <span className={`text-[10px] tracking-tight mt-1 ${isActive ? 'font-bold text-zinc-950 dark:text-yellow-400' : ''}`}>
                 {item.label}
               </span>
             </button>
