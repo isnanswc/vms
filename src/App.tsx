@@ -81,6 +81,10 @@ export function App() {
     setSelectedVehicleIdForDetail(newVeh.id);
   };
 
+  const handleUpdateVehicle = (updatedVehicle: Vehicle) => {
+    setVehicles(vehicles.map((v) => (v.id === updatedVehicle.id ? updatedVehicle : v)));
+  };
+
   const handleAddFuelLog = (newLog: FuelLog) => {
     setFuelLogs([newLog, ...fuelLogs]);
     setVehicles(vehicles.map((v) => 
@@ -179,16 +183,16 @@ export function App() {
   const handleSendMessage = (
     sessionId: string, 
     text: string, 
+    sender: 'user' | 'ai' = 'user',
     attachment?: { type: 'image' | 'file'; url: string; name?: string }
   ) => {
     setChatSessions((prev) =>
       prev.map((s) => {
         if (s.id !== sessionId) return s;
 
-        const isUser = (attachment || text.startsWith('Halo,') || text.startsWith('Tolong') || text.startsWith('Kapan') || text.startsWith('Berapa') || text.startsWith('Apakah') || text.startsWith('Saya baru')) && !text.includes('**');
         const newMsg = {
-          id: `msg-${Date.now()}-${Math.random()}`,
-          sender: (isUser ? 'user' : 'ai') as 'user' | 'ai',
+          id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          sender,
           text,
           timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
           attachment,
@@ -197,9 +201,9 @@ export function App() {
         const updatedMessages = [...s.messages, newMsg];
         return {
           ...s,
-          lastMessage: text.slice(0, 50) + (text.length > 50 ? '...' : ''),
+          lastMessage: text.slice(0, 60) + (text.length > 60 ? '...' : ''),
           updatedAt: 'Baru saja',
-          title: s.title === 'Percakapan Baru' && text ? text.slice(0, 30) : s.title,
+          title: s.title === 'Percakapan Baru' && sender === 'user' ? text.slice(0, 30) : s.title,
           messages: updatedMessages,
         };
       })
@@ -212,7 +216,7 @@ export function App() {
     setSelectedVehicleIdForDetail(null);
     setActiveTab('chat');
     if (initialPrompt) {
-      handleSendMessage(activeSessionId, initialPrompt);
+      handleSendMessage(activeSessionId, initialPrompt, 'user');
     }
   };
 
@@ -377,6 +381,7 @@ export function App() {
             <AddVehiclePageView
               onBack={handleGoBack}
               onSaveVehicle={handleSaveNewVehicleAndParts}
+              aiSettings={aiSettings}
             />
           ) : selectedVehicleIdForDetail && currentDetailVehicle ? (
             /* VIEW C: VEHICLE DETAIL (INFO & PAJAK, BBM, SPAREPART) */
@@ -390,6 +395,7 @@ export function App() {
               onAddService={() => setIsAddServiceOpen(true)}
               onOpenAiChat={handleOpenAiChatWithPrompt}
               onAddTaxPayment={handleAddTaxPayment}
+              onUpdateVehicle={handleUpdateVehicle}
             />
           ) : (
             /* VIEW D: STANDARD TAB VIEWS */

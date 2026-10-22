@@ -9,7 +9,8 @@ import {
   Trash2, 
   X, 
   Mail, 
-  Phone
+  Phone,
+  Edit3
 } from 'lucide-react';
 
 interface ProfileViewProps {
@@ -24,6 +25,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onUpdateProfile,
 }) => {
   const [isAddSimModalOpen, setIsAddSimModalOpen] = useState(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+
+  // Form states for profile edit
+  const [profileName, setProfileName] = useState(profile.name);
+  const [profileEmail, setProfileEmail] = useState(profile.email);
+  const [profilePhone, setProfilePhone] = useState(profile.phone);
 
   // Form states for new license
   const [simType, setSimType] = useState<DriverLicense['simType']>('SIM C');
@@ -60,6 +67,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
     setSimNumber('');
     setIsAddSimModalOpen(false);
+  };
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profileName.trim()) return;
+
+    onUpdateProfile({
+      ...profile,
+      name: profileName.trim(),
+      email: profileEmail.trim(),
+      phone: profilePhone.trim(),
+    });
+    setIsEditProfileModalOpen(false);
   };
 
   const handleDeleteSim = (simId: string) => {
@@ -115,15 +135,30 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2.5 rounded-2xl border border-zinc-200">
-            <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950">
-              <CreditCard className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-[10px] text-zinc-400 uppercase font-bold block">Status Lisensi</span>
-              <span className="text-xs font-black text-zinc-900 font-mono">
-                {profile.licenses.length} SIM Aktif
-              </span>
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => {
+                setProfileName(profile.name);
+                setProfileEmail(profile.email);
+                setProfilePhone(profile.phone);
+                setIsEditProfileModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 py-2.5 px-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold rounded-2xl transition cursor-pointer"
+            >
+              <Edit3 className="w-3.5 h-3.5 text-zinc-700" />
+              <span>Edit Profil</span>
+            </button>
+
+            <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2.5 rounded-2xl border border-zinc-200">
+              <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950">
+                <CreditCard className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] text-zinc-400 uppercase font-bold block">Status Lisensi</span>
+                <span className="text-xs font-black text-zinc-900 font-mono">
+                  {profile.licenses.length} SIM Aktif
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -328,6 +363,77 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   className="w-full py-3 bg-zinc-950 hover:bg-zinc-800 text-white font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
                 >
                   Simpan Data SIM
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL EDIT DATA PROFIL */}
+      {isEditProfileModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md bg-white border-2 border-zinc-900 rounded-3xl p-5 shadow-2xl text-zinc-900">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-yellow-400 text-zinc-950">
+                  <Edit3 className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <h3 className="font-black text-sm uppercase tracking-wider text-zinc-900">
+                  Edit Informasi Profil
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsEditProfileModalOpen(false)}
+                className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="mt-4 space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-zinc-800 mb-1">Nama Lengkap Pemilik</label>
+                <input
+                  type="text"
+                  value={profileName}
+                  onChange={(e) => setProfileName(e.target.value)}
+                  placeholder="Nama Lengkap Pemilik Akun"
+                  className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-zinc-800 mb-1">Alamat Email</label>
+                <input
+                  type="email"
+                  value={profileEmail}
+                  onChange={(e) => setProfileEmail(e.target.value)}
+                  placeholder="contoh@domain.com"
+                  className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-zinc-800 mb-1">Nomor Telepon / WhatsApp</label>
+                <input
+                  type="text"
+                  value={profilePhone}
+                  onChange={(e) => setProfilePhone(e.target.value)}
+                  placeholder="+62 812-3456-7890"
+                  className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                  required
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-zinc-950 hover:bg-zinc-800 text-white font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
+                >
+                  Simpan Perubahan Profil
                 </button>
               </div>
             </form>

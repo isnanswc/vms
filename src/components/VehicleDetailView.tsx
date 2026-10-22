@@ -5,21 +5,17 @@ import {
   Car, 
   Bike, 
   Truck, 
-  Calendar, 
   Fuel, 
   Wrench, 
   FileText, 
   ShieldCheck, 
   AlertTriangle, 
   Plus, 
-  MapPin, 
-  Gauge, 
-  TrendingUp, 
   Sparkles, 
-  MessageSquare,
-  Navigation,
   X,
-  CreditCard
+  CreditCard,
+  Edit3,
+  Check
 } from 'lucide-react';
 
 interface VehicleDetailViewProps {
@@ -32,6 +28,7 @@ interface VehicleDetailViewProps {
   onAddService: () => void;
   onOpenAiChat: (prompt: string) => void;
   onAddTaxPayment: (record: TaxPaymentRecord) => void;
+  onUpdateVehicle?: (updated: Vehicle) => void;
 }
 
 export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
@@ -44,9 +41,29 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
   onAddService,
   onOpenAiChat,
   onAddTaxPayment,
+  onUpdateVehicle,
 }) => {
   const [activeTab, setActiveTab] = useState<'info' | 'fuel' | 'parts'>('info');
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Edit Vehicle Form States
+  const [editName, setEditName] = useState(vehicle.name);
+  const [editPlateNumber, setEditPlateNumber] = useState(vehicle.plateNumber);
+  const [editCategory, setEditCategory] = useState(vehicle.category);
+  const [editYear, setEditYear] = useState(vehicle.year);
+  const [editOdometer, setEditOdometer] = useState(vehicle.currentOdometerKm);
+  const [editFuelType, setEditFuelType] = useState(vehicle.fuelType);
+  const [editTankCapacity, setEditTankCapacity] = useState(vehicle.tankCapacityLiters);
+  const [editMaxCargo, setEditMaxCargo] = useState(vehicle.maxCargoWeightKg || 150);
+  const [editNotes, setEditNotes] = useState(vehicle.notes);
+  const [editStnkNumber, setEditStnkNumber] = useState(vehicle.stnkNumber || '');
+  const [editChassisNumber, setEditChassisNumber] = useState(vehicle.chassisNumber || '');
+  const [editEngineNumber, setEditEngineNumber] = useState(vehicle.engineNumber || '');
+  const [editStnkExpiryDate, setEditStnkExpiryDate] = useState(vehicle.stnkExpiryDate);
+  const [editStnkFiveYearExpiryDate, setEditStnkFiveYearExpiryDate] = useState(vehicle.stnkFiveYearExpiryDate);
+  const [editTaxCostAnnual, setEditTaxCostAnnual] = useState(vehicle.stnkTaxCostAnnual);
+  const [editTaxCostFiveYear, setEditTaxCostFiveYear] = useState(vehicle.stnkTaxCostFiveYear);
 
   // Form states for manual tax record
   const [taxDate, setTaxDate] = useState('2026-10-21');
@@ -92,6 +109,34 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
     setIsTaxModalOpen(false);
   };
 
+  const handleSaveVehicleEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName.trim() || !editPlateNumber.trim()) return;
+
+    if (onUpdateVehicle) {
+      onUpdateVehicle({
+        ...vehicle,
+        name: editName.trim(),
+        plateNumber: editPlateNumber.trim().toUpperCase(),
+        category: editCategory,
+        year: Number(editYear),
+        currentOdometerKm: Number(editOdometer),
+        fuelType: editFuelType,
+        tankCapacityLiters: Number(editTankCapacity),
+        maxCargoWeightKg: editMaxCargo ? Number(editMaxCargo) : undefined,
+        notes: editNotes.trim(),
+        stnkNumber: editStnkNumber.trim(),
+        chassisNumber: editChassisNumber.trim(),
+        engineNumber: editEngineNumber.trim(),
+        stnkExpiryDate: editStnkExpiryDate,
+        stnkFiveYearExpiryDate: editStnkFiveYearExpiryDate,
+        stnkTaxCostAnnual: Number(editTaxCostAnnual),
+        stnkTaxCostFiveYear: Number(editTaxCostFiveYear),
+      });
+    }
+    setIsEditModalOpen(false);
+  };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'motor':
@@ -115,13 +160,41 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
           <span>Kembali ke Garasi</span>
         </button>
 
-        <button
-          onClick={() => onOpenAiChat(`Tolong berikan analisa komprehensif untuk kendaraan ${vehicle.name} (${vehicle.plateNumber}) saat ini.`)}
-          className="flex items-center gap-1.5 py-2 px-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black transition cursor-pointer shadow-xs"
-        >
-          <Sparkles className="w-4 h-4 fill-zinc-950" />
-          <span>Tanya AI Tentang Unit Ini</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setEditName(vehicle.name);
+              setEditPlateNumber(vehicle.plateNumber);
+              setEditCategory(vehicle.category);
+              setEditYear(vehicle.year);
+              setEditOdometer(vehicle.currentOdometerKm);
+              setEditFuelType(vehicle.fuelType);
+              setEditTankCapacity(vehicle.tankCapacityLiters);
+              setEditMaxCargo(vehicle.maxCargoWeightKg || 150);
+              setEditNotes(vehicle.notes);
+              setEditStnkNumber(vehicle.stnkNumber || '');
+              setEditChassisNumber(vehicle.chassisNumber || '');
+              setEditEngineNumber(vehicle.engineNumber || '');
+              setEditStnkExpiryDate(vehicle.stnkExpiryDate);
+              setEditStnkFiveYearExpiryDate(vehicle.stnkFiveYearExpiryDate);
+              setEditTaxCostAnnual(vehicle.stnkTaxCostAnnual);
+              setEditTaxCostFiveYear(vehicle.stnkTaxCostFiveYear);
+              setIsEditModalOpen(true);
+            }}
+            className="flex items-center gap-1.5 py-2 px-3.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold transition cursor-pointer"
+          >
+            <Edit3 className="w-3.5 h-3.5 text-zinc-700" />
+            <span>Edit Informasi Dasar</span>
+          </button>
+
+          <button
+            onClick={() => onOpenAiChat(`Tolong berikan analisa komprehensif untuk kendaraan ${vehicle.name} (${vehicle.plateNumber}) saat ini.`)}
+            className="flex items-center gap-1.5 py-2 px-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black transition cursor-pointer shadow-xs"
+          >
+            <Sparkles className="w-4 h-4 fill-zinc-950" />
+            <span>Tanya AI Tentang Unit Ini</span>
+          </button>
+        </div>
       </div>
 
       {/* Hero Vehicle Overview Card (Desktop Widescreen) */}
@@ -623,6 +696,260 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
               >
                 Simpan Pembayaran Pajak
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL EDIT DATA KENDARAAN (INFORMASI DASAR LENGKAP) */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900">
+          <div className="w-full max-w-2xl bg-white border-2 border-zinc-900 rounded-3xl p-5 md:p-6 shadow-2xl max-h-[92vh] overflow-y-auto no-scrollbar">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 shadow-xs">
+                  <Edit3 className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm uppercase tracking-wider text-zinc-900">
+                    Edit Informasi Dasar Kendaraan
+                  </h3>
+                  <p className="text-[11px] text-zinc-500">Ubah identitas armada, spesifikasi teknis & administrasi STNK</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveVehicleEdit} className="mt-4 space-y-4 text-xs">
+              {/* Bagian 1: Identitas Unit */}
+              <div className="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-3">
+                <span className="font-extrabold text-[11px] uppercase tracking-wider text-zinc-700 block">
+                  1. Identitas Unit Kendaraan
+                </span>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Nama / Merk Kendaraan</label>
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Nomor Registrasi (Plat Nomor)</label>
+                    <input
+                      type="text"
+                      value={editPlateNumber}
+                      onChange={(e) => setEditPlateNumber(e.target.value.toUpperCase())}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono font-black focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Kategori Kendaraan</label>
+                    <select
+                      value={editCategory}
+                      onChange={(e) => setEditCategory(e.target.value as any)}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                    >
+                      <option value="motor">Sepeda Motor</option>
+                      <option value="mobil">Mobil Penumpang / Niaga</option>
+                      <option value="truk">Truk / Kendaraan Berat</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Tahun Pembuatan</label>
+                    <input
+                      type="number"
+                      value={editYear}
+                      onChange={(e) => setEditYear(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bagian 2: Spesifikasi Teknis & Odometer */}
+              <div className="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-3">
+                <span className="font-extrabold text-[11px] uppercase tracking-wider text-zinc-700 block">
+                  2. Spesifikasi Teknis & Tangki BBM
+                </span>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Odometer Terkini (KM)</label>
+                    <input
+                      type="number"
+                      value={editOdometer}
+                      onChange={(e) => setEditOdometer(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Jenis Bahan Bakar</label>
+                    <select
+                      value={editFuelType}
+                      onChange={(e) => setEditFuelType(e.target.value as any)}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-bold focus:outline-none focus:border-zinc-900"
+                    >
+                      <option value="Pertalite">Pertalite (RON 90)</option>
+                      <option value="Pertamax">Pertamax (RON 92)</option>
+                      <option value="Pertamax Turbo">Pertamax Turbo (RON 98)</option>
+                      <option value="Solar">Solar</option>
+                      <option value="Bio Solar">Bio Solar</option>
+                      <option value="Dexlite">Dexlite</option>
+                      <option value="Listrik">Listrik (EV)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Kapasitas Tangki (Liter)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={editTankCapacity}
+                      onChange={(e) => setEditTankCapacity(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Maksimal Beban Muatan (KG)</label>
+                    <input
+                      type="number"
+                      value={editMaxCargo}
+                      onChange={(e) => setEditMaxCargo(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Catatan Operasional Kendaraan</label>
+                    <input
+                      type="text"
+                      value={editNotes}
+                      onChange={(e) => setEditNotes(e.target.value)}
+                      placeholder="Contoh: Unit operasional antar kota / servis bengkel resmi"
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bagian 3: Dokumen STNK & Pajak */}
+              <div className="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-3">
+                <span className="font-extrabold text-[11px] uppercase tracking-wider text-zinc-700 block">
+                  3. Dokumen Legalitas STNK & Pajak
+                </span>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Nomor Seri STNK</label>
+                    <input
+                      type="text"
+                      value={editStnkNumber}
+                      onChange={(e) => setEditStnkNumber(e.target.value)}
+                      placeholder="Contoh: 1234567/MJ/2022"
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Nomor Rangka (VIN)</label>
+                    <input
+                      type="text"
+                      value={editChassisNumber}
+                      onChange={(e) => setEditChassisNumber(e.target.value.toUpperCase())}
+                      placeholder="Contoh: MH1JF5119EK..."
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Nomor Mesin</label>
+                    <input
+                      type="text"
+                      value={editEngineNumber}
+                      onChange={(e) => setEditEngineNumber(e.target.value.toUpperCase())}
+                      placeholder="Contoh: JF51E1123456"
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Jatuh Tempo Pajak Tahunan (PKB)</label>
+                    <input
+                      type="date"
+                      value={editStnkExpiryDate}
+                      onChange={(e) => setEditStnkExpiryDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Jatuh Tempo Plat 5 Tahunan (Kaleng)</label>
+                    <input
+                      type="date"
+                      value={editStnkFiveYearExpiryDate}
+                      onChange={(e) => setEditStnkFiveYearExpiryDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Estimasi Biaya Pajak Tahunan (Rp)</label>
+                    <input
+                      type="number"
+                      value={editTaxCostAnnual}
+                      onChange={(e) => setEditTaxCostAnnual(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-800 mb-1">Estimasi Biaya Ganti Plat 5 Tahun (Rp)</label>
+                    <input
+                      type="number"
+                      value={editTaxCostFiveYear}
+                      onChange={(e) => setEditTaxCostFiveYear(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold focus:outline-none focus:border-zinc-900"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full py-3.5 bg-zinc-950 hover:bg-zinc-800 text-white font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Check className="w-4 h-4 text-yellow-400 stroke-[3]" />
+                  <span>Simpan Perubahan Data Kendaraan</span>
+                </button>
+              </div>
             </form>
           </div>
         </div>
