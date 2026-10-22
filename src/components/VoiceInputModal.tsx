@@ -385,7 +385,5 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
         </div>
       </div>
     </div>
-      </div>
-    </div>
   );
 };

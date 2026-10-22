@@ -267,7 +267,5 @@ export const ScanModal: React.FC<ScanModalProps> = ({
         )}
       </div>
     </div>
-      </div>
-    </div>
   );
 };

@@ -1109,6 +1109,3 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
     </div>
   );
 };
-    </div>
-  );
-};
