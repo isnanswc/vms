@@ -4,14 +4,14 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
-export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/vms/' : '/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/vms/' : '/',
   plugins: [
     react(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico'],
+      includeAssets: ['favicon.svg'],
       manifest: {
         name: 'Fleet & Vehicle Logbook',
         short_name: 'FleetVMS',
@@ -23,4 +23,4 @@ export default defineConfig({
       }
     })
   ],
-})
+}))
