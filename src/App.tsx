@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   INITIAL_VEHICLES, 
   INITIAL_FUEL_LOGS, 
@@ -12,6 +12,7 @@ import {
 import { INITIAL_USER_PROFILE, type UserProfile } from './types/user';
 import type { Vehicle, FuelLog, SparePart, ServiceRecord, TaxPaymentRecord } from './types';
 import type { ChatSession, AiSettings } from './types/chat';
+import { loadInitialData, saveToStorage, loadFromIndexedDB } from './utils/storage';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { BottomNav, type TabType } from './components/BottomNav';
@@ -35,19 +36,35 @@ export function App() {
   const [isAddingVehiclePage, setIsAddingVehiclePage] = useState(false);
   const [isViewingProfile, setIsViewingProfile] = useState(false);
 
-  // Application Data States
-  const [vehicles, setVehicles] = useState<Vehicle[]>(INITIAL_VEHICLES);
-  const [fuelLogs, setFuelLogs] = useState<FuelLog[]>(INITIAL_FUEL_LOGS);
-  const [spareParts, setSpareParts] = useState<SparePart[]>(INITIAL_SPAREPARTS);
-  const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>(INITIAL_SERVICE_RECORDS);
+  // Application Data States (Persistent IndexedDB + LocalStorage)
+  const [vehicles, setVehicles] = useState<Vehicle[]>(() => loadInitialData('vehicles', INITIAL_VEHICLES));
+  const [fuelLogs, setFuelLogs] = useState<FuelLog[]>(() => loadInitialData('fuelLogs', INITIAL_FUEL_LOGS));
+  const [spareParts, setSpareParts] = useState<SparePart[]>(() => loadInitialData('spareParts', INITIAL_SPAREPARTS));
+  const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>(() => loadInitialData('serviceRecords', INITIAL_SERVICE_RECORDS));
 
   // User Profile & Multi-SIM state
-  const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER_PROFILE);
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => loadInitialData('userProfile', INITIAL_USER_PROFILE));
 
   // Chat Data States
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>(INITIAL_CHAT_SESSIONS);
-  const [activeSessionId, setActiveSessionId] = useState<string>(INITIAL_CHAT_SESSIONS[0].id);
-  const [aiSettings, setAiSettings] = useState<AiSettings>(DEFAULT_AI_SETTINGS);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => loadInitialData('chatSessions', INITIAL_CHAT_SESSIONS));
+  const [activeSessionId, setActiveSessionId] = useState<string>(() => INITIAL_CHAT_SESSIONS[0].id);
+  const [aiSettings, setAiSettings] = useState<AiSettings>(() => loadInitialData('aiSettings', DEFAULT_AI_SETTINGS));
+
+  // Auto-persist to IndexedDB and LocalStorage on state changes
+  useEffect(() => { saveToStorage('vehicles', vehicles); }, [vehicles]);
+  useEffect(() => { saveToStorage('fuelLogs', fuelLogs); }, [fuelLogs]);
+  useEffect(() => { saveToStorage('spareParts', spareParts); }, [spareParts]);
+  useEffect(() => { saveToStorage('serviceRecords', serviceRecords); }, [serviceRecords]);
+  useEffect(() => { saveToStorage('userProfile', userProfile); }, [userProfile]);
+  useEffect(() => { saveToStorage('chatSessions', chatSessions); }, [chatSessions]);
+  useEffect(() => { saveToStorage('aiSettings', aiSettings); }, [aiSettings]);
+
+  // Reconcile with IndexedDB on initial mount
+  useEffect(() => {
+    loadFromIndexedDB<Vehicle[]>('vehicles', INITIAL_VEHICLES).then((v) => {
+      if (v && v.length > 0) setVehicles(v);
+    });
+  }, []);
 
   // Modal Dialog States
   const [isAiSettingsOpen, setIsAiSettingsOpen] = useState(false);
