@@ -18,10 +18,10 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
   const [vehicleId, setVehicleId] = useState(vehicles[0]?.id || '');
   const [type, setType] = useState<'routine' | 'unexpected'>('routine');
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState('2026-10-21');
-  const [odometerKm, setOdometerKm] = useState(42900);
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [odometerKm, setOdometerKm] = useState(vehicles[0]?.currentOdometerKm || 0);
   const [workshopName, setWorkshopName] = useState('');
-  const [cost, setCost] = useState(150000);
+  const [cost, setCost] = useState(0);
   const [notes, setNotes] = useState('');
   const [replacedPartsStr, setReplacedPartsStr] = useState('');
 
@@ -109,11 +109,15 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
               onChange={(e) => setVehicleId(e.target.value)}
               className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
             >
-              {vehicles.map((v) => (
-                <option key={v.id} value={v.id}>
-                  [{v.plateNumber}] {v.name}
-                </option>
-              ))}
+              {vehicles.length === 0 ? (
+                <option value="">Belum ada kendaraan di garasi</option>
+              ) : (
+                vehicles.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    [{v.plateNumber}] {v.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

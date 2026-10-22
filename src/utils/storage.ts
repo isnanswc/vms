@@ -2,6 +2,21 @@ const DB_NAME = 'FleetLogVMS_DB';
 const DB_VERSION = 1;
 const STORE_NAME = 'fleet_data';
 
+// Bersihkan cache dummy lama dari browser pengguna secara otomatis (sekali saja)
+if (typeof window !== 'undefined') {
+  if (localStorage.getItem('vms_dummy_purged_v1') !== 'true') {
+    ['vms_vehicles', 'vms_fuelLogs', 'vms_spareParts', 'vms_serviceRecords', 'vms_userProfile', 'vms_chatSessions'].forEach((k) => {
+      localStorage.removeItem(k);
+    });
+    if (window.indexedDB) {
+      try {
+        indexedDB.deleteDatabase(DB_NAME);
+      } catch {}
+    }
+    localStorage.setItem('vms_dummy_purged_v1', 'true');
+  }
+}
+
 function getDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined' || !window.indexedDB) {

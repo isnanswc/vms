@@ -332,7 +332,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   className="flex items-center gap-1 py-1.5 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5 text-yellow-400 stroke-[3]" />
-                  <span>+ Catat</span>
+                  <span>Catat Pajak</span>
                 </button>
               </div>
             </div>
@@ -413,7 +413,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
               className="py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-2xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
-              <span>+ Catat Pengisian BBM</span>
+              <span>Catat Pengisian BBM</span>
             </button>
           </div>
 

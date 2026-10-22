@@ -82,7 +82,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             className="flex items-center gap-2 py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-black rounded-2xl transition cursor-pointer shadow-sm active:scale-95"
           >
             <Fuel className="w-4 h-4 text-yellow-400" />
-            <span>+ Catat Pengisian BBM</span>
+            <span>Catat Pengisian BBM</span>
           </button>
         </div>
       </div>
@@ -228,23 +228,30 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="p-3 bg-white rounded-2xl border border-yellow-200/80">
-                <span className="font-bold text-zinc-900 block">
-                  Daihatsu Gran Max (B 9214 TXA)
-                </span>
-                <p className="text-[11px] text-zinc-600 mt-0.5">
-                  Jatuh tempo <strong>Pajak 5 Tahunan (Ganti Kaleng)</strong> dalam 9 hari.
-                </p>
-              </div>
-
-              <div className="p-3 bg-white rounded-2xl border border-yellow-200/80">
-                <span className="font-bold text-zinc-900 block">
-                  Honda Vario 125 (B 3829 KLG)
-                </span>
-                <p className="text-[11px] text-zinc-600 mt-0.5">
-                  V-Belt & Roller CVT tersisa 12%. Segera ganti sebelum putus mendadak.
-                </p>
-              </div>
+              {criticalParts.length === 0 && vehicles.length === 0 ? (
+                <div className="p-3 bg-white/80 rounded-2xl border border-yellow-200/60 text-zinc-500">
+                  Belum ada unit terdaftar. Daftarkan kendaraan pertama Anda untuk mengaktifkan pemantauan suku cadang otomatis.
+                </div>
+              ) : criticalParts.length === 0 ? (
+                <div className="p-3 bg-white rounded-2xl border border-emerald-200 text-emerald-800 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span className="font-bold">Semua unit armada dalam kondisi prima!</span>
+                </div>
+              ) : (
+                criticalParts.slice(0, 3).map((part) => {
+                  const veh = vehicles.find((v) => v.id === part.vehicleId);
+                  return (
+                    <div key={part.id} className="p-3 bg-white rounded-2xl border border-red-200">
+                      <span className="font-bold text-zinc-900 block">
+                        {veh ? `${veh.name} (${veh.plateNumber})` : 'Unit Terdaftar'}
+                      </span>
+                      <p className="text-[11px] text-zinc-600 mt-0.5">
+                        {part.name} tersisa {part.estimatedLifeRemainingPct}%. Segera lakukan pemeriksaan atau penggantian.
+                      </p>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -271,51 +278,63 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* 3 Columns Desktop Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {vehicles.map((veh) => (
-            <div
-              key={veh.id}
-              onClick={() => onNavigateTab('vehicles')}
-              className="bg-white border-2 border-zinc-200 hover:border-zinc-900 rounded-3xl p-4.5 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-3 group"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="px-2.5 py-1 bg-zinc-950 text-white font-mono font-black text-xs rounded-lg shadow-sm">
-                    {veh.plateNumber}
-                  </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 font-bold uppercase">
-                    {veh.category}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-zinc-900">
-                  <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
-                  <span>{veh.healthScore}%</span>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-extrabold text-sm text-zinc-900 group-hover:text-black">
-                  {veh.name} <span className="text-zinc-400 font-normal">({veh.year})</span>
-                </h4>
-                <p className="text-xs text-zinc-500 line-clamp-1 mt-0.5">{veh.notes}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 text-xs">
-                <div className="bg-zinc-50 p-2 rounded-xl">
-                  <span className="text-[10px] text-zinc-400 block">Odometer</span>
-                  <span className="font-mono font-bold text-zinc-900">
-                    {veh.currentOdometerKm.toLocaleString('id-ID')} KM
-                  </span>
-                </div>
-                <div className="bg-zinc-50 p-2 rounded-xl">
-                  <span className="text-[10px] text-zinc-400 block">Tangki BBM</span>
-                  <span className="font-mono font-bold text-zinc-900">
-                    {veh.tankCapacityLiters} L ({veh.fuelType})
-                  </span>
-                </div>
-              </div>
+          {vehicles.length === 0 ? (
+            <div className="col-span-full p-8 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-3xl text-center text-zinc-500 text-xs space-y-3">
+              <p>Belum ada kendaraan yang didaftarkan ke dalam sistem garasi.</p>
+              <button
+                onClick={() => onNavigateTab('vehicles')}
+                className="py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-black text-xs rounded-xl shadow-xs cursor-pointer transition inline-flex items-center gap-1.5"
+              >
+                <span>Daftarkan Kendaraan Pertama (AI)</span>
+              </button>
             </div>
-          ))}
+          ) : (
+            vehicles.map((veh) => (
+              <div
+                key={veh.id}
+                onClick={() => onNavigateTab('vehicles')}
+                className="bg-white border-2 border-zinc-200 hover:border-zinc-900 rounded-3xl p-4.5 shadow-sm hover:shadow-md transition-all cursor-pointer space-y-3 group"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="px-2.5 py-1 bg-zinc-950 text-white font-mono font-black text-xs rounded-lg shadow-sm">
+                      {veh.plateNumber}
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 font-bold uppercase">
+                      {veh.category}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-zinc-900">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                    <span>{veh.healthScore}%</span>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-extrabold text-sm text-zinc-900 group-hover:text-black">
+                    {veh.name} <span className="text-zinc-400 font-normal">({veh.year})</span>
+                  </h4>
+                  <p className="text-xs text-zinc-500 line-clamp-1 mt-0.5">{veh.notes}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 text-xs">
+                  <div className="bg-zinc-50 p-2 rounded-xl">
+                    <span className="text-[10px] text-zinc-400 block">Odometer</span>
+                    <span className="font-mono font-bold text-zinc-900">
+                      {veh.currentOdometerKm.toLocaleString('id-ID')} KM
+                    </span>
+                  </div>
+                  <div className="bg-zinc-50 p-2 rounded-xl">
+                    <span className="text-[10px] text-zinc-400 block">Tangki BBM</span>
+                    <span className="font-mono font-bold text-zinc-900">
+                      {veh.tankCapacityLiters} L ({veh.fuelType})
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

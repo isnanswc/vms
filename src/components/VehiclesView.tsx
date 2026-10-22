@@ -59,13 +59,33 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
           className="flex items-center justify-center gap-2 py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-2xl transition shadow-sm active:scale-95 cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
-          <span>+ TAMBAH KENDARAAN (AI)</span>
+          <span>TAMBAH KENDARAAN (AI)</span>
         </button>
       </div>
 
       {/* Vehicle Cards Responsive Grid (1 col on mobile, 2 cols on tablet, 3 cols on desktop) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {vehicles.map((veh) => {
+        {vehicles.length === 0 ? (
+          <div className="col-span-full p-12 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-3xl text-center text-zinc-500 text-xs space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-yellow-400 text-zinc-950 flex items-center justify-center mx-auto shadow-sm">
+              <Car className="w-6 h-6 stroke-[2.2]" />
+            </div>
+            <div>
+              <h4 className="font-extrabold text-sm text-zinc-900">Garasi Anda Masih Kosong</h4>
+              <p className="text-zinc-500 mt-1 max-w-sm mx-auto">
+                Daftarkan kendaraan pertama Anda menggunakan AI. Cukup ketik nama model (misal: Vario, Avanza, Gran Max) dan spesifikasi pabrikan akan terisi otomatis.
+              </p>
+            </div>
+            <button
+              onClick={onAddVehicle}
+              className="py-3 px-5 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-black text-xs rounded-xl shadow-xs cursor-pointer transition inline-flex items-center gap-2 active:scale-95"
+            >
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>TAMBAH KENDARAAN PERTAMA (AI)</span>
+            </button>
+          </div>
+        ) : (
+          vehicles.map((veh) => {
           const daysToExpiry = getDaysUntilExpiry(veh.stnkExpiryDate);
           const isStnkUrgent = daysToExpiry <= 14;
 
@@ -166,7 +186,8 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
               </div>
             </div>
           );
-        })}
+        })
+      )}
       </div>
     </div>
   );

@@ -18,11 +18,11 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
   defaultVehicleId,
 }) => {
   const [vehicleId, setVehicleId] = useState(defaultVehicleId || vehicles[0]?.id || '');
-  const [date, setDate] = useState('2026-10-21');
-  const [fuelType, setFuelType] = useState<FuelType>('Pertamax');
-  const [liters, setLiters] = useState<number>(5);
-  const [totalCost, setTotalCost] = useState<number>(65000);
-  const [odometerKm, setOdometerKm] = useState<number>(42950);
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [fuelType, setFuelType] = useState<FuelType>(vehicles[0]?.fuelType || 'Pertamax');
+  const [liters, setLiters] = useState<number>(10);
+  const [totalCost, setTotalCost] = useState<number>(100000);
+  const [odometerKm, setOdometerKm] = useState<number>(vehicles[0]?.currentOdometerKm || 0);
   const [stationName, setStationName] = useState('SPBU Pertamina');
   const [isLocating, setIsLocating] = useState(false);
   const [gpsLocation, setGpsLocation] = useState<{
@@ -120,11 +120,15 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
               onChange={(e) => setVehicleId(e.target.value)}
               className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900"
             >
-              {vehicles.map((v) => (
-                <option key={v.id} value={v.id}>
-                  [{v.plateNumber}] {v.name}
-                </option>
-              ))}
+              {vehicles.length === 0 ? (
+                <option value="">Belum ada kendaraan di garasi</option>
+              ) : (
+                vehicles.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    [{v.plateNumber}] {v.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

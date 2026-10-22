@@ -48,7 +48,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
   const [pendingAttachment, setPendingAttachment] = useState<{ type: 'image' | 'file'; url: string; name?: string } | null>(null);
   const [isAiTyping, setIsAiTyping] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
@@ -56,7 +56,9 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
   const currentSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
   }, [currentSession?.messages, isAiTyping]);
 
   const handleSend = (textOverride?: string) => {
@@ -77,7 +79,14 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
       let replyText = 'Saya mengerti kebutuhan armada Anda.';
       const lower = textToSend.toLowerCase();
 
-      if (attachmentToSend?.type === 'image') {
+      const matchedVeh = vehicles.find((v) => 
+        lower.includes(v.name.toLowerCase()) || 
+        lower.includes(v.plateNumber.toLowerCase().replace(/\s/g, ''))
+      );
+
+      if (matchedVeh) {
+        replyText = `🚗 **Analisa Data Armada ${matchedVeh.name} (${matchedVeh.plateNumber})**:\n• Status Kesehatan: **${matchedVeh.healthScore}%**\n• Odometer Terkini: **${matchedVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n• Jenis Bahan Bakar Rekomendasi: **${matchedVeh.fuelType}**\n• Rekomendasi AI: Unit terdaftar dalam sistem pengawasan. Silakan catat pengisian BBM atau jadwalkan servis berkala saat jatuh tempo.`;
+      } else if (attachmentToSend?.type === 'image') {
         replyText = `📸 **Hasil Analisis Gambar AI (${settings.selectedModel})**:\nSaya berhasil membaca foto lampiran Anda.\n• **Status**: Gambar jelas & terverifikasi.\n• **Estimasi Data**: Terdeteksi indikasi spedometer / bukti transaksi SPBU.\n• **Rekomendasi**: Nilai odometer ini telah diselaraskan dengan buku servis kendaraan Anda.`;
       } else if (lower.includes('vario') || lower.includes('oli') || lower.includes('servis')) {
         replyText = `🔧 **Informasi Perawatan Honda Vario 125 (2015)**:\n• Kapasitas oli mesin: **0.8 Liter** (Gunakan tipe SAE 10W-30 MPX2/SPX2).\n• Interval oli mesin: Tiap 2.000 - 2.500 KM.\n• Interval oli gardan: Tiap 6.000 KM.\n• Catatan: Jangan lupa bersihkan saringan udara setiap 8.000 KM agar konsumsi BBM tetap irit di kisaran ~43 km/liter.`;
@@ -134,7 +143,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col md:flex-row h-screen w-full bg-white text-zinc-900 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col md:flex-row w-full h-[100dvh] max-h-[100dvh] bg-white text-zinc-900 overflow-hidden">
       {/* Hidden File Inputs */}
       <input
         ref={cameraInputRef}
@@ -158,6 +167,98 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         className="hidden"
         onChange={(e) => handleFileCapture(e, 'file')}
       />
+
+      {/* MOBILE DRAWER (Slide-Over Session Drawer for Mobile Phones) */}
+      {isDrawerOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div
+            className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setIsDrawerOpen(false)}
+          />
+          <div className="relative flex flex-col w-[85%] max-w-xs bg-zinc-50 h-full shadow-2xl z-10 animate-fade-in border-r border-zinc-200">
+            <div className="p-4 border-b border-zinc-200 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 font-black text-xs shadow-xs">
+                  AI
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-xs uppercase tracking-wider text-zinc-900">
+                    Riwayat Chat
+                  </h3>
+                  <p className="text-[10px] text-zinc-400 font-mono">Sessions ({sessions.length})</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsDrawerOpen(false)}
+                className="p-1.5 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-white border-b border-zinc-100">
+              <button
+                onClick={() => {
+                  onNewChat();
+                  setIsDrawerOpen(false);
+                }}
+                className="w-full py-3 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-yellow-400 stroke-[3]" />
+                <span>Buat Chat Baru</span>
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1.5 no-scrollbar">
+              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 px-2 py-1 block">
+                Percakapan Tersimpan
+              </span>
+
+              {sessions.map((session) => {
+                const isActive = session.id === currentSession.id;
+                return (
+                  <div
+                    key={session.id}
+                    onClick={() => {
+                      onSelectSession(session.id);
+                      setIsDrawerOpen(false);
+                    }}
+                    className={`p-3 rounded-2xl border transition cursor-pointer text-left ${
+                      isActive
+                        ? 'bg-white border-yellow-400 text-zinc-950 shadow-sm'
+                        : 'bg-transparent border-transparent hover:bg-zinc-200/60 text-zinc-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-xs truncate max-w-[170px]">{session.title}</h4>
+                      <span className="text-[9px] text-zinc-400 font-mono shrink-0">
+                        {session.updatedAt}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-zinc-500 truncate mt-1">{session.lastMessage}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="p-3.5 border-t border-zinc-200 bg-white text-xs text-zinc-500">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-zinc-800 text-[11px]">Model: {settings.selectedModel}</span>
+                <button
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    onOpenSettings();
+                  }}
+                  className="text-[10px] text-yellow-700 font-bold hover:underline"
+                >
+                  Ubah
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* DESKTOP PERMANENT LEFT CHAT SESSIONS SIDEBAR (Hidden on Mobile) */}
       <aside className="hidden md:flex flex-col w-72 lg:w-80 bg-zinc-50 border-r border-zinc-200 h-full shrink-0 select-none">
@@ -189,7 +290,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
             className="w-full py-3 px-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
           >
             <Plus className="w-4 h-4 text-yellow-400 stroke-[3]" />
-            <span>+ Buat Chat Baru</span>
+            <span>Buat Chat Baru</span>
           </button>
         </div>
 
@@ -236,9 +337,9 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
       </aside>
 
       {/* MAIN CHAT AREA (Mobile + Desktop Center) */}
-      <div className="flex-1 flex flex-col h-full min-w-0 bg-white">
+      <div className="flex-1 flex flex-col h-full min-w-0 bg-white overflow-hidden">
         {/* Top Header */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-4 py-3 flex items-center justify-between shadow-xs">
+        <header className="shrink-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-4 py-3 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2">
             {/* Drawer Button for Mobile */}
             <button
@@ -290,7 +391,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         </header>
 
         {/* Message Stream (Max Width Centered for Desktop Ergonomics) */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-zinc-50/50">
+        <div ref={chatScrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 md:p-6 space-y-4 bg-zinc-50/50 touch-pan-y">
           <div className="max-w-3xl mx-auto space-y-4">
             <div className="text-center py-4">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-3xl bg-yellow-400 text-zinc-950 shadow-md shadow-yellow-400/20 mb-2">
@@ -370,14 +471,12 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                 <span className="text-xs">Fleet AI sedang menganalisis...</span>
               </div>
             )}
-
-            <div ref={messagesEndRef} />
           </div>
         </div>
 
         {/* Pending Attachment Preview */}
         {pendingAttachment && (
-          <div className="max-w-3xl w-full mx-auto p-3 bg-yellow-50 border-t border-yellow-200 flex items-center justify-between text-xs">
+          <div className="shrink-0 max-w-3xl w-full mx-auto p-3 bg-yellow-50 border-t border-yellow-200 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2.5">
               {pendingAttachment.type === 'image' ? (
                 <img
@@ -406,7 +505,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
         {/* Attachment Popover Menu */}
         {isAttachMenuOpen && (
-          <div className="max-w-3xl w-full mx-auto p-3 bg-white border-t border-zinc-200 grid grid-cols-4 gap-2 shadow-lg animate-fade-in">
+          <div className="shrink-0 max-w-3xl w-full mx-auto p-3 bg-white border-t border-zinc-200 grid grid-cols-4 gap-2 shadow-lg animate-fade-in">
             <button
               type="button"
               onClick={() => cameraInputRef.current?.click()}
@@ -457,7 +556,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         )}
 
         {/* Input Bar (Centered Desktop Layout) */}
-        <div className="bg-white border-t border-zinc-200 p-3 md:p-4">
+        <div className="shrink-0 bg-white border-t border-zinc-200 p-3 md:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="max-w-3xl mx-auto flex items-center gap-2">
             <button
               type="button"

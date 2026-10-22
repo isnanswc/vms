@@ -152,7 +152,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             className="flex items-center gap-1.5 py-2 px-3.5 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-xl transition shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>+ TAMBAH SIM</span>
+            <span>TAMBAH SIM</span>
           </button>
         </div>
 

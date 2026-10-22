@@ -637,7 +637,7 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                   className="flex items-center gap-1 py-1.5 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-bold rounded-xl transition cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5 text-zinc-900" />
-                  <span>+ Komponen</span>
+                  <span>Tambah Komponen</span>
                 </button>
               </div>
 

@@ -17,26 +17,9 @@ export interface UserProfile {
 }
 
 export const INITIAL_USER_PROFILE: UserProfile = {
-  name: 'Isnandar Saputra',
-  email: 'isnandar.dev@gmail.com',
-  phone: '0812-9842-1029',
+  name: 'Pemilik Kendaraan',
+  email: '',
+  phone: '',
   accountType: 'personal',
-  licenses: [
-    {
-      id: 'sim-1',
-      simType: 'SIM C',
-      simNumber: '9402-1209-00214',
-      holderName: 'ISNANDAR SAPUTRA',
-      expiryDate: '2027-08-14',
-      issuingCity: 'Polda Metro Jaya (Jakarta)',
-    },
-    {
-      id: 'sim-2',
-      simType: 'SIM A',
-      simNumber: '9201-1904-00185',
-      holderName: 'ISNANDAR SAPUTRA',
-      expiryDate: '2026-11-20', // Jatuh tempo 1 bulan lagi!
-      issuingCity: 'Polres Metro Jakarta Selatan',
-    },
-  ],
+  licenses: [],
 };

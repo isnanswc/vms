@@ -99,6 +99,19 @@ export function App() {
     ));
   };
 
+  const handleUpdateServiceRecord = (updatedRecord: ServiceRecord) => {
+    setServiceRecords(serviceRecords.map((r) => r.id === updatedRecord.id ? updatedRecord : r));
+    setVehicles(vehicles.map((v) => 
+      v.id === updatedRecord.vehicleId && updatedRecord.odometerKm > v.currentOdometerKm
+        ? { ...v, currentOdometerKm: updatedRecord.odometerKm }
+        : v
+    ));
+  };
+
+  const handleDeleteServiceRecord = (recordId: string) => {
+    setServiceRecords(serviceRecords.filter((r) => r.id !== recordId));
+  };
+
   // Handler for adding tax payment
   const handleAddTaxPayment = (record: TaxPaymentRecord) => {
     setVehicles(vehicles.map((v) => {
@@ -345,6 +358,8 @@ export function App() {
                   serviceRecords={serviceRecords}
                   onAddService={() => setIsAddServiceOpen(true)}
                   onExportPdf={() => setIsPdfModalOpen(true)}
+                  onUpdateService={handleUpdateServiceRecord}
+                  onDeleteService={handleDeleteServiceRecord}
                 />
               )}
             </>
