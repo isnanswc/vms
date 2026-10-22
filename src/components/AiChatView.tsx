@@ -115,7 +115,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
           url,
           name: file.name,
         });
-      } catch (err) {
+      } catch {
         const url = URL.createObjectURL(file);
         setPendingAttachment({
           type: 'image',

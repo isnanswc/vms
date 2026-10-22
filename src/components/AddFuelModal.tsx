@@ -53,7 +53,7 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
         });
         setStationName(`SPBU Terdekat (GPS ${lat}, ${lng})`);
       },
-      (err) => {
+      () => {
         setIsLocating(false);
         // Fallback simulation
         const mockLat = -6.2412;

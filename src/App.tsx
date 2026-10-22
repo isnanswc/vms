@@ -172,9 +172,10 @@ export function App() {
       prev.map((s) => {
         if (s.id !== sessionId) return s;
 
+        const isUser = (attachment || text.startsWith('Halo,') || text.startsWith('Tolong') || text.startsWith('Kapan') || text.startsWith('Berapa') || text.startsWith('Apakah') || text.startsWith('Saya baru')) && !text.includes('**');
         const newMsg = {
           id: `msg-${Date.now()}-${Math.random()}`,
-          sender: (attachment || text.startsWith('Halo,') || text.startsWith('Tolong') || text.startsWith('Kapan') || text.startsWith('Berapa') || text.startsWith('Apakah') || text.startsWith('Saya baru')) && !text.includes('**') ? 'user' : 'ai' as const,
+          sender: (isUser ? 'user' : 'ai') as 'user' | 'ai',
           text,
           timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
           attachment,

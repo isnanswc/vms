@@ -48,7 +48,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
-      } catch (e) {
+      } catch {
         // ignore
       }
       recognitionRef.current = null;
@@ -147,7 +147,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
           if (isRecording && recognitionRef.current) {
             try {
               recognition.start();
-            } catch (e) {
+            } catch {
               // ignore
             }
           }
@@ -171,7 +171,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
