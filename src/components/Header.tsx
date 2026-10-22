@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, User, Sparkles } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 import type { UserProfile } from '../types/user';
 
 interface HeaderProps {
@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-3">
           {/* Mobile Only Logo */}
           <div className="flex md:hidden items-center gap-2">
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-yellow-400 text-zinc-950 font-black shadow-sm">
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-yellow-400 text-zinc-950 font-black shadow-sm animate-sparkle-loop">
               <span className="text-sm tracking-tighter">FL</span>
             </div>
             <span className="font-black text-sm tracking-wider text-zinc-900 uppercase">
@@ -67,9 +67,9 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Peringatan Operasional"
             className="relative p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition cursor-pointer"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className={`w-4 h-4 ${urgentCount > 0 ? 'text-zinc-900 animate-wiggle-loop' : ''}`} />
             {urgentCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 text-zinc-950 text-[10px] font-black rounded-full flex items-center justify-center shadow-xs">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 text-zinc-950 text-[10px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
                 {urgentCount}
               </span>
             )}

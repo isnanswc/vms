@@ -25,3 +25,147 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ========================================================================== */
+/* CUSTOM PAGE TRANSITIONS & LOOPING ICON ANIMATIONS (VMS LIVING INTERFACE)    */
+/* ========================================================================== */
+
+@keyframes slideDownFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpTech {
+  0% {
+    opacity: 0;
+    transform: translateY(48px) scale(0.98);
+    filter: blur(5px);
+  }
+  65% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sparkleGlow {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.45));
+  }
+  50% {
+    transform: scale(1.15) rotate(9deg);
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.95));
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes heartbeatPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.12);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.08);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+@keyframes radarPingLoop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+}
+
+@keyframes subtleWiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-7deg);
+  }
+  40% {
+    transform: rotate(7deg);
+  }
+  60% {
+    transform: rotate(-3deg);
+  }
+  80% {
+    transform: rotate(3deg);
+  }
+}
+
+.animate-profile-enter {
+  animation: slideDownFromTop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-tech-chat-enter {
+  animation: slideUpTech 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-page-enter {
+  animation: pageFadeIn 0.25s ease-out forwards;
+}
+
+.animate-sparkle-loop {
+  animation: sparkleGlow 2.5s ease-in-out infinite;
+}
+
+.animate-float-loop {
+  animation: floatGentle 2.6s ease-in-out infinite;
+}
+
+.animate-heartbeat-loop {
+  animation: heartbeatPulse 2.8s ease-in-out infinite;
+}
+
+.animate-radar-loop {
+  animation: radarPingLoop 2.2s ease-in-out infinite;
+}
+
+.animate-wiggle-loop {
+  animation: subtleWiggle 3.5s ease-in-out infinite;
+}

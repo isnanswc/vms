@@ -6,14 +6,11 @@ import {
   Camera, 
   Fuel, 
   Wrench, 
-  Car, 
   ChevronRight, 
   Gauge, 
   AlertTriangle,
   Wallet,
-  TrendingUp,
-  ShieldAlert,
-  ArrowUpRight
+  TrendingUp
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -72,16 +69,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="hidden md:flex items-center gap-2.5">
           <button
             onClick={onOpenQuickScan}
-            className="flex items-center gap-2 py-2.5 px-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold rounded-2xl transition cursor-pointer active:scale-95"
+            className="flex items-center gap-2 py-2.5 px-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold rounded-2xl transition cursor-pointer active:scale-95 group"
           >
-            <Camera className="w-4 h-4 text-zinc-700" />
+            <Camera className="w-4 h-4 text-zinc-700 group-hover:scale-110 transition-transform animate-radar-loop" />
             <span>Scan Spedometer / Struk</span>
           </button>
           <button
             onClick={onOpenAddFuel}
-            className="flex items-center gap-2 py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-black rounded-2xl transition cursor-pointer shadow-sm active:scale-95"
+            className="flex items-center gap-2 py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-black rounded-2xl transition cursor-pointer shadow-sm active:scale-95 group"
           >
-            <Fuel className="w-4 h-4 text-yellow-400" />
+            <Fuel className="w-4 h-4 text-yellow-400 group-hover:scale-110 transition-transform animate-float-loop" />
             <span>Catat Pengisian BBM</span>
           </button>
         </div>
@@ -174,7 +171,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => onOpenAiChat()}
               className="py-3 px-5 bg-zinc-950 hover:bg-zinc-800 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl transition shadow-md shadow-zinc-900/10 active:scale-95 flex items-center justify-center gap-2 cursor-pointer shrink-0"
             >
-              <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400 animate-sparkle-loop" />
               <span>Buka Chat AI</span>
               <ChevronRight className="w-4 h-4 text-yellow-400" />
             </button>
@@ -214,7 +211,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="bg-yellow-50 border-2 border-yellow-400 rounded-3xl p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-700" />
+                <AlertTriangle className="w-5 h-5 text-yellow-700 animate-heartbeat-loop" />
                 <h4 className="font-extrabold text-xs uppercase tracking-wider text-zinc-900">
                   Peringatan Mendesak
                 </h4>
@@ -305,8 +302,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-zinc-900">
-                    <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                  <div className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-900">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400 animate-heartbeat-loop"></span>
                     <span>{veh.healthScore}%</span>
                   </div>
                 </div>

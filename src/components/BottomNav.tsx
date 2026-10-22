@@ -42,7 +42,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                     ? 'bg-zinc-950 text-yellow-400 scale-110 shadow-zinc-900/30'
                     : 'bg-yellow-400 text-zinc-950 hover:bg-yellow-300'
                 }`}>
-                  <Icon className="w-5 h-5 stroke-[2.5]" />
+                  <Icon className="w-5 h-5 stroke-[2.5] animate-sparkle-loop" />
                 </div>
                 <span className="text-[10px] font-bold text-zinc-900 mt-1">
                   Chat AI
@@ -73,7 +73,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 />
 
                 {item.id === 'service' && serviceBadgeCount > 0 && (
-                  <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-[14px] bg-yellow-400 text-zinc-950 text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">
+                  <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-[14px] bg-yellow-400 text-zinc-950 text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
                     {serviceBadgeCount}
                   </span>
                 )}

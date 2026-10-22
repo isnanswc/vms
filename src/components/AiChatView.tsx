@@ -13,10 +13,12 @@ import {
   Sparkles, 
   Bot, 
   User, 
-  Mic
+  Mic,
+  Layers
 } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 import { VoiceInputModal } from './VoiceInputModal';
+import { callGeminiWithFallback } from '../utils/geminiApi';
 
 interface AiChatViewProps {
   sessions: ChatSession[];
@@ -61,7 +63,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
     }
   }, [currentSession?.messages, isAiTyping]);
 
-  const handleSend = (textOverride?: string) => {
+  const handleSend = async (textOverride?: string) => {
     const textToSend = textOverride !== undefined ? textOverride : inputText;
     if (!textToSend.trim() && !pendingAttachment) return;
 
@@ -72,8 +74,48 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
     setIsAttachMenuOpen(false);
 
     onSendMessage(currentSession.id, textToSend, attachmentToSend || undefined);
-
     setIsAiTyping(true);
+
+    // 1. Try real Gemini API with 3-Slot Fallback Cascade if API key exists
+    if (settings.apiKey?.trim()) {
+      try {
+        let imagePayload: { mimeType: string; dataBase64: string } | undefined;
+        if (attachmentToSend?.type === 'image' && attachmentToSend.url) {
+          try {
+            const blob = await fetch(attachmentToSend.url).then((r) => r.blob());
+            const reader = new FileReader();
+            const base64Promise = new Promise<string>((resolve) => {
+              reader.onloadend = () => {
+                const res = (reader.result as string) || '';
+                resolve(res.includes(',') ? res.split(',')[1] : res);
+              };
+            });
+            reader.readAsDataURL(blob);
+            const b64 = await base64Promise;
+            imagePayload = {
+              mimeType: blob.type || 'image/jpeg',
+              dataBase64: b64,
+            };
+          } catch (e) {
+            console.warn('Konversi base64 gagal:', e);
+          }
+        }
+
+        const res = await callGeminiWithFallback(textToSend, settings, imagePayload);
+        setIsAiTyping(false);
+
+        const slotNote = res.fallbackSlotIndex > 0
+          ? `\n\n*(⚡ Terhubung via Fallback Slot ${res.fallbackSlotIndex + 1}: ${res.modelUsed})*`
+          : `\n\n*(⚡ Terhubung via Slot 1 Utama: ${res.modelUsed})*`;
+
+        onSendMessage(currentSession.id, res.text + slotNote, undefined);
+        return;
+      } catch (err: any) {
+        console.warn('Fallback cascade error:', err);
+      }
+    }
+
+    // 2. Intelligent Offline Fleet Knowledge Engine
     setTimeout(() => {
       setIsAiTyping(false);
       let replyText = 'Saya mengerti kebutuhan armada Anda.';
@@ -85,19 +127,19 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
       );
 
       if (matchedVeh) {
-        replyText = `🚗 **Analisa Data Armada ${matchedVeh.name} (${matchedVeh.plateNumber})**:\n• Status Kesehatan: **${matchedVeh.healthScore}%**\n• Odometer Terkini: **${matchedVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n• Jenis Bahan Bakar Rekomendasi: **${matchedVeh.fuelType}**\n• Rekomendasi AI: Unit terdaftar dalam sistem pengawasan. Silakan catat pengisian BBM atau jadwalkan servis berkala saat jatuh tempo.`;
+        replyText = `🚗 **Analisa Data Armada ${matchedVeh.name} (${matchedVeh.plateNumber})**:\n• Status Kesehatan: **${matchedVeh.healthScore}%**\n• Odometer Terkini: **${matchedVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n• Jenis Bahan Bakar Rekomendasi: **${matchedVeh.fuelType}**\n• Rekomendasi AI: Unit terdaftar dalam sistem pengawasan. Silakan catat pengisian BBM atau jadwalkan servis berkala saat jatuh tempo.\n\n*(⚡ Respons Otomatis: Fleet Local Engine)*`;
       } else if (attachmentToSend?.type === 'image') {
-        replyText = `📸 **Hasil Analisis Gambar AI (${settings.selectedModel})**:\nSaya berhasil membaca foto lampiran Anda.\n• **Status**: Gambar jelas & terverifikasi.\n• **Estimasi Data**: Terdeteksi indikasi spedometer / bukti transaksi SPBU.\n• **Rekomendasi**: Nilai odometer ini telah diselaraskan dengan buku servis kendaraan Anda.`;
+        replyText = `📸 **Hasil Analisis Gambar AI (${settings.fallbackSlots?.[0] || settings.selectedModel})**:\nSaya berhasil membaca foto lampiran Anda.\n• **Status**: Gambar jelas & terverifikasi.\n• **Estimasi Data**: Terdeteksi indikasi spedometer / bukti transaksi SPBU.\n• **Rekomendasi**: Nilai odometer ini telah diselaraskan dengan buku servis kendaraan Anda.\n\n*(⚡ Respons Otomatis: Fleet Vision Engine)*`;
       } else if (lower.includes('vario') || lower.includes('oli') || lower.includes('servis')) {
-        replyText = `🔧 **Informasi Perawatan Honda Vario 125 (2015)**:\n• Kapasitas oli mesin: **0.8 Liter** (Gunakan tipe SAE 10W-30 MPX2/SPX2).\n• Interval oli mesin: Tiap 2.000 - 2.500 KM.\n• Interval oli gardan: Tiap 6.000 KM.\n• Catatan: Jangan lupa bersihkan saringan udara setiap 8.000 KM agar konsumsi BBM tetap irit di kisaran ~43 km/liter.`;
+        replyText = `🔧 **Informasi Perawatan Honda Vario 125 (2015)**:\n• Kapasitas oli mesin: **0.8 Liter** (Gunakan tipe SAE 10W-30 MPX2/SPX2).\n• Interval oli mesin: Tiap 2.000 - 2.500 KM.\n• Interval oli gardan: Tiap 6.000 KM.\n• Catatan: Jangan lupa bersihkan saringan udara setiap 8.000 KM agar konsumsi BBM tetap irit di kisaran ~43 km/liter.\n\n*(⚡ Respons Otomatis: Fleet Knowledge Engine)*`;
       } else if (lower.includes('bbm') || lower.includes('konsumsi') || lower.includes('bensin')) {
-        replyText = `⛽ **Laporan Efisiensi BBM**:\nRata-rata konsumsi armada Anda saat ini berada pada angka optimal. Kendaraan roda dua (Vario) mencatatkan **42.5 km/L**, sedangkan kendaraan logistik (Gran Max) berada pada **11.8 km/L** (sesuai standar beban kargo 1 ton).`;
+        replyText = `⛽ **Laporan Efisiensi BBM**:\nRata-rata konsumsi armada Anda saat ini berada pada angka optimal. Kendaraan roda dua (Vario) mencatatkan **42.5 km/L**, sedangkan kendaraan logistik (Gran Max) berada pada **11.8 km/L** (sesuai standar beban kargo 1 ton).\n\n*(⚡ Respons Otomatis: Fleet Telemetri Engine)*`;
       } else {
-        replyText = `Saya telah mencatat pertanyaan Anda: "${textToSend}". Sebagai asisten armada Anda, saya siap membantu mengecek masa berlaku STNK, menghitung biaya tak terduga, atau menganalisis foto odometer kapan saja.`;
+        replyText = `Saya telah mencatat pertanyaan Anda: "${textToSend}". Sebagai asisten armada Anda, saya siap membantu mengecek masa berlaku STNK, menghitung biaya tak terduga, atau menganalisis foto odometer kapan saja.\n\n*(⚡ Respons Otomatis: Assistant Standby)*`;
       }
 
       onSendMessage(currentSession.id, replyText, undefined);
-    }, 1000);
+    }, 700);
   };
 
   const handleVoiceTranscript = (transcriptText: string) => {
@@ -143,7 +185,9 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col md:flex-row w-full h-[100dvh] max-h-[100dvh] bg-white text-zinc-900 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col md:flex-row w-full h-[100dvh] max-h-[100dvh] bg-white text-zinc-900 overflow-hidden animate-tech-chat-enter">
+      {/* Sleek Futuristic Glowing Accent Strip */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-500 via-amber-300 to-yellow-500 z-50 shadow-xs shadow-yellow-400/50" />
       {/* Hidden File Inputs */}
       <input
         ref={cameraInputRef}
@@ -242,9 +286,12 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
               })}
             </div>
 
-            <div className="p-3.5 border-t border-zinc-200 bg-white text-xs text-zinc-500">
+            <div className="p-3 border-t border-zinc-200 bg-white text-xs text-zinc-500 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-zinc-800 text-[11px]">Model: {settings.selectedModel}</span>
+                <span className="font-bold text-zinc-800 text-[11px] flex items-center gap-1">
+                  <Layers className="w-3.5 h-3.5 text-yellow-600" />
+                  <span>3 Slot Fallback</span>
+                </span>
                 <button
                   onClick={() => {
                     setIsDrawerOpen(false);
@@ -254,6 +301,15 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                 >
                   Ubah
                 </button>
+              </div>
+              <div className="text-[10px] font-mono text-zinc-700 truncate font-bold">
+                1. {settings.fallbackSlots?.[0] || settings.selectedModel || 'gemini-2.5-flash'}
+              </div>
+              <div className="text-[10px] font-mono text-zinc-400 truncate">
+                2. {settings.fallbackSlots?.[1] || 'gemini-2.0-flash'}
+              </div>
+              <div className="text-[10px] font-mono text-zinc-400 truncate">
+                3. {settings.fallbackSlots?.[2] || 'gemini-1.5-flash'}
               </div>
             </div>
           </div>
@@ -323,15 +379,27 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
           })}
         </div>
 
-        <div className="p-3.5 border-t border-zinc-200 bg-white text-xs text-zinc-500">
+        <div className="p-3.5 border-t border-zinc-200 bg-white text-xs text-zinc-500 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="font-bold text-zinc-800 text-[11px]">Model: {settings.selectedModel}</span>
+            <span className="font-bold text-zinc-800 text-[11px] flex items-center gap-1">
+              <Layers className="w-3.5 h-3.5 text-yellow-600" />
+              <span>3 Slot Fallback Active</span>
+            </span>
             <button
               onClick={onOpenSettings}
-              className="text-[10px] text-yellow-700 font-bold hover:underline"
+              className="text-[10px] text-yellow-700 font-bold hover:underline cursor-pointer"
             >
               Ubah
             </button>
+          </div>
+          <div className="text-[10px] font-mono text-zinc-800 truncate font-bold">
+            1. {settings.fallbackSlots?.[0] || settings.selectedModel || 'gemini-2.5-flash'}
+          </div>
+          <div className="text-[10px] font-mono text-zinc-400 truncate">
+            2. {settings.fallbackSlots?.[1] || 'gemini-2.0-flash'}
+          </div>
+          <div className="text-[10px] font-mono text-zinc-400 truncate">
+            3. {settings.fallbackSlots?.[2] || 'gemini-1.5-flash'}
           </div>
         </div>
       </aside>
@@ -355,10 +423,16 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                 <span className="font-black text-sm md:text-base text-zinc-900 tracking-tight">
                   {currentSession.title}
                 </span>
-                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
               </div>
-              <p className="text-[11px] text-zinc-500 font-mono">
-                Fleet Intelligence • {settings.selectedModel}
+              <p className="text-[11px] text-zinc-500 font-mono flex items-center gap-1.5 flex-wrap">
+                <span>Fleet Intelligence</span>
+                <span>•</span>
+                <span className="text-zinc-800 font-bold">{settings.fallbackSlots?.[0] || settings.selectedModel}</span>
+                <span className="text-[9px] px-1.5 py-0.2 bg-yellow-100 border border-yellow-300 text-zinc-950 font-bold rounded-md flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping"></span>
+                  3 Slot Fallback
+                </span>
               </p>
             </div>
           </div>
@@ -395,7 +469,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
           <div className="max-w-3xl mx-auto space-y-4">
             <div className="text-center py-4">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-3xl bg-yellow-400 text-zinc-950 shadow-md shadow-yellow-400/20 mb-2">
-                <Sparkles className="w-7 h-7 stroke-[2.2]" />
+                <Sparkles className="w-7 h-7 stroke-[2.2] animate-sparkle-loop" />
               </div>
               <h2 className="text-base font-black text-zinc-900 tracking-tight">
                 Fleet Intelligence Assistant
@@ -420,7 +494,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                         : 'bg-yellow-400 text-zinc-950'
                     }`}
                   >
-                    {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                    {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 animate-float-loop" />}
                   </div>
 
                   <div

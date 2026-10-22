@@ -2,19 +2,14 @@ import React, { useState } from 'react';
 import type { UserProfile, DriverLicense } from '../types/user';
 import { 
   ChevronLeft, 
-  User, 
   CreditCard, 
   Plus, 
-  Calendar, 
-  ShieldAlert, 
   ShieldCheck, 
   AlertTriangle, 
   Trash2, 
   X, 
   Mail, 
-  Phone, 
-  Award,
-  Sparkles
+  Phone
 } from 'lucide-react';
 
 interface ProfileViewProps {
@@ -77,7 +72,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 pb-24 md:pb-8 pt-1 animate-fade-in text-zinc-900 max-w-5xl">
+    <div className="space-y-6 pb-24 md:pb-8 pt-1 animate-profile-enter text-zinc-900 max-w-5xl">
       {/* Top Header */}
       <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
         <button

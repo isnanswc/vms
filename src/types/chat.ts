@@ -19,7 +19,9 @@ export interface ChatSession {
 }
 
 export interface AiSettings {
-  selectedModel: 'gemini-2.5-flash' | 'gemini-2.5-pro' | 'gemini-flash-lite';
+  selectedModel: string;
   apiKey: string;
+  fallbackSlots: [string, string, string]; // [Slot 1: Utama, Slot 2: Cadangan 1, Slot 3: Cadangan 2]
+  availableModels?: string[];
   systemPromptPreset: 'fleet-expert' | 'financial-mechanic' | 'casual-assistant';
 }

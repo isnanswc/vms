@@ -222,6 +222,92 @@ export function App() {
   // Selected vehicle for detail view
   const currentDetailVehicle = vehicles.find((v) => v.id === selectedVehicleIdForDetail);
 
+  // Unified Navigation & Browser History Back Management
+  const navigateTo = (options: {
+    tab?: TabType;
+    vehicleId?: string | null;
+    isAdding?: boolean;
+    isProfile?: boolean;
+  }) => {
+    if (options.tab !== undefined) setActiveTab(options.tab);
+    if (options.vehicleId !== undefined) setSelectedVehicleIdForDetail(options.vehicleId);
+    if (options.isAdding !== undefined) setIsAddingVehiclePage(options.isAdding);
+    if (options.isProfile !== undefined) setIsViewingProfile(options.isProfile);
+
+    if (typeof window !== 'undefined') {
+      window.history.pushState(
+        {
+          tab: options.tab !== undefined ? options.tab : activeTab,
+          vehicleId: options.vehicleId !== undefined ? options.vehicleId : selectedVehicleIdForDetail,
+          isAdding: options.isAdding !== undefined ? options.isAdding : isAddingVehiclePage,
+          isProfile: options.isProfile !== undefined ? options.isProfile : isViewingProfile,
+        },
+        ''
+      );
+    }
+  };
+
+  const handleGoBack = () => {
+    // If browser history has an entry, trigger popstate
+    if (typeof window !== 'undefined' && window.history.state) {
+      window.history.back();
+      return;
+    }
+
+    // Direct fallback
+    if (isViewingProfile) {
+      setIsViewingProfile(false);
+      return;
+    }
+    if (isAddingVehiclePage) {
+      setIsAddingVehiclePage(false);
+      return;
+    }
+    if (selectedVehicleIdForDetail) {
+      setSelectedVehicleIdForDetail(null);
+      return;
+    }
+    if (activeTab === 'chat') {
+      setActiveTab('dashboard');
+      return;
+    }
+    if (activeTab !== 'dashboard') {
+      setActiveTab('dashboard');
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.history.state) {
+      window.history.replaceState(
+        {
+          tab: 'dashboard',
+          vehicleId: null,
+          isAdding: false,
+          isProfile: false,
+        },
+        ''
+      );
+    }
+
+    const onPopState = (e: PopStateEvent) => {
+      const state = e.state;
+      if (state) {
+        if (state.tab !== undefined) setActiveTab(state.tab);
+        setSelectedVehicleIdForDetail(state.vehicleId || null);
+        setIsAddingVehiclePage(Boolean(state.isAdding));
+        setIsViewingProfile(Boolean(state.isProfile));
+      } else {
+        setIsViewingProfile(false);
+        setIsAddingVehiclePage(false);
+        setSelectedVehicleIdForDetail(null);
+        setActiveTab('dashboard');
+      }
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
   // 1. IF ACTIVE TAB IS CHAT: Render full pure Chat AI experience
   if (activeTab === 'chat') {
     return (
@@ -233,7 +319,7 @@ export function App() {
           onNewChat={handleNewChat}
           onSendMessage={handleSendMessage}
           onOpenSettings={() => setIsAiSettingsOpen(true)}
-          onBackToHome={() => setActiveTab('dashboard')}
+          onBackToHome={handleGoBack}
           settings={aiSettings}
           vehicles={vehicles}
         />
@@ -254,17 +340,12 @@ export function App() {
       <Sidebar
         activeTab={activeTab}
         onChangeTab={(tab) => {
-          setIsViewingProfile(false);
-          setIsAddingVehiclePage(false);
-          setSelectedVehicleIdForDetail(null);
-          setActiveTab(tab);
+          navigateTo({ tab, isProfile: false, isAdding: false, vehicleId: null });
         }}
         serviceBadgeCount={criticalPartsCount}
         profile={userProfile}
         onOpenProfile={() => {
-          setIsAddingVehiclePage(false);
-          setSelectedVehicleIdForDetail(null);
-          setIsViewingProfile(true);
+          navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
         }}
       />
 
@@ -275,15 +356,10 @@ export function App() {
           urgentCount={urgentCount}
           profile={userProfile}
           onOpenAlerts={() => {
-            setIsViewingProfile(false);
-            setIsAddingVehiclePage(false);
-            setSelectedVehicleIdForDetail(null);
-            setActiveTab('service');
+            navigateTo({ tab: 'service', isProfile: false, isAdding: false, vehicleId: null });
           }}
           onOpenProfile={() => {
-            setIsAddingVehiclePage(false);
-            setSelectedVehicleIdForDetail(null);
-            setIsViewingProfile(true);
+            navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
           }}
         />
 
@@ -293,13 +369,13 @@ export function App() {
           {isViewingProfile ? (
             <ProfileView
               profile={userProfile}
-              onBack={() => setIsViewingProfile(false)}
+              onBack={handleGoBack}
               onUpdateProfile={(updated) => setUserProfile(updated)}
             />
           ) : isAddingVehiclePage ? (
             /* VIEW B: ADD VEHICLE FULL PAGE (AI SEARCH & AUTO-SUGGESTION) */
             <AddVehiclePageView
-              onBack={() => setIsAddingVehiclePage(false)}
+              onBack={handleGoBack}
               onSaveVehicle={handleSaveNewVehicleAndParts}
             />
           ) : selectedVehicleIdForDetail && currentDetailVehicle ? (
@@ -309,7 +385,7 @@ export function App() {
               fuelLogs={fuelLogs}
               spareParts={spareParts}
               serviceRecords={serviceRecords}
-              onBack={() => setSelectedVehicleIdForDetail(null)}
+              onBack={handleGoBack}
               onAddFuelLog={() => setIsAddFuelOpen(true)}
               onAddService={() => setIsAddServiceOpen(true)}
               onOpenAiChat={handleOpenAiChatWithPrompt}
@@ -317,7 +393,7 @@ export function App() {
             />
           ) : (
             /* VIEW D: STANDARD TAB VIEWS */
-            <>
+            <div className="animate-page-enter">
               {activeTab === 'dashboard' && (
                 <DashboardView
                   vehicles={vehicles}
@@ -325,8 +401,7 @@ export function App() {
                   spareParts={spareParts}
                   serviceRecords={serviceRecords}
                   onNavigateTab={(tab) => {
-                    setSelectedVehicleIdForDetail(null);
-                    setActiveTab(tab);
+                    navigateTo({ tab, vehicleId: null, isAdding: false, isProfile: false });
                   }}
                   onOpenQuickScan={() => setIsScanModalOpen(true)}
                   onOpenAddFuel={() => setIsAddFuelOpen(true)}
@@ -337,8 +412,8 @@ export function App() {
               {activeTab === 'vehicles' && (
                 <VehiclesView
                   vehicles={vehicles}
-                  onAddVehicle={() => setIsAddingVehiclePage(true)}
-                  onSelectVehicle={(veh) => setSelectedVehicleIdForDetail(veh.id)}
+                  onAddVehicle={() => navigateTo({ isAdding: true, isProfile: false, vehicleId: null })}
+                  onSelectVehicle={(veh) => navigateTo({ vehicleId: veh.id, isAdding: false, isProfile: false })}
                 />
               )}
 
@@ -362,7 +437,7 @@ export function App() {
                   onDeleteService={handleDeleteServiceRecord}
                 />
               )}
-            </>
+            </div>
           )}
         </main>
 
@@ -370,10 +445,7 @@ export function App() {
         <BottomNav
           activeTab={activeTab}
           onChangeTab={(tab) => {
-            setIsViewingProfile(false);
-            setIsAddingVehiclePage(false);
-            setSelectedVehicleIdForDetail(null);
-            setActiveTab(tab);
+            navigateTo({ tab, isProfile: false, isAdding: false, vehicleId: null });
           }}
           serviceBadgeCount={criticalPartsCount}
         />
