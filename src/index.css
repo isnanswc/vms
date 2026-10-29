@@ -175,7 +175,7 @@
 }
 
 /* ========================================================================== */
-/* CHAT AI HIGH-TECH CIRCUIT LINE RUNNER & BLACK GLOW ANIMATION                */
+/* CHAT AI HIGH-TECH CIRCUIT LINE RUNNER & PURE WHITE GLOW ANIMATION           */
 /* ========================================================================== */
 
 @keyframes chatLineTrace {
@@ -196,20 +196,39 @@
 @keyframes chatGlowPulse {
   0%, 40% {
     filter: drop-shadow(0 0 0px transparent);
-    opacity: 0.8;
+    opacity: 0.85;
   }
   50%, 80% {
-    filter: drop-shadow(0 0 7px rgba(9, 9, 11, 0.95)) drop-shadow(0 0 3px rgba(250, 204, 21, 0.7));
+    /* Glowing pure white aura instead of black shadow */
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.65)) drop-shadow(0 0 4px rgba(250, 204, 21, 0.8));
     opacity: 1;
   }
   100% {
     filter: drop-shadow(0 0 0px transparent);
-    opacity: 0.8;
+    opacity: 0.85;
   }
 }
 
 .animate-chat-line-run {
   stroke-dasharray: 80 80;
   animation: chatLineTrace 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite, chatGlowPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ========================================================================== */
+/* VIEW TRANSITION CIRCULAR REVEAL WAVE ANIMATION (THEME TOGGLE)              */
+/* ========================================================================== */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 99999;
 }
 

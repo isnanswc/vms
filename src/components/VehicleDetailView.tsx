@@ -23,6 +23,8 @@ import {
   MapPin,
   Navigation
 } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
+import { triggerHaptic } from '../utils/haptics';
 
 interface VehicleDetailViewProps {
   vehicle: Vehicle;
@@ -42,10 +44,10 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
   vehicle,
   fuelLogs,
   spareParts,
-  serviceRecords,
+  serviceRecords: _serviceRecords,
   onBack,
   onAddFuelLog,
-  onAddService,
+  onAddService: _onAddService,
   onOpenAiChat,
   onAddTaxPayment,
   onUpdateVehicle,
@@ -83,7 +85,6 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
   const vFuelLogs = fuelLogs.filter((l) => l.vehicleId === vehicle.id);
   const vParts = spareParts.filter((p) => p.vehicleId === vehicle.id);
-  const vServices = serviceRecords.filter((s) => s.vehicleId === vehicle.id);
 
   const totalLiters = vFuelLogs.reduce((acc, l) => acc + l.liters, 0);
   const totalFuelCost = vFuelLogs.reduce((acc, l) => acc + l.totalCost, 0);
@@ -133,7 +134,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
         fuelType: editFuelType,
         tankCapacityLiters: Number(editTankCapacity),
         maxCargoWeightKg: editMaxCargo ? Number(editMaxCargo) : undefined,
-        notes: editNotes.trim(),
+        notes: (editNotes || '').trim(),
         stnkNumber: editStnkNumber.trim(),
         chassisNumber: editChassisNumber.trim(),
         engineNumber: editEngineNumber.trim(),
@@ -168,20 +169,27 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
   return (
     <div className="space-y-6 pb-24 md:pb-8 pt-2 animate-fade-in text-zinc-900 dark:text-zinc-100 transition-colors">
-      {/* Top Header / Back Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+      {/* Top Header / Back Bar - Executive Aesthetic Redesign */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200/80 dark:border-zinc-800">
+        {/* Left: Back Button */}
         <button
-          onClick={onBack}
-          className="flex items-center gap-1.5 py-2 px-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition cursor-pointer border border-zinc-200/80 dark:border-zinc-700"
+          onClick={() => {
+            triggerHaptic('light');
+            onBack();
+          }}
+          className="group flex items-center gap-2 py-2 px-4 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-black transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 active:scale-95"
         >
-          <ChevronLeft className="w-4 h-4" />
-          <span>Kembali ke Garasi</span>
+          <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+          <span className="hidden sm:inline">Kembali ke Garasi</span>
+          <span className="sm:hidden">Garasi</span>
         </button>
 
-        <div className="flex items-center gap-2">
-          {/* Edit Button */}
+        {/* Right: Cohesive Action Toolbar */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Edit Information Button */}
           <button
             onClick={() => {
+              triggerHaptic('light');
               setEditName(vehicle.name);
               setEditPlateNumber(vehicle.plateNumber);
               setEditCategory(vehicle.category);
@@ -200,35 +208,43 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
               setEditTaxCostFiveYear(vehicle.stnkTaxCostFiveYear);
               setIsEditModalOpen(true);
             }}
-            className="flex items-center gap-1.5 py-2 px-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold transition cursor-pointer border border-zinc-200 dark:border-zinc-700"
+            className="flex items-center gap-2 py-2 px-3.5 sm:px-4 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 active:scale-95"
+            title="Edit Informasi Kendaraan"
           >
-            <Edit3 className="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" />
-            <span>Edit Informasi Dasar</span>
+            <Edit3 className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+            <span className="hidden md:inline">Edit Informasi</span>
+            <span className="md:hidden">Edit</span>
           </button>
 
           {/* Delete Button */}
           <button
-            onClick={() => setIsDeleteConfirmOpen(true)}
-            className="flex items-center gap-1.5 py-2 px-3 rounded-2xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 text-xs font-bold transition cursor-pointer border border-red-200 dark:border-red-900"
+            onClick={() => {
+              triggerHaptic('warning');
+              setIsDeleteConfirmOpen(true);
+            }}
+            className="flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-950/40 text-zinc-400 hover:text-red-600 dark:hover:text-red-400 text-xs font-bold transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 hover:border-red-300 dark:hover:border-red-800/80 shadow-xs active:scale-95"
             title="Hapus Kendaraan dari Garasi"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Hapus Unit</span>
+            <span className="hidden lg:inline">Hapus Unit</span>
           </button>
 
           {/* AI Advisor Button */}
           <button
-            onClick={() => onOpenAiChat(`Tolong berikan analisa komprehensif untuk kendaraan ${vehicle.name} (${vehicle.plateNumber}) saat ini.`)}
-            className="flex items-center gap-1.5 py-2 px-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black transition cursor-pointer shadow-xs"
+            onClick={() => {
+              triggerHaptic('medium');
+              onOpenAiChat(`Tolong berikan analisa komprehensif untuk kendaraan ${vehicle.name} (${vehicle.plateNumber}) saat ini.`);
+            }}
+            className="flex items-center gap-2 py-2 px-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-95 ring-2 ring-yellow-400/20"
           >
-            <Sparkles className="w-4 h-4 fill-zinc-950" />
+            <Sparkles className="w-4 h-4 fill-zinc-950 text-zinc-950" />
             <span>Tanya AI</span>
           </button>
         </div>
       </div>
 
       {/* Hero Vehicle Overview Card (Desktop Widescreen) */}
-      <div className="bg-white border-2 border-zinc-900 rounded-3xl p-5 md:p-6 shadow-sm">
+      <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 md:p-6 shadow-sm transition-colors">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -630,133 +646,136 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
       {/* MODAL INPUT MANUAL PAJAK STNK */}
       {isTaxModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md bg-white border-2 border-zinc-900 rounded-3xl p-5 shadow-2xl text-zinc-900">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
-              <h3 className="font-black text-sm uppercase tracking-wider text-zinc-900">
-                Catat Pembayaran Pajak STNK
-              </h3>
-              <button
-                onClick={() => setIsTaxModalOpen(false)}
-                className="p-1 rounded-full text-zinc-400 hover:text-zinc-900"
-              >
-                <X className="w-5 h-5" />
-              </button>
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 shadow-2xl text-zinc-900 dark:text-zinc-100">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+                <h3 className="font-black text-sm uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                  Catat Pembayaran Pajak STNK
+                </h3>
+                <button
+                  onClick={() => setIsTaxModalOpen(false)}
+                  className="p-1 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveTax} className="mt-4 space-y-3 text-xs">
+                <div>
+                  <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Jenis Pembayaran Pajak</label>
+                  <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 font-bold">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTaxType('tahunan');
+                        setTaxCost(vehicle.stnkTaxCostAnnual);
+                      }}
+                      className={`py-2 rounded-lg transition cursor-pointer ${
+                        taxType === 'tahunan' ? 'bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Pajak Tahunan (PKB)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTaxType('lima_tahunan');
+                        setTaxCost(vehicle.stnkTaxCostFiveYear);
+                      }}
+                      className={`py-2 rounded-lg transition cursor-pointer ${
+                        taxType === 'lima_tahunan' ? 'bg-yellow-400 text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+                      }`}
+                    >
+                      5 Tahunan (Plat Kaleng)
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Tanggal Bayar</label>
+                    <input
+                      type="date"
+                      value={taxDate}
+                      onChange={(e) => setTaxDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Total Biaya (Rp)</label>
+                    <input
+                      type="number"
+                      value={taxCost}
+                      onChange={(e) => setTaxCost(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Nomor Pengesahan / Notice Pajak</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: PKB-2026-9921"
+                    value={taxValidation}
+                    onChange={(e) => setTaxValidation(e.target.value)}
+                    className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Tempat Bayar / Catatan</label>
+                  <input
+                    type="text"
+                    placeholder="Misal: Samsat Keliling Blok M / Aplikasi SIGNAL"
+                    value={taxNotes}
+                    onChange={(e) => setTaxNotes(e.target.value)}
+                    className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 mt-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
+                >
+                  Simpan Pembayaran Pajak
+                </button>
+              </form>
             </div>
-
-            <form onSubmit={handleSaveTax} className="mt-4 space-y-3 text-xs">
-              <div>
-                <label className="block font-bold text-zinc-800 mb-1">Jenis Pembayaran Pajak</label>
-                <div className="grid grid-cols-2 p-1 bg-zinc-100 rounded-xl border border-zinc-200 font-bold">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTaxType('tahunan');
-                      setTaxCost(vehicle.stnkTaxCostAnnual);
-                    }}
-                    className={`py-2 rounded-lg transition ${
-                      taxType === 'tahunan' ? 'bg-white text-zinc-950 shadow-xs' : 'text-zinc-500'
-                    }`}
-                  >
-                    Pajak Tahunan (PKB)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTaxType('lima_tahunan');
-                      setTaxCost(vehicle.stnkTaxCostFiveYear);
-                    }}
-                    className={`py-2 rounded-lg transition ${
-                      taxType === 'lima_tahunan' ? 'bg-yellow-400 text-zinc-950 shadow-xs' : 'text-zinc-500'
-                    }`}
-                  >
-                    5 Tahunan (Plat Kaleng)
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block font-bold text-zinc-800 mb-1">Tanggal Bayar</label>
-                  <input
-                    type="date"
-                    value={taxDate}
-                    onChange={(e) => setTaxDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-zinc-800 mb-1">Total Biaya (Rp)</label>
-                  <input
-                    type="number"
-                    value={taxCost}
-                    onChange={(e) => setTaxCost(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono font-bold"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-zinc-800 mb-1">Nomor Pengesahan / Notice Pajak</label>
-                <input
-                  type="text"
-                  placeholder="Contoh: PKB-2026-9921"
-                  value={taxValidation}
-                  onChange={(e) => setTaxValidation(e.target.value)}
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-zinc-800 mb-1">Tempat Bayar / Catatan</label>
-                <input
-                  type="text"
-                  placeholder="Misal: Samsat Keliling Blok M / Aplikasi SIGNAL"
-                  value={taxNotes}
-                  onChange={(e) => setTaxNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-xl text-zinc-900"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 mt-2 bg-zinc-950 hover:bg-zinc-800 text-white font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
-              >
-                Simpan Pembayaran Pajak
-              </button>
-            </form>
           </div>
-        </div>
+        </ModalPortal>
       )}
 
       {/* MODAL EDIT DATA KENDARAAN (INFORMASI DASAR LENGKAP - EXECUTIVE REDESIGN) */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-zinc-950/75 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-          <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 md:p-7 shadow-2xl max-h-[92vh] flex flex-col">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-2xl bg-yellow-400 text-zinc-950 shadow-xs">
-                  <Edit3 className="w-5 h-5 stroke-[2.5]" />
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 md:p-6 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 md:p-7 shadow-2xl max-h-[92vh] flex flex-col">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-2xl bg-yellow-400 text-zinc-950 shadow-xs">
+                    <Edit3 className="w-5 h-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base uppercase tracking-wider text-zinc-900 dark:text-white">
+                      Edit Informasi Dasar Kendaraan
+                    </h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Kelola identitas armada, spesifikasi teknis mesin, dan administrasi STNK
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-black text-base uppercase tracking-wider text-zinc-900 dark:text-white">
-                    Edit Informasi Dasar Kendaraan
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Kelola identitas armada, spesifikasi teknis mesin, dan administrasi STNK
-                  </p>
-                </div>
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="p-2 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="p-2 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
             {/* Scrollable Form Body */}
             <form onSubmit={handleSaveVehicleEdit} className="flex-1 overflow-y-auto py-5 pr-1 space-y-5 no-scrollbar text-xs">
@@ -1010,50 +1029,53 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
             </form>
           </div>
         </div>
+      </ModalPortal>
       )}
 
       {/* MODAL KONFIRMASI HAPUS KENDARAAN (DANGER DIALOG) */}
       {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-red-600 dark:border-red-500 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-red-600 dark:border-red-500 rounded-3xl p-6 shadow-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-zinc-900 dark:text-white">
+                    Hapus Kendaraan dari Garasi?
+                  </h3>
+                  <span className="text-xs text-red-600 dark:text-red-400 font-bold">
+                    Tindakan ini tidak dapat dibatalkan
+                  </span>
+                </div>
               </div>
-              <div>
-                <h3 className="font-black text-base text-zinc-900 dark:text-white">
-                  Hapus Kendaraan dari Garasi?
-                </h3>
-                <span className="text-xs text-red-600 dark:text-red-400 font-bold">
-                  Tindakan ini tidak dapat dibatalkan
-                </span>
+
+              <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed bg-zinc-50 dark:bg-zinc-800/60 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700">
+                Unit armada <strong>{vehicle.name}</strong> dengan plat nomor <strong>{vehicle.plateNumber}</strong> akan dihapus permanen dari sistem, termasuk seluruh catatan BBM, suku cadang, dan riwayat servis terkait.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                  className="py-3 px-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition cursor-pointer"
+                >
+                  Batalkan
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  className="py-3 px-4 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-wider transition shadow-md shadow-red-600/20 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Ya, Hapus</span>
+                </button>
               </div>
-            </div>
-
-            <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed bg-zinc-50 dark:bg-zinc-800/60 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700">
-              Unit armada <strong>{vehicle.name}</strong> dengan plat nomor <strong>{vehicle.plateNumber}</strong> akan dihapus permanen dari sistem, termasuk seluruh catatan BBM, suku cadang, dan riwayat servis terkait.
-            </p>
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsDeleteConfirmOpen(false)}
-                className="py-3 px-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition cursor-pointer"
-              >
-                Batalkan
-              </button>
-
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                className="py-3 px-4 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-wider transition shadow-md shadow-red-600/20 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Ya, Hapus</span>
-              </button>
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

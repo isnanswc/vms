@@ -414,7 +414,7 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
   // Step 1 states: Search & AI suggestion
   const [searchQuery, setSearchQuery] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState<PresetVehicleSpec[]>([]);
-  const [isAiSearching, setIsAiSearching] = useState(false);
+  const [, setIsAiSearching] = useState(false);
   const [isDeepAiAnalyzing, setIsDeepAiAnalyzing] = useState(false);
   const [aiMessageNotice, setAiMessageNotice] = useState<string | null>(null);
   const [hasSelectedModel, setHasSelectedModel] = useState(false);
@@ -995,10 +995,10 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                   </div>
                 </div>
 
-                {/* No STNK & Rangka (Opsional) */}
-                <div className="grid grid-cols-2 gap-2">
+                {/* No STNK, Rangka & Mesin (Opsional) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Seri STNK (Opsional)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Seri STNK</label>
                     <input
                       type="text"
                       placeholder="Contoh: 08392104-JKT"
@@ -1008,12 +1008,22 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Rangka / VIN (Opsional)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Rangka / VIN</label>
                     <input
                       type="text"
                       placeholder="MH1JF31..."
                       value={chassisNumber}
                       onChange={(e) => setChassisNumber(e.target.value.toUpperCase())}
+                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Mesin</label>
+                    <input
+                      type="text"
+                      placeholder="JF31E-10..."
+                      value={engineNumber}
+                      onChange={(e) => setEngineNumber(e.target.value.toUpperCase())}
                       className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                     />
                   </div>

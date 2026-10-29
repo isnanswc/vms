@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   X
 } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
 
 interface VehiclesViewProps {
   vehicles: Vehicle[];
@@ -226,61 +227,63 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
 
       {/* CONFIRM DELETE VEHICLE MODAL */}
       {vehicleToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-red-500 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400">
-                  <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-red-500 rounded-3xl p-6 shadow-2xl space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400">
+                    <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base uppercase tracking-tight text-red-600 dark:text-red-400">
+                      Hapus Unit Kendaraan?
+                    </h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Tindakan ini permanen dan tidak dapat dibatalkan</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-black text-base uppercase tracking-tight text-red-600 dark:text-red-400">
-                    Hapus Unit Kendaraan?
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Tindakan ini permanen dan tidak dapat dibatalkan</p>
+
+                <button
+                  type="button"
+                  onClick={() => setVehicleToDelete(null)}
+                  className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs space-y-1">
+                <div className="font-extrabold text-sm text-zinc-900 dark:text-zinc-100">
+                  {vehicleToDelete.name} ({vehicleToDelete.year})
                 </div>
+                <div className="font-mono text-zinc-600 dark:text-zinc-300 font-bold">
+                  Plat: {vehicleToDelete.plateNumber}
+                </div>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pt-1 leading-relaxed">
+                  Seluruh catatan riwayat pengisian BBM, buku servis, dan suku cadang yang terdaftar untuk unit ini akan terhapus otomatis dari penyimpanan sistem.
+                </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setVehicleToDelete(null)}
-                className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs space-y-1">
-              <div className="font-extrabold text-sm text-zinc-900 dark:text-zinc-100">
-                {vehicleToDelete.name} ({vehicleToDelete.year})
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setVehicleToDelete(null)}
+                  className="flex-1 py-3 px-4 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl transition shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Ya, Hapus Unit</span>
+                </button>
               </div>
-              <div className="font-mono text-zinc-600 dark:text-zinc-300 font-bold">
-                Plat: {vehicleToDelete.plateNumber}
-              </div>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pt-1 leading-relaxed">
-                Seluruh catatan riwayat pengisian BBM, buku servis, dan suku cadang yang terdaftar untuk unit ini akan terhapus otomatis dari penyimpanan sistem.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setVehicleToDelete(null)}
-                className="flex-1 py-3 px-4 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs rounded-xl transition cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl transition shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Ya, Hapus Unit</span>
-              </button>
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

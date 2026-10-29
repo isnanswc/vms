@@ -13,6 +13,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { fetchAvailableGeminiModels, FALLBACK_DEFAULT_MODELS } from '../utils/geminiApi';
+import { ModalPortal } from './ModalPortal';
 
 interface AiSettingsModalProps {
   isOpen: boolean;
@@ -119,8 +120,9 @@ export const AiSettingsModal: React.FC<AiSettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-      <div className="w-full max-w-lg bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 md:p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+        <div className="w-full max-w-lg bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 md:p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
@@ -317,5 +319,6 @@ export const AiSettingsModal: React.FC<AiSettingsModalProps> = ({
         </form>
       </div>
     </div>
+  </ModalPortal>
   );
 };

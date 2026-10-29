@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Vehicle, FuelLog, FuelType } from '../types';
-import { X, Fuel, MapPin, Navigation, Loader2 } from 'lucide-react';
+import { X, Fuel, Navigation, Loader2 } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
 
 interface AddFuelModalProps {
   isOpen: boolean;
@@ -96,8 +97,9 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900 dark:text-zinc-100">
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-yellow-400 text-zinc-950">
@@ -230,5 +232,6 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
         </form>
       </div>
     </div>
+  </ModalPortal>
   );
 };

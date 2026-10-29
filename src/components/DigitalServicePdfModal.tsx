@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Vehicle, ServiceRecord, SparePart } from '../types';
 import { X, Printer, ShieldCheck, Award } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
 
 interface DigitalServicePdfModalProps {
   isOpen: boolean;
@@ -21,25 +22,28 @@ export const DigitalServicePdfModal: React.FC<DigitalServicePdfModalProps> = ({
   const targetVehicle = vehicles[0]; // Primary vehicle
   if (!targetVehicle) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/90 backdrop-blur-md animate-fade-in">
-        <div className="w-full max-w-sm bg-zinc-900 border border-zinc-700 rounded-3xl p-6 text-center text-white">
-          <p className="font-bold text-sm">Belum ada unit kendaraan di garasi.</p>
-          <button
-            onClick={onClose}
-            className="mt-4 px-4 py-2 bg-yellow-400 text-zinc-950 font-bold text-xs rounded-xl cursor-pointer"
-          >
-            Tutup
-          </button>
+      <ModalPortal>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 bg-black/90 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-sm bg-zinc-900 border border-zinc-700 rounded-3xl p-6 text-center text-white">
+            <p className="font-bold text-sm">Belum ada unit kendaraan di garasi.</p>
+            <button
+              onClick={onClose}
+              className="mt-4 px-4 py-2 bg-yellow-400 text-zinc-950 font-bold text-xs rounded-xl cursor-pointer"
+            >
+              Tutup
+            </button>
+          </div>
         </div>
-      </div>
+      </ModalPortal>
     );
   }
 
   const targetRecords = serviceRecords.filter((r) => r.vehicleId === targetVehicle.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/90 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-lg bg-zinc-900 border border-zinc-700 rounded-3xl p-5 shadow-2xl max-h-[92vh] overflow-y-auto no-scrollbar">
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 bg-black/90 backdrop-blur-md animate-fade-in">
+        <div className="w-full max-w-lg bg-zinc-900 border border-zinc-700 rounded-3xl p-5 shadow-2xl max-h-[92vh] overflow-y-auto no-scrollbar">
         {/* Top Controls */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
           <div className="flex items-center gap-2">
@@ -141,5 +145,6 @@ export const DigitalServicePdfModal: React.FC<DigitalServicePdfModalProps> = ({
         </div>
       </div>
     </div>
+  </ModalPortal>
   );
 };

@@ -29,12 +29,15 @@ import { ScanModal } from './components/ScanModal';
 import { AddFuelModal } from './components/AddFuelModal';
 import { AddServiceModal } from './components/AddServiceModal';
 import { DigitalServicePdfModal } from './components/DigitalServicePdfModal';
+import { NotificationModal } from './components/NotificationModal';
+import { executeThemeTransition } from './utils/themeTransition';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [selectedVehicleIdForDetail, setSelectedVehicleIdForDetail] = useState<string | null>(null);
   const [isAddingVehiclePage, setIsAddingVehiclePage] = useState(false);
   const [isViewingProfile, setIsViewingProfile] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   // Dark Mode Theme State
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -55,8 +58,10 @@ export function App() {
     localStorage.setItem('vms_theme', theme);
   }, [theme]);
 
-  const handleToggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  const handleToggleTheme = (event?: React.MouseEvent) => {
+    executeThemeTransition(event, theme, (newTheme) => {
+      setTheme(newTheme);
+    });
   };
 
   // Application Data States (Persistent IndexedDB + LocalStorage)
@@ -394,9 +399,7 @@ export function App() {
           profile={userProfile}
           theme={theme}
           onToggleTheme={handleToggleTheme}
-          onOpenAlerts={() => {
-            navigateTo({ tab: 'service', isProfile: false, isAdding: false, vehicleId: null });
-          }}
+          onOpenAlerts={() => setIsNotificationModalOpen(true)}
           onOpenProfile={() => {
             navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
           }}
@@ -492,8 +495,33 @@ export function App() {
             navigateTo({ tab, isProfile: false, isAdding: false, vehicleId: null });
           }}
           serviceBadgeCount={criticalPartsCount}
+          onOpenQuickScan={() => setIsScanModalOpen(true)}
+          onOpenAiSettings={() => setIsAiSettingsOpen(true)}
+          onNewChat={handleNewChat}
+          onOpenAiWithPrompt={handleOpenAiChatWithPrompt}
         />
       </div>
+
+      {/* Notification Modal Dialog */}
+      <NotificationModal
+        isOpen={isNotificationModalOpen}
+        onClose={() => setIsNotificationModalOpen(false)}
+        vehicles={vehicles}
+        spareParts={spareParts}
+        userProfile={userProfile}
+        onNavigateToService={() => {
+          navigateTo({ tab: 'service', isProfile: false, isAdding: false, vehicleId: null });
+        }}
+        onNavigateToVehicle={(vehicleId) => {
+          navigateTo({ vehicleId, isProfile: false, isAdding: false });
+        }}
+        onNavigateToProfile={() => {
+          navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
+        }}
+        onNavigateToAi={(prompt) => {
+          handleOpenAiChatWithPrompt(prompt);
+        }}
+      />
 
       {/* Modals & Dialogs */}
       <AiSettingsModal

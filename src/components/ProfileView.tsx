@@ -17,6 +17,8 @@ import {
   MapPin,
   FileBadge
 } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
+import { triggerHaptic } from '../utils/haptics';
 
 interface ProfileViewProps {
   profile: UserProfile;
@@ -103,7 +105,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {/* Top Header */}
       <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <button
-          onClick={onBack}
+          onClick={() => {
+            triggerHaptic('light');
+            onBack();
+          }}
           className="flex items-center gap-1.5 py-2 px-3.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -147,6 +152,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => {
+                triggerHaptic('light');
                 setProfileName(profile.name);
                 setProfileEmail(profile.email);
                 setProfilePhone(profile.phone);
@@ -187,7 +193,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
 
           <button
-            onClick={() => setIsAddSimModalOpen(true)}
+            onClick={() => {
+              triggerHaptic('medium');
+              setIsAddSimModalOpen(true);
+            }}
             className="flex items-center gap-1.5 py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-xl transition shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
@@ -237,7 +246,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     </div>
 
                     <button
-                      onClick={() => setSimToDelete(sim)}
+                      onClick={() => {
+                        triggerHaptic('warning');
+                        setSimToDelete(sim);
+                      }}
                       className="p-2 rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
                       title="Hapus SIM"
                     >
@@ -300,304 +312,310 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {/* MODAL EDIT DATA PROFIL (SPACIOUS & PROFESSIONAL)         */}
       {/* ======================================================== */}
       {isEditProfileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-          <div className="w-full max-w-xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
-            {/* Header */}
-            <div className="flex items-start justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-yellow-400 text-zinc-950 shadow-sm">
-                  <Edit3 className="w-5 h-5 stroke-[2.5]" />
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
+              {/* Header */}
+              <div className="flex items-start justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-yellow-400 text-zinc-950 shadow-sm">
+                    <Edit3 className="w-5 h-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base md:text-lg uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                      Edit Informasi Profil
+                    </h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Perbarui identitas pemilik akun dan data kontak operasional
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-black text-base md:text-lg uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-                    Edit Informasi Profil
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Perbarui identitas pemilik akun dan data kontak operasional
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsEditProfileModalOpen(false)}
-                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSaveProfile} className="space-y-5 text-xs">
-              <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-zinc-500" />
-                  <span>Nama Lengkap Pemilik</span>
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={profileName}
-                  onChange={(e) => setProfileName(e.target.value)}
-                  placeholder="Contoh: Isnan SWC"
-                  className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 text-sm transition"
-                  required
-                />
+                <button
+                  type="button"
+                  onClick={() => setIsEditProfileModalOpen(false)}
+                  className="p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Form */}
+              <form onSubmit={handleSaveProfile} className="space-y-5 text-xs">
                 <div>
                   <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>Alamat Email</span>
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={profileEmail}
-                    onChange={(e) => setProfileEmail(e.target.value)}
-                    placeholder="nama@domain.com"
-                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-medium transition"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>Nomor Telepon / WhatsApp</span>
+                    <User className="w-3.5 h-3.5 text-zinc-500" />
+                    <span>Nama Lengkap Pemilik</span>
                     <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={profilePhone}
-                    onChange={(e) => setProfilePhone(e.target.value)}
-                    placeholder="+62 812-3456-7890"
-                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-medium transition"
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    placeholder="Contoh: Isnan SWC"
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 text-sm transition"
                     required
                   />
                 </div>
-              </div>
 
-              {/* Security Hint */}
-              <div className="p-3 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800/60 rounded-2xl flex items-start gap-2.5 text-[11px] text-zinc-600 dark:text-zinc-400">
-                <ShieldCheck className="w-4 h-4 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
-                <p>
-                  Data profil disimpan langsung di IndexedDB lokal perangkat Anda. Tidak ada data pribadi yang disinkronisasi ke server luar tanpa persetujuan Anda.
-                </p>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>Alamat Email</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      placeholder="nama@domain.com"
+                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-medium transition"
+                      required
+                    />
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => setIsEditProfileModalOpen(false)}
-                  className="py-3 px-5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold transition cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
-                >
-                  <Check className="w-4 h-4 stroke-[3]" />
-                  <span>Simpan Perubahan</span>
-                </button>
-              </div>
-            </form>
+                  <div>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>Nomor Telepon / WhatsApp</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={profilePhone}
+                      onChange={(e) => setProfilePhone(e.target.value)}
+                      placeholder="+62 812-3456-7890"
+                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-medium transition"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Security Hint */}
+                <div className="p-3 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800/60 rounded-2xl flex items-start gap-2.5 text-[11px] text-zinc-600 dark:text-zinc-400">
+                  <ShieldCheck className="w-4 h-4 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
+                  <p>
+                    Data profil disimpan langsung di IndexedDB lokal perangkat Anda. Tidak ada data pribadi yang disinkronisasi ke server luar tanpa persetujuan Anda.
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditProfileModalOpen(false)}
+                    className="py-3 px-5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold transition cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>Simpan Perubahan</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
 
       {/* ======================================================== */}
       {/* MODAL TAMBAH SIM BARU (SPACIOUS & PROFESSIONAL)          */}
       {/* ======================================================== */}
       {isAddSimModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-          <div className="w-full max-w-xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto no-scrollbar">
-            {/* Header */}
-            <div className="flex items-start justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-yellow-400 text-zinc-950 shadow-sm">
-                  <CreditCard className="w-5 h-5 stroke-[2.5]" />
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto no-scrollbar">
+              {/* Header */}
+              <div className="flex items-start justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-yellow-400 text-zinc-950 shadow-sm">
+                    <CreditCard className="w-5 h-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base md:text-lg uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                      Tambah Surat Izin Mengemudi
+                    </h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Registrasi lisensi SIM untuk pemantauan masa berlaku berkala
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-black text-base md:text-lg uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-                    Tambah Surat Izin Mengemudi
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Registrasi lisensi SIM untuk pemantauan masa berlaku berkala
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsAddSimModalOpen(false)}
-                className="p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleAddSim} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
-                  <FileBadge className="w-3.5 h-3.5 text-zinc-500" />
-                  <span>Golongan / Tipe SIM</span>
-                  <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={simType}
-                  onChange={(e) => setSimType(e.target.value as any)}
-                  className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 cursor-pointer"
-                >
-                  <option value="SIM C">SIM C (Sepeda Motor s/d 250cc)</option>
-                  <option value="SIM C1">SIM C1 (Sepeda Motor 250cc - 500cc)</option>
-                  <option value="SIM A">SIM A (Mobil Pribadi / Penumpang)</option>
-                  <option value="SIM B1">SIM B1 (Truk / Bus / Angkutan Barang)</option>
-                  <option value="SIM B2">SIM B2 (Alat Berat / Gandengan)</option>
-                  <option value="SIM D">SIM D (Penyandang Disabilitas)</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                    Nomor SIM <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: 9402-1209-00214"
-                    value={simNumber}
-                    onChange={(e) => setSimNumber(e.target.value)}
-                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-bold"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>Tanggal Kedaluwarsa SIM</span>
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={expiryDate}
-                    onChange={(e) => setExpiryDate(e.target.value)}
-                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-bold"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                    Nama Pemilik (Sesuai KTP/SIM) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={holderName}
-                    onChange={(e) => setHolderName(e.target.value)}
-                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-bold uppercase focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>Polda / Satpas Penerbit (Opsional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: Polres Metro Jaksel"
-                    value={issuingCity}
-                    onChange={(e) => setIssuingCity(e.target.value)}
-                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                  />
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsAddSimModalOpen(false)}
-                  className="py-3 px-5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold transition cursor-pointer"
+                  className="p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                 >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
-                >
-                  <Check className="w-4 h-4 stroke-[3]" />
-                  <span>Simpan Data SIM</span>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
+
+              {/* Form */}
+              <form onSubmit={handleAddSim} className="space-y-4 text-xs">
+                <div>
+                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                    <FileBadge className="w-3.5 h-3.5 text-zinc-500" />
+                    <span>Golongan / Tipe SIM</span>
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={simType}
+                    onChange={(e) => setSimType(e.target.value as any)}
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 cursor-pointer"
+                  >
+                    <option value="SIM C">SIM C (Sepeda Motor s/d 250cc)</option>
+                    <option value="SIM C1">SIM C1 (Sepeda Motor 250cc - 500cc)</option>
+                    <option value="SIM A">SIM A (Mobil Pribadi / Penumpang)</option>
+                    <option value="SIM B1">SIM B1 (Truk / Bus / Angkutan Barang)</option>
+                    <option value="SIM B2">SIM B2 (Alat Berat / Gandengan)</option>
+                    <option value="SIM D">SIM D (Penyandang Disabilitas)</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Nomor SIM <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: 9402-1209-00214"
+                      value={simNumber}
+                      onChange={(e) => setSimNumber(e.target.value)}
+                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-bold"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>Tanggal Kedaluwarsa SIM</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={expiryDate}
+                      onChange={(e) => setExpiryDate(e.target.value)}
+                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 font-bold"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Nama Pemilik (Sesuai KTP/SIM) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={holderName}
+                      onChange={(e) => setHolderName(e.target.value)}
+                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 font-bold uppercase focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>Polda / Satpas Penerbit (Opsional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: Polres Metro Jaksel"
+                      value={issuingCity}
+                      onChange={(e) => setIssuingCity(e.target.value)}
+                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddSimModalOpen(false)}
+                    className="py-3 px-5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold transition cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>Simpan Data SIM</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
 
       {/* ======================================================== */}
       {/* CONFIRM DELETE SIM MODAL                                 */}
       {/* ======================================================== */}
       {simToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-red-500 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400">
-                  <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-red-500 rounded-3xl p-6 shadow-2xl space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400">
+                    <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base uppercase tracking-tight text-red-600 dark:text-red-400">
+                      Hapus Kartu SIM?
+                    </h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Konfirmasi penghapusan data lisensi</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-black text-base uppercase tracking-tight text-red-600 dark:text-red-400">
-                    Hapus Kartu SIM?
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Konfirmasi penghapusan data lisensi</p>
-                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSimToDelete(null)}
+                  className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setSimToDelete(null)}
-                className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs space-y-1">
-              <div className="font-extrabold text-sm text-zinc-900 dark:text-zinc-100">
-                {simToDelete.simType} — No. {simToDelete.simNumber}
+              <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs space-y-1">
+                <div className="font-extrabold text-sm text-zinc-900 dark:text-zinc-100">
+                  {simToDelete.simType} — No. {simToDelete.simNumber}
+                </div>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pt-1 leading-relaxed">
+                  Kartu SIM ini akan dihapus dari profil dan pengingat tanggal jatuh tempo tidak akan aktif lagi.
+                </p>
               </div>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pt-1 leading-relaxed">
-                Kartu SIM ini akan dihapus dari profil dan pengingat tanggal jatuh tempo tidak akan aktif lagi.
-              </p>
-            </div>
 
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setSimToDelete(null)}
-                className="flex-1 py-3 px-4 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs rounded-xl transition cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDeleteSim}
-                className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl transition shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Ya, Hapus SIM</span>
-              </button>
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSimToDelete(null)}
+                  className="flex-1 py-3 px-4 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDeleteSim}
+                  className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl transition shadow active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Ya, Hapus SIM</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

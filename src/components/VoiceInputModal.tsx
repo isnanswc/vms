@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Send, X, RotateCcw, Sparkles, AlertCircle, Edit3, Volume2 } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
 
 interface VoiceInputModalProps {
   isOpen: boolean;
@@ -225,8 +226,9 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto no-scrollbar">
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto no-scrollbar">
         {/* Top Header */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
@@ -385,5 +387,6 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
         </div>
       </div>
     </div>
+  </ModalPortal>
   );
 };

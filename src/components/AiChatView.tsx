@@ -191,7 +191,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
     handleSend(transcriptText);
   };
 
-  const handleFileCapture = async (e: React.ChangeEvent<HTMLInputElement>, type: 'camera' | 'gallery' | 'file') => {
+  const handleFileCapture = async (e: React.ChangeEvent<HTMLInputElement>, _type: 'camera' | 'gallery' | 'file') => {
     const file = e.target.files?.[0];
     if (!file) return;
 

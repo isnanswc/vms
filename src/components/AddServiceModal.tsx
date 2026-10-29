@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Vehicle, ServiceRecord } from '../types';
 import { X, Wrench, AlertTriangle } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
 
 interface AddServiceModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
           category: 'sparepart' as const,
           cost: Math.round(Number(cost) / parts.length),
         }))
-      : [{ name: title, category: (type === 'routine' ? 'jasa' : 'darurat') as const, cost: Number(cost) }];
+      : [{ name: title, category: (type === 'routine' ? 'jasa' : 'darurat') as 'jasa' | 'darurat', cost: Number(cost) }];
 
     const newRecord: ServiceRecord = {
       id: `srv-${Date.now()}`,
@@ -62,8 +63,9 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900 dark:text-zinc-100">
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-yellow-400 text-zinc-950">
@@ -137,6 +139,16 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
 
           <div className="grid grid-cols-2 gap-2">
             <div>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Tanggal Servis</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                required
+              />
+            </div>
+            <div>
               <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Total Biaya (Rp)</label>
               <input
                 type="number"
@@ -146,6 +158,9 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
                 required
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Odometer (KM)</label>
               <input
@@ -156,17 +171,16 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
                 required
               />
             </div>
-          </div>
-
-          <div>
-            <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Nama Bengkel / Toko</label>
-            <input
-              type="text"
-              placeholder="Contoh: AHASS Palmerah / Tambal Ban Pak Min"
-              value={workshopName}
-              onChange={(e) => setWorkshopName(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-            />
+            <div>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Nama Bengkel</label>
+              <input
+                type="text"
+                placeholder="Contoh: AHASS Palmerah"
+                value={workshopName}
+                onChange={(e) => setWorkshopName(e.target.value)}
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+              />
+            </div>
           </div>
 
           {type === 'routine' ? (
@@ -202,5 +216,6 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
         </form>
       </div>
     </div>
+  </ModalPortal>
   );
 };

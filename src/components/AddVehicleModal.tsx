@@ -82,7 +82,9 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       currentOdometerKm: Number(currentOdometerKm),
       healthScore: 100,
       stnkExpiryDate,
+      stnkFiveYearExpiryDate: `${Number(stnkExpiryDate.split('-')[0]) + 5}-${stnkExpiryDate.split('-')[1] || '05'}-${stnkExpiryDate.split('-')[2] || '10'}`,
       stnkTaxCostAnnual: category === 'motor' ? 280000 : 2500000,
+      stnkTaxCostFiveYear: category === 'motor' ? 450000 : 3200000,
       notes,
     };
 

@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, User, MoreVertical, Moon, Sun, Sparkles, ChevronRight } from 'lucide-react';
 import type { UserProfile } from '../types/user';
+import { triggerHaptic } from '../utils/haptics';
 
 interface HeaderProps {
   urgentCount: number;
   profile: UserProfile;
   theme: 'light' | 'dark';
-  onToggleTheme: () => void;
+  onToggleTheme: (e?: React.MouseEvent) => void;
   onOpenAlerts?: () => void;
   onOpenProfile?: () => void;
   onOpenAiSettings?: () => void;
@@ -70,9 +71,12 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2">
           {/* Urgent Notification Bell */}
           <button
-            onClick={onOpenAlerts}
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenAlerts?.();
+            }}
             aria-label="Peringatan Operasional"
-            className="relative p-2.5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-800 transition cursor-pointer"
+            className="relative p-2.5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-800 transition cursor-pointer active:scale-95 shadow-xs"
           >
             <Bell className={`w-4 h-4 ${urgentCount > 0 ? 'text-zinc-900 dark:text-yellow-400 animate-wiggle-loop' : ''}`} />
             {urgentCount > 0 && (
@@ -85,9 +89,12 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Corner Menu: 3-Dots Button */}
           <div className="relative" ref={menuRef}>
             <button
-              onClick={() => setIsCornerMenuOpen(!isCornerMenuOpen)}
+              onClick={() => {
+                triggerHaptic('light');
+                setIsCornerMenuOpen(!isCornerMenuOpen);
+              }}
               aria-label="Menu Opsi"
-              className={`p-2.5 rounded-2xl border transition cursor-pointer ${
+              className={`p-2.5 rounded-2xl border transition cursor-pointer active:scale-95 ${
                 isCornerMenuOpen
                   ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 border-zinc-900 dark:border-white shadow-sm'
                   : 'bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border-zinc-200/80 dark:border-zinc-800'
@@ -117,6 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Option 1: Kelola Profil */}
                   <button
                     onClick={() => {
+                      triggerHaptic('light');
                       setIsCornerMenuOpen(false);
                       onOpenProfile?.();
                     }}
@@ -139,6 +147,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Option 2: Kelola AI */}
                   <button
                     onClick={() => {
+                      triggerHaptic('light');
                       setIsCornerMenuOpen(false);
                       onOpenAiSettings?.();
                     }}
@@ -160,8 +169,9 @@ export const Header: React.FC<HeaderProps> = ({
 
                   {/* Option 3: Mode Malam Toggle */}
                   <button
-                    onClick={() => {
-                      onToggleTheme();
+                    onClick={(e) => {
+                      triggerHaptic('medium');
+                      onToggleTheme(e);
                     }}
                     className="w-full flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer text-left group"
                   >

@@ -19,6 +19,7 @@ import {
   FileText,
   Check
 } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
 
 interface ServiceViewProps {
   vehicles: Vehicle[];
@@ -807,30 +808,31 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm animate-fade-in text-zinc-900 dark:text-zinc-100">
-      <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 md:p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
-        {/* Header Modal */}
-        <div className="flex items-start justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-lg bg-zinc-950 dark:bg-zinc-800 text-white font-mono font-black text-xs border border-zinc-800 dark:border-zinc-700">
-                {vehicle?.plateNumber || 'Unit'}
-              </span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">{vehicle?.name}</span>
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+        <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-5 md:p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
+          {/* Header Modal */}
+          <div className="flex items-start justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-lg bg-zinc-950 dark:bg-zinc-800 text-white font-mono font-black text-xs border border-zinc-800 dark:border-zinc-700">
+                  {vehicle?.plateNumber || 'Unit'}
+                </span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">{vehicle?.name}</span>
+              </div>
+              <h3 className="font-black text-base md:text-lg text-zinc-900 dark:text-zinc-100">
+                Detail & Formulir Buku Servis
+              </h3>
             </div>
-            <h3 className="font-black text-base md:text-lg text-zinc-900 dark:text-zinc-100">
-              Detail & Formulir Buku Servis
-            </h3>
-          </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
         {/* 2 TABS NAVIGATION */}
         <div className="flex p-1 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 text-xs font-bold my-4">
@@ -1130,5 +1132,6 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
         </form>
       </div>
     </div>
+  </ModalPortal>
   );
 };
