@@ -49,8 +49,8 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-3">
           {/* Mobile Only Logo */}
           <div className="flex md:hidden items-center gap-2">
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-theme-accent text-theme-accent-fg font-black shadow-sm animate-sparkle-loop">
-              <span className="text-sm tracking-tighter">FL</span>
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-zinc-200 dark:border-zinc-800 p-0.5 shadow-sm overflow-hidden">
+              <img src="/app-logo.png" alt="FleetLog" className="w-full h-full object-contain" />
             </div>
             <span className="font-black text-sm tracking-wider text-zinc-900 dark:text-white uppercase">
               Fleet<span className="text-theme-accent">Log</span>

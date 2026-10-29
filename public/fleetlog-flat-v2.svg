@@ -1,0 +1,242 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <!-- Shadow for clean white background -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#09090b" flood-opacity="0.08" />
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#09090b" flood-opacity="0.04" />
+    </filter>
+
+    <filter id="satelliteShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#09090b" flood-opacity="0.12" />
+    </filter>
+
+    <!-- Amber Glow -->
+    <filter id="amberGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#facc15" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- 1. PURE WHITE BACKGROUND -->
+  <rect width="600" height="600" fill="#ffffff" />
+
+  <!-- Outer Rounded Card Canvas (White with subtle border) -->
+  <rect x="30" y="30" width="540" height="540" rx="44" fill="#ffffff" stroke="#f1f5f9" stroke-width="2" filter="url(#cardShadow)" />
+
+  <!-- 2. ORBITAL MANAGEMENT RING & TACHOMETER GRADUATION -->
+  <!-- Outer Dotted Orbit Track -->
+  <circle cx="300" cy="300" r="215" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="4 8" />
+  
+  <!-- Active Yellow Amber Orbit Arc (Management Flow) -->
+  <path d="M 300 85 A 215 215 0 0 1 515 300" fill="none" stroke="#facc15" stroke-width="5" stroke-linecap="round" />
+  <path d="M 300 515 A 215 215 0 0 1 85 300" fill="none" stroke="#09090b" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Precision Inner Dial Ring -->
+  <circle cx="300" cy="300" r="175" fill="none" stroke="#f1f5f9" stroke-width="1.5" />
+  
+  <!-- Precision Tachometer Gauge Ticks (Black Onyx & Yellow Amber) -->
+  <g id="dial-ticks" stroke-linecap="round">
+    <!-- Top Arc Ticks -->
+    <line x1="300" y1="92" x2="300" y2="102" stroke="#09090b" stroke-width="2" />
+    <line x1="340" y1="97" x2="336" y2="106" stroke="#09090b" stroke-width="1.5" />
+    <line x1="380" y1="110" x2="374" y2="119" stroke="#facc15" stroke-width="2.5" />
+    <line x1="416" y1="131" x2="408" y2="139" stroke="#facc15" stroke-width="2.5" />
+    <line x1="447" y1="160" x2="438" y2="167" stroke="#facc15" stroke-width="2.5" />
+    <line x1="470" y1="196" x2="460" y2="201" stroke="#09090b" stroke-width="1.5" />
+    <line x1="483" y1="235" x2="473" y2="238" stroke="#09090b" stroke-width="1.5" />
+    
+    <!-- Left & Bottom Arc Ticks -->
+    <line x1="260" y1="97" x2="264" y2="106" stroke="#09090b" stroke-width="1.5" />
+    <line x1="220" y1="110" x2="226" y2="119" stroke="#09090b" stroke-width="2" />
+    <line x1="184" y1="131" x2="192" y2="139" stroke="#09090b" stroke-width="2" />
+    <line x1="153" y1="160" x2="162" y2="167" stroke="#09090b" stroke-width="2" />
+    <line x1="130" y1="196" x2="140" y2="201" stroke="#09090b" stroke-width="1.5" />
+    <line x1="117" y1="235" x2="127" y2="238" stroke="#09090b" stroke-width="1.5" />
+  </g>
+
+  <!-- 3. CENTRAL GROUND / ROAD DATUM LINE -->
+  <line x1="130" y1="400" x2="470" y2="400" stroke="#09090b" stroke-width="4" stroke-linecap="round" />
+  <line x1="220" y1="412" x2="380" y2="412" stroke="#facc15" stroke-width="3" stroke-linecap="round" />
+
+  <!-- 4. CAR SILHOUETTE (PRECISION GEOMETRIC - BACKGROUND LAYER) -->
+  <!-- Positioned in the background right/center with sleek fastback aerodynamic proportions -->
+  <g id="precision-car">
+    <!-- Car Wheels Background Layer -->
+    <!-- Rear Wheel -->
+    <circle cx="215" cy="385" r="25" fill="#ffffff" stroke="#09090b" stroke-width="7" />
+    <circle cx="215" cy="385" r="14" fill="#09090b" />
+    <circle cx="215" cy="385" r="6" fill="#facc15" />
+    
+    <!-- Front Wheel -->
+    <circle cx="410" cy="385" r="25" fill="#ffffff" stroke="#09090b" stroke-width="7" />
+    <circle cx="410" cy="385" r="14" fill="#09090b" />
+    <circle cx="410" cy="385" r="6" fill="#facc15" />
+
+    <!-- Car Body Silhouette (Matte Black Onyx with Crisp Cuts) -->
+    <path d="M 140 375 
+             C 142 360, 155 352, 172 352
+             C 176 352, 180 354, 184 358
+             C 192 342, 208 335, 226 335
+             C 245 335, 260 345, 266 360
+             L 345 360
+             C 352 344, 368 335, 386 335
+             C 405 335, 422 344, 428 360
+             L 448 360
+             C 458 360, 468 364, 470 372
+             C 472 380, 466 385, 452 385
+             L 440 385
+             C 438 375, 428 368, 410 368
+             C 392 368, 382 375, 380 385
+             L 245 385
+             C 243 375, 233 368, 215 368
+             C 197 368, 187 375, 185 385
+             L 150 385
+             C 142 385, 138 381, 140 375 Z"
+          fill="#09090b" />
+
+    <!-- Car Aerodynamic Cabin Roofline (Streamlined Fastback) -->
+    <path d="M 180 352 
+             C 195 345, 215 320, 240 285
+             C 260 258, 290 252, 335 252
+             C 375 252, 405 275, 430 325
+             L 452 358
+             L 435 358
+             C 415 315, 390 292, 350 280
+             C 310 270, 270 275, 248 298
+             C 225 322, 205 348, 180 352 Z"
+          fill="#facc15" />
+
+    <!-- Car Windows (White & Black Onyx Pillar) -->
+    <path d="M 252 292 
+             C 270 272, 305 266, 338 266 
+             L 338 330 
+             L 230 330 
+             C 238 314, 245 300, 252 292 Z" 
+          fill="#ffffff" stroke="#09090b" stroke-width="2.5" />
+    <path d="M 348 266 
+             C 372 266, 395 280, 414 312 
+             L 426 330 
+             L 348 330 Z" 
+          fill="#ffffff" stroke="#09090b" stroke-width="2.5" />
+
+    <!-- Car LED Headlight & Taillight -->
+    <polygon points="458,362 468,364 466,370 454,367" fill="#facc15" />
+    <polygon points="144,366 148,366 147,374 142,374" fill="#ef4444" />
+  </g>
+
+  <!-- 5. MOTORCYCLE SILHOUETTE (PRECISION SPORT / NAKED - FOREGROUND LAYER) -->
+  <!-- Positioned in front, crisp, muscular, perfectly balanced -->
+  <g id="precision-motorcycle" filter="url(#amberGlow)">
+    <!-- Rear Wheel -->
+    <circle cx="170" cy="385" r="24" fill="#ffffff" stroke="#09090b" stroke-width="6.5" />
+    <circle cx="170" cy="385" r="13" fill="#facc15" stroke="#09090b" stroke-width="2" />
+    <circle cx="170" cy="385" r="4.5" fill="#09090b" />
+
+    <!-- Front Wheel -->
+    <circle cx="285" cy="385" r="24" fill="#ffffff" stroke="#09090b" stroke-width="6.5" />
+    <circle cx="285" cy="385" r="13" fill="#facc15" stroke="#09090b" stroke-width="2" />
+    <circle cx="285" cy="385" r="4.5" fill="#09090b" />
+
+    <!-- Swingarm & Chain Drive (Black Onyx) -->
+    <polygon points="170,385 210,380 225,385 220,392 170,390" fill="#09090b" />
+
+    <!-- Exhaust Pipe (Yellow Amber Tip) -->
+    <path d="M 215 375 L 235 378 L 195 385" fill="none" stroke="#facc15" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Engine Block & Trellis Frame (Mechanical Geometry) -->
+    <polygon points="205,378 245,378 255,345 220,340" fill="#09090b" stroke="#facc15" stroke-width="2" />
+    <line x1="215" y1="355" x2="245" y2="368" stroke="#facc15" stroke-width="1.8" />
+    <line x1="235" y1="345" x2="215" y2="375" stroke="#facc15" stroke-width="1.8" />
+
+    <!-- Muscular Fuel Tank (Yellow Amber Sculpted) -->
+    <path d="M 205,338 
+             C 215,315, 235,305, 252,308 
+             L 268,328 
+             L 248,342 
+             L 205,342 Z" 
+          fill="#facc15" 
+          stroke="#09090b" 
+          stroke-width="2.5" />
+
+    <!-- Sport Seat & Tail Section (Black Onyx & White) -->
+    <path d="M 180,332 C 192,328, 205,332, 212,338 L 198,344 Z" fill="#09090b" />
+    <path d="M 165,338 L 182,332 L 180,342 Z" fill="#facc15" stroke="#09090b" stroke-width="1.5" />
+
+    <!-- Front Telescopic Forks (Precision 65-deg Angle) -->
+    <line x1="285" y1="385" x2="252" y2="295" stroke="#09090b" stroke-width="6" stroke-linecap="round" />
+    <line x1="285" y1="385" x2="255" y2="305" stroke="#facc15" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Front Headlight Mask & Windscreen -->
+    <path d="M 250,296 L 268,290 L 272,305 L 256,310 Z" fill="#facc15" stroke="#09090b" stroke-width="2" />
+    <!-- Clip-on Handlebar -->
+    <line x1="242" y1="300" x2="258" y2="296" stroke="#09090b" stroke-width="4.5" stroke-linecap="round" />
+  </g>
+
+  <!-- 6. FOUR ORBITAL SATELLITES (BLACK ONYX BADGES + YELLOW AMBER ICONS) -->
+
+  <!-- SATELLITE 1: SPEEDOMETER (Top - 12 o'clock) -->
+  <g transform="translate(300, 85)" filter="url(#satelliteShadow)">
+    <!-- White Base Disc -->
+    <circle cx="0" cy="0" r="30" fill="#ffffff" stroke="#09090b" stroke-width="3" />
+    <!-- Yellow Amber Accent Ring -->
+    <circle cx="0" cy="0" r="24" fill="#09090b" />
+    <!-- Minimalist Speedometer Icon -->
+    <path d="M -14 6 A 15 15 0 1 1 14 6" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="0" cy="5" r="2.5" fill="#ffffff" />
+    <line x1="0" y1="5" x2="8" y2="-6" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+
+  <!-- SATELLITE 2: FUEL PUMP (Right - 3 o'clock) -->
+  <g transform="translate(515, 300)" filter="url(#satelliteShadow)">
+    <circle cx="0" cy="0" r="30" fill="#ffffff" stroke="#09090b" stroke-width="3" />
+    <circle cx="0" cy="0" r="24" fill="#09090b" />
+    <!-- Fuel Pump Dispenser Icon -->
+    <rect x="-11" y="-11" width="13" height="22" rx="3" fill="none" stroke="#facc15" stroke-width="2.2" />
+    <rect x="-8" y="-7" width="7" height="6" rx="1" fill="#facc15" />
+    <path d="M 2 -3 L 5 -3 C 9 -3, 9 10, 5 10 L 4 10" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+    <path d="M 6 -7 L 9 -11 L 11 -9 L 9 -5" fill="none" stroke="#facc15" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- SATELLITE 3: SERVICE WRENCH (Bottom - 6 o'clock) -->
+  <g transform="translate(300, 515)" filter="url(#satelliteShadow)">
+    <circle cx="0" cy="0" r="30" fill="#ffffff" stroke="#09090b" stroke-width="3" />
+    <circle cx="0" cy="0" r="24" fill="#09090b" />
+    <!-- Minimalist Precision Wrench Icon -->
+    <path d="M -7 -10 
+             C -11 -6, -11 0, -6 4 
+             L 6 16 
+             C 8 18, 11 18, 13 16 
+             C 15 14, 15 11, 13 9 
+             L 1 -3 
+             C 4 2, 8 0, 7 -5 
+             L 3 -3 
+             L -1 -7 
+             L -3 -3 
+             Z" 
+          fill="#facc15" 
+          stroke="#09090b" 
+          stroke-width="1.2" />
+  </g>
+
+  <!-- SATELLITE 4: SHIELD INSPECTION (Left - 9 o'clock) -->
+  <g transform="translate(85, 300)" filter="url(#satelliteShadow)">
+    <circle cx="0" cy="0" r="30" fill="#ffffff" stroke="#09090b" stroke-width="3" />
+    <circle cx="0" cy="0" r="24" fill="#09090b" />
+    <!-- Shield & Checkmark Icon -->
+    <path d="M -9 -10 L 0 -13 L 9 -10 C 9 -1, 5 9, 0 13 C -5 9, -9 -1, -9 -10 Z" 
+          fill="none" 
+          stroke="#facc15" 
+          stroke-width="2.2" 
+          stroke-linejoin="round" />
+    <path d="M -4 0 L -1 3 L 5 -3" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- 7. BRAND LOGO TYPOGRAPHY (BOTTOM) -->
+  <g transform="translate(300, 470)" text-anchor="middle">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" letter-spacing="4" fill="#09090b">
+      FLEET<tspan fill="#eab308">LOG</tspan>
+    </text>
+    <text y="18" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" letter-spacing="3" fill="#64748b">
+      VEHICLE MANAGEMENT SYSTEM
+    </text>
+  </g>
+</svg>
