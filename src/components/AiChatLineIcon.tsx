@@ -6,9 +6,9 @@ interface AiChatLineIconProps {
 }
 
 /**
- * Modern AI Assistant Icon:
- * Google Gemini / Stellar 4-point star with orbital satellite twinkles and ambient cosmic breathing pulse.
- * Clean, premium, and visually soothing compared to harsh racing dashed lines.
+ * Konsep 2: The Neural Orb / Quantum AI Core
+ * Glowing holographic orb surrounded by two 3D-angled orbital rings
+ * with orbiting photon nodes and ambient core breathing pulse.
  */
 export const AiChatLineIcon: React.FC<AiChatLineIconProps> = ({
   className = 'w-6 h-6',
@@ -22,46 +22,72 @@ export const AiChatLineIcon: React.FC<AiChatLineIconProps> = ({
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full overflow-visible"
       >
-        {/* Soft Ambient Radial Aura Glow */}
+        {/* Ambient Outer Halo Pulse */}
         <circle
           cx="12"
           cy="12"
-          r="9"
+          r="9.5"
           className={isActive ? 'animate-ping opacity-25' : 'animate-pulse opacity-15'}
           fill="currentColor"
         />
 
-        {/* Satellite Micro Star 1 (Top Right) */}
-        <g className="animate-ai-satellite-1 origin-[18px_5px]">
-          <path
-            d="M18 2C18 3.65 19.35 5 21 5C19.35 5 18 6.35 18 8C18 6.35 16.65 5 15 5C16.65 5 18 3.65 18 2Z"
-            fill="currentColor"
-            className="opacity-80"
-          />
-        </g>
-
-        {/* Satellite Micro Star 2 (Bottom Left) */}
-        <g className="animate-ai-satellite-2 origin-[5px_19px]">
-          <path
-            d="M5 16C5 17.1 5.9 18 7 18C5.9 18 5 18.9 5 20C5 18.9 4.1 18 3 18C4.1 18 5 17.1 5 16Z"
-            fill="currentColor"
+        {/* Primary Orbital Ring (Rotates Clockwise around Core) */}
+        <g className="animate-quantum-ring-1 origin-[12px_12px]">
+          {/* Elliptical orbit path */}
+          <ellipse
+            cx="12"
+            cy="12"
+            rx="9"
+            ry="3.6"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeDasharray="24 8"
             className="opacity-70"
           />
+          {/* Orbiting Photon Satellite Node 1 */}
+          <circle cx="21" cy="12" r="1.3" fill="currentColor" className="drop-shadow-xs" />
+          <circle cx="21" cy="12" r="0.6" fill="white" />
         </g>
 
-        {/* Primary Gemini 4-Point Star Core */}
-        <g className="animate-ai-star-breathe origin-center">
-          <path
-            d="M12 2C12 7.52 16.48 12 22 12C16.48 12 12 16.48 12 22C12 16.48 7.52 12 2 12C7.52 12 12 7.52 12 2Z"
-            fill="currentColor"
-            className="drop-shadow-xs"
+        {/* Secondary Orbital Ring (Crossed & Counter-Rotating) */}
+        <g className="animate-quantum-ring-2 origin-[12px_12px]">
+          {/* Intersecting elliptical orbit path */}
+          <ellipse
+            cx="12"
+            cy="12"
+            rx="9"
+            ry="3.6"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeDasharray="18 10"
+            className="opacity-60"
           />
-          {/* Subtle Inner Highlight Prism */}
-          <path
-            d="M12 6C12 9.3 14.7 12 18 12C14.7 12 12 14.7 12 18C12 14.7 9.3 12 6 12C9.3 12 12 9.3 12 6Z"
+          {/* Orbiting Photon Satellite Node 2 */}
+          <circle cx="3" cy="12" r="1.3" fill="currentColor" className="drop-shadow-xs" />
+          <circle cx="3" cy="12" r="0.6" fill="white" />
+        </g>
+
+        {/* Central Neural Orb Core with Gentle Breathing Pulse */}
+        <g className="animate-neural-orb origin-[12px_12px]">
+          {/* Soft Core Aura */}
+          <circle cx="12" cy="12" r="5" fill="currentColor" className="opacity-25 filter blur-xs" />
+          
+          {/* Main Sphere Body */}
+          <circle cx="12" cy="12" r="4.2" fill="currentColor" className="opacity-90" />
+          
+          {/* 3D Glassmorphic Specular Highlight */}
+          <ellipse
+            cx="10.8"
+            cy="10.5"
+            rx="1.8"
+            ry="1.1"
+            transform="rotate(-25 10.8 10.5)"
             fill="white"
-            fillOpacity="0.3"
+            fillOpacity="0.55"
           />
+
+          {/* Micro Quantum Sparkle in Center */}
+          <circle cx="12" cy="12" r="1.2" fill="white" />
         </g>
       </svg>
     </div>

@@ -643,3 +643,52 @@ button.bg-yellow-500:hover {
 .animate-ai-satellite-2 {
   animation: aiSatelliteTwinkle2 2.6s ease-in-out infinite 0.4s;
 }
+
+
+/* ========================================================================== */
+/* KONSEP 2: THE NEURAL ORB & QUANTUM ORBITAL RINGS ANIMATIONS               */
+/* ========================================================================== */
+
+@keyframes quantumRingSpin1 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-quantum-ring-1 {
+  animation: quantumRingSpin1 5s linear infinite;
+  transform-origin: 12px 12px;
+}
+
+@keyframes quantumRingSpin2 {
+  0% {
+    transform: rotate(-55deg);
+  }
+  100% {
+    transform: rotate(-415deg);
+  }
+}
+
+.animate-quantum-ring-2 {
+  animation: quantumRingSpin2 6.5s linear infinite;
+  transform-origin: 12px 12px;
+}
+
+@keyframes neuralOrbBreathe {
+  0%, 100% {
+    transform: scale(0.94);
+    filter: drop-shadow(0 0 3px var(--theme-accent-glow, rgba(250, 204, 21, 0.35)));
+  }
+  50% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 8px var(--theme-accent-glow, rgba(250, 204, 21, 0.65)));
+  }
+}
+
+.animate-neural-orb {
+  animation: neuralOrbBreathe 2.5s ease-in-out infinite;
+  transform-origin: 12px 12px;
+}
