@@ -60,7 +60,7 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
 
         <button
           onClick={onAddVehicle}
-          className="flex items-center justify-center gap-2 py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-2xl transition shadow-sm active:scale-95 cursor-pointer shrink-0"
+          className="flex items-center justify-center gap-2 py-2.5 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black rounded-2xl transition shadow-sm active:scale-95 cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           <span>TAMBAH KENDARAAN (AI)</span>
@@ -71,7 +71,7 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {vehicles.length === 0 ? (
           <div className="col-span-full p-12 bg-zinc-50 dark:bg-zinc-900/50 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl text-center text-zinc-500 dark:text-zinc-400 text-xs space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-yellow-400 text-zinc-950 flex items-center justify-center mx-auto shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-theme-accent text-theme-accent-fg flex items-center justify-center mx-auto shadow-sm">
               <Car className="w-6 h-6 stroke-[2.2]" />
             </div>
             <div>
@@ -82,7 +82,7 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
             </div>
             <button
               onClick={onAddVehicle}
-              className="py-3 px-5 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-black text-xs rounded-xl shadow-xs cursor-pointer transition inline-flex items-center gap-2 active:scale-95"
+              className="py-3 px-5 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg font-black text-xs rounded-xl shadow-xs cursor-pointer transition inline-flex items-center gap-2 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>TAMBAH KENDARAAN PERTAMA (AI)</span>
@@ -97,7 +97,7 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
               <div
                 key={veh.id}
                 onClick={() => onSelectVehicle(veh)}
-                className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 shadow-sm border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-900 dark:hover:border-yellow-400 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between group hover:shadow-md"
+                className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 shadow-sm border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-900 dark:hover:border-theme-accent transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between group hover:shadow-md"
               >
                 <div>
                   {/* Header inside card: Plate & Category & Delete Quick Button */}
@@ -115,7 +115,7 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
                     <div className="flex items-center gap-1.5">
                       <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 text-[11px] font-mono font-bold">
                         <span className="text-zinc-500 dark:text-zinc-400">Kondisi:</span>
-                        <span className="text-zinc-950 dark:text-yellow-400 font-black">{veh.healthScore}%</span>
+                        <span className="text-theme-accent font-black">{veh.healthScore}%</span>
                       </div>
 
                       {onDeleteVehicle && (
@@ -202,7 +202,7 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
 
                   <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
                     isStnkUrgent 
-                      ? 'bg-yellow-400 text-zinc-950 shadow-xs' 
+                      ? 'bg-theme-accent text-theme-accent-fg shadow-xs' 
                       : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200'
                   }`}>
                     {daysToExpiry > 0 ? `${daysToExpiry} Hari Lagi` : 'Jatuh Tempo!'}

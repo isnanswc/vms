@@ -124,7 +124,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 md:p-7 shadow-sm transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-yellow-400 text-zinc-950 flex items-center justify-center font-black text-2xl shadow-md shrink-0 ring-4 ring-yellow-400/20">
+            <div className="w-16 h-16 rounded-2xl bg-theme-accent text-theme-accent-fg flex items-center justify-center font-black text-2xl shadow-md shrink-0 ring-4 ring-theme-accent/20">
               {profile.name.charAt(0)}
             </div>
             <div>
@@ -132,7 +132,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <h3 className="text-lg md:text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
                   {profile.name}
                 </h3>
-                <span className="px-2.5 py-0.5 bg-yellow-100 dark:bg-yellow-950/60 text-zinc-900 dark:text-yellow-400 text-[10px] font-mono font-bold rounded-full border border-yellow-300 dark:border-yellow-800">
+                <span className="px-2.5 py-0.5 bg-theme-accent-subtle text-zinc-900 dark:text-zinc-100 text-[10px] font-mono font-bold rounded-full border border-theme-accent-border">
                   Personal Owner
                 </span>
               </div>
@@ -165,7 +165,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </button>
 
             <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/80 px-4 py-2 rounded-2xl border border-zinc-200 dark:border-zinc-700">
-              <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 shadow-xs">
+              <div className="p-2 rounded-xl bg-theme-accent text-theme-accent-fg shadow-xs">
                 <CreditCard className="w-4 h-4" />
               </div>
               <div>
@@ -184,7 +184,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         <div className="flex items-center justify-between px-1">
           <div>
             <h4 className="text-xs md:text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-yellow-500" />
+              <CreditCard className="w-4 h-4 text-theme-accent" />
               <span>Surat Izin Mengemudi (SIM)</span>
             </h4>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -197,7 +197,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               triggerHaptic('medium');
               setIsAddSimModalOpen(true);
             }}
-            className="flex items-center gap-1.5 py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-xl transition shadow-xs cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 py-2.5 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black rounded-xl transition shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>TAMBAH SIM</span>
@@ -410,7 +410,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+                    className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
                   >
                     <Check className="w-4 h-4 stroke-[3]" />
                     <span>Simpan Perubahan</span>
@@ -546,7 +546,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+                    className="py-3 px-6 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg font-black uppercase tracking-wider rounded-2xl transition shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
                   >
                     <Check className="w-4 h-4 stroke-[3]" />
                     <span>Simpan Data SIM</span>

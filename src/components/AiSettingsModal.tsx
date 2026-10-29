@@ -126,7 +126,7 @@ export const AiSettingsModal: React.FC<AiSettingsModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-yellow-400 text-zinc-950 shadow-xs">
+            <div className="p-2 rounded-xl bg-theme-accent text-theme-accent-fg shadow-xs">
               <Cpu className="w-4 h-4 stroke-[2.5]" />
             </div>
             <div>
@@ -149,14 +149,14 @@ export const AiSettingsModal: React.FC<AiSettingsModalProps> = ({
           <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-2xl space-y-2">
             <div className="flex items-center justify-between">
               <label className="font-bold text-zinc-900 dark:text-zinc-200 flex items-center gap-1.5 text-xs">
-                <Key className="w-3.5 h-3.5 text-yellow-500" />
+                <Key className="w-3.5 h-3.5 text-theme-accent" />
                 <span>Google Gemini API Key</span>
               </label>
               <button
                 type="button"
                 onClick={() => loadModelsFromApi(current.apiKey)}
                 disabled={isLoadingModels || !current.apiKey.trim()}
-                className="text-[10px] text-zinc-900 hover:text-black font-extrabold flex items-center gap-1 px-2.5 py-1 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-40 rounded-lg cursor-pointer transition shadow-xs"
+                className="text-[10px] font-extrabold flex items-center gap-1 px-2.5 py-1 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg disabled:opacity-40 rounded-lg cursor-pointer transition shadow-xs"
               >
                 <RefreshCw className={`w-3 h-3 ${isLoadingModels ? 'animate-spin' : ''}`} />
                 <span>{isLoadingModels ? 'Mengambil...' : 'Muat Model API'}</span>
@@ -310,9 +310,9 @@ export const AiSettingsModal: React.FC<AiSettingsModalProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-extrabold uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg font-extrabold uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Check className="w-4 h-4 text-yellow-400 dark:text-zinc-950 stroke-[3]" />
+              <Check className="w-4 h-4 text-theme-accent dark:text-theme-accent-fg stroke-[3]" />
               <span>Simpan Pengaturan AI (3 Slot Aktif)</span>
             </button>
           </div>

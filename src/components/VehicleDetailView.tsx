@@ -222,9 +222,9 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
               triggerHaptic('medium');
               onOpenAiChat(`Tolong berikan analisa komprehensif untuk kendaraan ${vehicle.name} (${vehicle.plateNumber}) saat ini.`);
             }}
-            className="flex items-center gap-2 py-2 px-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-95 ring-2 ring-yellow-400/20"
+            className="flex items-center gap-2 py-2 px-4 rounded-2xl bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-95"
           >
-            <Sparkles className="w-4 h-4 fill-zinc-950 text-zinc-950" />
+            <Sparkles className="w-4 h-4 fill-current text-theme-accent-fg" />
             <span>Tanya AI</span>
           </button>
         </div>
@@ -483,42 +483,42 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
       {activeTab === 'fuel' && (
         <div className="space-y-5">
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-3xl p-4 border-2 border-zinc-200 border-b-4 border-b-yellow-400 shadow-sm">
-              <span className="text-[11px] font-bold text-zinc-500 uppercase flex items-center gap-1">
-                <TrendingUp className="w-3.5 h-3.5 text-yellow-600" />
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-theme-accent shadow-sm">
+              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-theme-accent" />
                 <span>Efisiensi Rata-Rata</span>
               </span>
-              <div className="mt-2 font-mono font-black text-xl text-zinc-950">
-                {avgEfficiency} <span className="text-xs font-normal text-zinc-500">km/L</span>
+              <div className="mt-2 font-mono font-black text-xl text-zinc-950 dark:text-zinc-100">
+                {avgEfficiency} <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">km/L</span>
               </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">Rasio pemakaian</p>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Rasio pemakaian</p>
             </div>
 
-            <div className="bg-white rounded-3xl p-4 border-2 border-zinc-200 border-b-4 border-b-zinc-900 shadow-sm">
-              <span className="text-[11px] font-bold text-zinc-500 uppercase">Biaya / KM</span>
-              <div className="mt-2 font-mono font-black text-xl text-zinc-950">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-theme-accent shadow-sm">
+              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Biaya / KM</span>
+              <div className="mt-2 font-mono font-black text-xl text-zinc-950 dark:text-zinc-100">
                 Rp {costPerKm}
               </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">Operasional riil BBM</p>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Operasional riil BBM</p>
             </div>
 
-            <div className="bg-white rounded-3xl p-4 border-2 border-zinc-200 border-b-4 border-b-zinc-900 shadow-sm">
-              <span className="text-[11px] font-bold text-zinc-500 uppercase">Volume Terisi</span>
-              <div className="mt-2 font-mono font-black text-xl text-zinc-950">
-                {totalLiters.toFixed(1)} <span className="text-xs font-normal text-zinc-500">L</span>
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-theme-accent shadow-sm">
+              <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Volume Terisi</span>
+              <div className="mt-2 font-mono font-black text-xl text-zinc-950 dark:text-zinc-100">
+                {totalLiters.toFixed(1)} <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">L</span>
               </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">Bahan bakar tercatat</p>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Bahan bakar tercatat</p>
             </div>
           </div>
 
           {/* Action Header */}
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-black uppercase tracking-wider text-zinc-900">
+            <h4 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
               Riwayat Pengisian & Koordinat GPS SPBU
             </h4>
             <button
               onClick={onAddFuelLog}
-              className="py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-2xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+              className="py-2.5 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black rounded-2xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Catat Pengisian BBM</span>
@@ -673,7 +673,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                         setTaxCost(vehicle.stnkTaxCostFiveYear);
                       }}
                       className={`py-2 rounded-lg transition cursor-pointer ${
-                        taxType === 'lima_tahunan' ? 'bg-yellow-400 text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+                        taxType === 'lima_tahunan' ? 'bg-theme-accent text-theme-accent-fg shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                       }`}
                     >
                       5 Tahunan (Plat Kaleng)
@@ -728,7 +728,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full py-3 mt-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
+                  className="w-full py-3 mt-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
                 >
                   Simpan Pembayaran Pajak
                 </button>
@@ -746,7 +746,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-2xl bg-yellow-400 text-zinc-950 shadow-xs">
+                  <div className="p-2.5 rounded-2xl bg-theme-accent text-theme-accent-fg shadow-xs">
                     <Edit3 className="w-5 h-5 stroke-[2.5]" />
                   </div>
                   <div>
@@ -1008,7 +1008,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
                   <button
                     type="submit"
-                    className="flex-1 sm:flex-none py-3 px-6 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-black uppercase tracking-wider text-xs rounded-2xl transition shadow-md shadow-yellow-400/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                    className="flex-1 sm:flex-none py-3 px-6 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg font-black uppercase tracking-wider text-xs rounded-2xl transition shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Check className="w-4 h-4 stroke-[3]" />
                     <span>Simpan Perubahan</span>

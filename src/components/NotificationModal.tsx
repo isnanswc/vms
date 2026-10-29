@@ -196,7 +196,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           {/* Header */}
           <div className="p-5 sm:p-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-4 bg-zinc-50/60 dark:bg-zinc-900/60">
             <div className="flex items-center gap-3">
-              <div className="relative p-2.5 sm:p-3 rounded-2xl bg-yellow-400 text-zinc-950 shadow-md">
+              <div className="relative p-2.5 sm:p-3 rounded-2xl bg-theme-accent text-theme-accent-fg shadow-md">
                 <Bell className="w-5 h-5 stroke-[2.5]" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] font-black rounded-full flex items-center justify-center ring-2 ring-white dark:ring-zinc-900 animate-pulse">
@@ -208,7 +208,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 <h3 id="notification-modal-title" className="text-base sm:text-lg font-black tracking-tight uppercase text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                   <span>Pemberitahuan Sistem</span>
                   {unreadCount > 0 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-zinc-950 font-mono">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-theme-accent text-theme-accent-fg font-mono">
                       {unreadCount} Baru
                     </span>
                   )}
@@ -249,7 +249,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               }}
               className={`px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition cursor-pointer ${
                 activeCategory === 'all'
-                  ? 'bg-zinc-950 text-white dark:bg-yellow-400 dark:text-zinc-950 shadow-xs'
+                  ? 'bg-zinc-950 text-white dark:bg-theme-accent dark:text-theme-accent-fg shadow-xs'
                   : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
             >
@@ -262,7 +262,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               }}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition cursor-pointer ${
                 activeCategory === 'service'
-                  ? 'bg-zinc-950 text-white dark:bg-yellow-400 dark:text-zinc-950 shadow-xs'
+                  ? 'bg-zinc-950 text-white dark:bg-theme-accent dark:text-theme-accent-fg shadow-xs'
                   : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
             >
@@ -276,7 +276,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               }}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition cursor-pointer ${
                 activeCategory === 'tax'
-                  ? 'bg-zinc-950 text-white dark:bg-yellow-400 dark:text-zinc-950 shadow-xs'
+                  ? 'bg-zinc-950 text-white dark:bg-theme-accent dark:text-theme-accent-fg shadow-xs'
                   : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
             >
@@ -290,7 +290,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               }}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition cursor-pointer ${
                 activeCategory === 'license'
-                  ? 'bg-zinc-950 text-white dark:bg-yellow-400 dark:text-zinc-950 shadow-xs'
+                  ? 'bg-zinc-950 text-white dark:bg-theme-accent dark:text-theme-accent-fg shadow-xs'
                   : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
             >
@@ -385,7 +385,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                         {isRead ? 'Sudah Dibaca' : 'Abaikan'}
                       </button>
 
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-950 dark:bg-yellow-400 text-white dark:text-zinc-950 text-xs font-black shadow-xs group-hover:scale-105 transition-transform">
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-950 dark:bg-theme-accent text-white dark:text-theme-accent-fg text-xs font-black shadow-xs group-hover:scale-105 transition-transform">
                         <span>{item.actionLabel}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </div>
@@ -399,7 +399,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           {/* Footer Bar: AI Assistant Advice shortcut */}
           <div className="p-4 sm:p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/90 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-              <Sparkles className="w-4 h-4 text-yellow-500" />
+              <Sparkles className="w-4 h-4 text-theme-accent" />
               <span>Butuh rekomendasi bengkel atau perhitungan anggaran?</span>
             </div>
 

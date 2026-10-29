@@ -128,7 +128,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, isU
       const rest = numberMatch[2];
       renderedElements.push(
         <div key={`num-${index}`} className="flex items-start gap-2.5 my-1 text-xs md:text-sm text-zinc-800 dark:text-zinc-200">
-          <span className="w-5 h-5 rounded-full bg-zinc-950 dark:bg-yellow-400 text-yellow-400 dark:text-zinc-950 font-mono text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+          <span className="w-5 h-5 rounded-full bg-zinc-950 dark:bg-theme-accent text-theme-accent dark:text-theme-accent-fg font-mono text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
             {num}
           </span>
           <span className="flex-1 leading-relaxed">{formatInline(rest)}</span>

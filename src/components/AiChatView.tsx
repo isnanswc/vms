@@ -500,7 +500,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
           <div className="relative flex flex-col w-[85%] max-w-xs bg-zinc-50 dark:bg-zinc-900 h-full shadow-2xl z-10 animate-fade-in border-r border-zinc-200 dark:border-zinc-800">
             <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-vms-accent font-black text-xs shadow-xs">
+                <div className="p-2 rounded-xl bg-theme-accent text-theme-accent-fg font-black text-xs shadow-xs">
                   AI
                 </div>
                 <div>
@@ -525,7 +525,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                   onNewChat();
                   setIsDrawerOpen(false);
                 }}
-                className="w-full py-3 px-3 bg-vms-accent hover:opacity-90 font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-95"
+                className="w-full py-3 px-3 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-95"
               >
                 <Plus className="w-4 h-4 stroke-[3]" />
                 <span>Buat Sesi Chat Baru</span>
@@ -587,7 +587,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
       <aside className="hidden md:flex flex-col w-72 lg:w-80 bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 h-full shrink-0 select-none transition-colors">
         <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-vms-accent font-black text-xs shadow-xs">
+            <div className="p-2 rounded-xl bg-theme-accent text-theme-accent-fg font-black text-xs shadow-xs">
               AI
             </div>
             <div>
@@ -737,8 +737,8 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
                   <div
                     className={`w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 text-xs font-bold shadow-xs ${
                       isUser
-                        ? 'bg-zinc-950 dark:bg-vms-accent text-white dark:text-zinc-950'
-                        : 'bg-vms-accent text-zinc-950'
+                        ? 'bg-zinc-950 dark:bg-theme-accent text-white dark:text-theme-accent-fg'
+                        : 'bg-theme-accent text-theme-accent-fg'
                     }`}
                   >
                     {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 animate-float-loop" />}

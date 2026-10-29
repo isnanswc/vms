@@ -148,7 +148,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
             onClick={() => setSelectedVehicleId('all')}
             className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
               selectedVehicleId === 'all'
-                ? 'bg-zinc-950 text-vms-accent dark:bg-vms-accent dark:text-zinc-950 shadow-sm'
+                ? 'bg-zinc-950 text-theme-accent dark:bg-theme-accent dark:text-theme-accent-fg shadow-sm'
                 : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
             }`}
           >
@@ -163,7 +163,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                 onClick={() => setSelectedVehicleId(veh.id)}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                   isSelected
-                    ? 'bg-zinc-950 text-vms-accent dark:bg-vms-accent dark:text-zinc-950 shadow-sm'
+                    ? 'bg-zinc-950 text-theme-accent dark:bg-theme-accent dark:text-theme-accent-fg shadow-sm'
                     : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
                 }`}
               >
@@ -201,7 +201,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
 
           <button
             onClick={onAddService}
-            className="flex items-center gap-1.5 py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-2xl transition shadow-xs cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 py-2.5 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black rounded-2xl transition shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>CATAT SERVIS</span>
@@ -210,7 +210,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
       </div>
 
       {/* Service Expense KPI Summary Card */}
-      <div className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-4 border-b-yellow-400 transition-colors">
+      <div className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-4 border-b-theme-accent transition-colors">
         <div>
           <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
             Total Biaya Pemeliharaan Armada
@@ -241,7 +241,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
             onClick={() => setViewMode('analytics')}
             className={`py-2 px-3 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === 'analytics'
-                ? 'bg-yellow-400 text-zinc-950 shadow-xs'
+                ? 'bg-theme-accent text-theme-accent-fg shadow-xs'
                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
@@ -259,7 +259,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
               <p>Belum ada riwayat servis untuk unit kendaraan ini.</p>
               <button
                 onClick={onAddService}
-                className="py-2 px-3.5 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-bold text-xs rounded-xl shadow-xs cursor-pointer transition inline-flex items-center gap-1.5"
+                className="py-2 px-3.5 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg font-bold text-xs rounded-xl shadow-xs cursor-pointer transition inline-flex items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Catat Servis Pertama</span>
@@ -276,7 +276,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                   <div
                     key={record.id}
                     onClick={() => setSelectedRecordForDetail(record)}
-                    className="bg-white dark:bg-zinc-900 rounded-3xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-900 dark:hover:border-yellow-400 transition-all p-4.5 shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between group active:scale-[0.99]"
+                    className="bg-white dark:bg-zinc-900 rounded-3xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-900 dark:hover:border-theme-accent transition-all p-4.5 shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between group active:scale-[0.99]"
                   >
                     <div>
                       {/* Top Plate & Date */}
@@ -358,7 +358,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-xs font-bold text-yellow-600 dark:text-yellow-400 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors">
+                      <div className="flex items-center gap-1 text-xs font-bold text-theme-accent group-hover:text-zinc-950 dark:group-hover:text-white transition-colors">
                         <span>Lihat Rincian & Sparepart</span>
                         <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                       </div>
@@ -398,7 +398,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                     onClick={() => setTimeRange(pill.id as any)}
                     className={`py-1.5 px-3 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                       isSelected
-                        ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-xs'
+                        ? 'bg-zinc-950 text-theme-accent dark:bg-theme-accent dark:text-theme-accent-fg shadow-xs'
                         : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
                     }`}
                   >
@@ -411,7 +411,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
 
           {/* Key Analytics Metric Cards (4 Cards Grid) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-yellow-400 shadow-sm transition-colors">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-theme-accent shadow-sm transition-colors">
               <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
                 <span>Biaya Servis</span>
                 <Wallet className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />

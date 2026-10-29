@@ -102,8 +102,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-yellow-400 text-zinc-950 flex items-center justify-center shadow-[0_0_12px_rgba(255,255,255,0.7)] font-black">
-                  <Sparkles className="w-4 h-4 fill-zinc-950" />
+                <div className="w-8 h-8 rounded-full bg-theme-accent text-theme-accent-fg flex items-center justify-center shadow-[0_0_12px_rgba(255,255,255,0.7)] font-black">
+                  <Sparkles className="w-4 h-4 fill-current" />
                 </div>
                 <div>
                   <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 dark:text-white">
@@ -135,14 +135,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   onNewChat?.();
                   onChangeTab('chat');
                 }}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-yellow-400 hover:text-zinc-950 dark:hover:bg-yellow-400 dark:hover:text-zinc-950 border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
+                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-theme-accent hover:text-theme-accent-fg dark:hover:bg-theme-accent dark:hover:text-theme-accent-fg border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
               >
-                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-yellow-500 group-hover:bg-zinc-950 group-hover:text-yellow-400 transition shadow-xs">
+                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-theme-accent group-hover:bg-zinc-950 group-hover:text-theme-accent transition shadow-xs">
                   <MessageSquarePlus className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="block font-black">Percakapan Baru</span>
-                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900">
+                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-inherit">
                     Buka sesi tanya jawab AI segar
                   </span>
                 </div>
@@ -155,14 +155,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   setIsQuickAiMenuOpen(false);
                   onOpenQuickScan?.();
                 }}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-yellow-400 hover:text-zinc-950 dark:hover:bg-yellow-400 dark:hover:text-zinc-950 border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
+                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-theme-accent hover:text-theme-accent-fg dark:hover:bg-theme-accent dark:hover:text-theme-accent-fg border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
               >
-                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-yellow-500 group-hover:bg-zinc-950 group-hover:text-yellow-400 transition shadow-xs">
+                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-theme-accent group-hover:bg-zinc-950 group-hover:text-theme-accent transition shadow-xs">
                   <Camera className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="block font-black">Pindai Struk BBM Cepat</span>
-                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900">
+                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-inherit">
                     Otomatis deteksi liter, biaya & KM
                   </span>
                 </div>
@@ -175,14 +175,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   setIsQuickAiMenuOpen(false);
                   onOpenAiWithPrompt?.('Tolong buatkan analisis kondisi seluruh armada dan rekomendasi servis yang paling mendesak hari ini.');
                 }}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-yellow-400 hover:text-zinc-950 dark:hover:bg-yellow-400 dark:hover:text-zinc-950 border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
+                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-theme-accent hover:text-theme-accent-fg dark:hover:bg-theme-accent dark:hover:text-theme-accent-fg border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
               >
-                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-yellow-500 group-hover:bg-zinc-950 group-hover:text-yellow-400 transition shadow-xs">
+                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-theme-accent group-hover:bg-zinc-950 group-hover:text-theme-accent transition shadow-xs">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="block font-black">Analisis Armada Mandiri</span>
-                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900">
+                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-inherit">
                     Cek efisiensi bbm & kesehatan suku cadang
                   </span>
                 </div>
@@ -195,14 +195,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   setIsQuickAiMenuOpen(false);
                   onOpenAiSettings?.();
                 }}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-yellow-400 hover:text-zinc-950 dark:hover:bg-yellow-400 dark:hover:text-zinc-950 border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
+                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 hover:bg-theme-accent hover:text-theme-accent-fg dark:hover:bg-theme-accent dark:hover:text-theme-accent-fg border border-zinc-200 dark:border-zinc-700/80 transition cursor-pointer text-left group"
               >
-                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-yellow-500 group-hover:bg-zinc-950 group-hover:text-yellow-400 transition shadow-xs">
+                <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 text-theme-accent group-hover:bg-zinc-950 group-hover:text-theme-accent transition shadow-xs">
                   <Sliders className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="block font-black">Setelan Model Gemini</span>
-                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900">
+                  <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400 group-hover:text-inherit">
                     Konfigurasi API Key & slot model fallback
                   </span>
                 </div>
@@ -243,8 +243,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                       isHoldingAi ? 'scale-115' : 'hover:scale-105 active:scale-95'
                     } ${
                       isActive
-                        ? 'bg-zinc-950 dark:bg-zinc-900 text-vms-accent border-2 border-theme-accent shadow-[0_0_20px_rgba(255,255,255,0.7)] dark:shadow-[0_0_25px_rgba(255,255,255,0.45)]'
-                        : 'bg-vms-accent text-zinc-950 hover:opacity-90 shadow-[0_0_18px_rgba(255,255,255,0.75)] dark:shadow-[0_0_22px_rgba(255,255,255,0.4)]'
+                        ? 'bg-zinc-950 dark:bg-zinc-900 text-theme-accent border-2 border-theme-accent shadow-[0_0_20px_rgba(255,255,255,0.7)] dark:shadow-[0_0_25px_rgba(255,255,255,0.45)]'
+                        : 'bg-theme-accent text-theme-accent-fg hover:opacity-90 shadow-[0_0_18px_rgba(255,255,255,0.75)] dark:shadow-[0_0_22px_rgba(255,255,255,0.4)]'
                     }`}
                   >
                     {/* Holding Pulse Ring Indicator */}
@@ -258,8 +258,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                     </div>
                   </button>
 
-                  <span className={`text-[10px] tracking-tight -mt-3 ${
-                    isActive ? 'font-black text-zinc-950 dark:text-theme-accent' : 'font-bold text-zinc-600 dark:text-zinc-400'
+                  <span className={`text-[10px] tracking-tight -mt-3 transition-colors ${
+                    isActive ? 'font-black text-theme-accent' : 'font-bold text-zinc-600 dark:text-zinc-400'
                   }`}>
                     Chat AI
                   </span>
@@ -277,8 +277,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 }}
                 className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer ${
                   isActive
-                    ? 'text-zinc-950 dark:text-zinc-100 font-black'
-                    : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                    ? 'text-theme-accent font-black'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
                 }`}
               >
                 {isActive && (
@@ -288,18 +288,20 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 <div className="relative">
                   <Icon
                     className={`w-5 h-5 transition-transform duration-200 ${
-                      isActive ? 'scale-110 stroke-[2.5] text-zinc-950 dark:text-theme-accent' : 'stroke-[1.8]'
+                      isActive ? 'scale-110 stroke-[2.5] text-theme-accent' : 'stroke-[2] text-zinc-600 dark:text-zinc-400'
                     }`}
                   />
 
                   {item.id === 'service' && serviceBadgeCount > 0 && (
-                    <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-[14px] bg-vms-accent text-zinc-950 text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
+                    <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-[14px] bg-theme-accent text-theme-accent-fg text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
                       {serviceBadgeCount}
                     </span>
                   )}
                 </div>
 
-                <span className={`text-[10px] tracking-tight mt-1 ${isActive ? 'font-bold text-zinc-950 dark:text-theme-accent' : ''}`}>
+                <span className={`text-[10px] tracking-tight mt-1 transition-colors ${
+                  isActive ? 'font-black text-theme-accent' : 'font-semibold text-zinc-600 dark:text-zinc-400'
+                }`}>
                   {item.label}
                 </span>
               </button>

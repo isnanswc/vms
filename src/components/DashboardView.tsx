@@ -52,7 +52,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 bg-yellow-400 text-zinc-950 text-[10px] font-black uppercase tracking-wider rounded-md shadow-xs">
+            <span className="px-2.5 py-0.5 bg-theme-accent text-theme-accent-fg text-[10px] font-black uppercase tracking-wider rounded-md shadow-xs">
               Fleet Console
             </span>
             <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">Bulan Oktober 2026</span>
@@ -76,9 +76,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </button>
           <button
             onClick={onOpenAddFuel}
-            className="flex items-center gap-2 py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 text-xs font-black rounded-2xl transition cursor-pointer shadow-sm active:scale-95 group"
+            className="flex items-center gap-2 py-2.5 px-4 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg text-xs font-black rounded-2xl transition cursor-pointer shadow-sm active:scale-95 group"
           >
-            <Fuel className="w-4 h-4 text-yellow-400 dark:text-zinc-950 group-hover:scale-110 transition-transform animate-float-loop" />
+            <Fuel className="w-4 h-4 text-theme-accent dark:text-theme-accent-fg group-hover:scale-110 transition-transform animate-float-loop" />
             <span>Catat Pengisian BBM</span>
           </button>
         </div>
@@ -87,7 +87,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* 2. Key Metrics Grid (4 Cards in a Row on Desktop) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {/* Card 1: Total Pengeluaran */}
-        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-yellow-400 shadow-sm transition-colors">
+        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-theme-accent shadow-sm transition-colors">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
             <span>Total Biaya</span>
             <Wallet className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
@@ -101,10 +101,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 2: Rata-rata Efisiensi */}
-        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-yellow-400 shadow-sm transition-colors">
+        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-theme-accent shadow-sm transition-colors">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
             <span>Rata-Rata BBM</span>
-            <Gauge className="w-4 h-4 text-yellow-500" />
+            <Gauge className="w-4 h-4 text-theme-accent" />
           </div>
           <div className="mt-2">
             <span className="text-lg md:text-xl font-black font-mono tracking-tight text-zinc-950 dark:text-zinc-100">
@@ -115,7 +115,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 3: Biaya Operasional Riil per KM */}
-        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-yellow-400 shadow-sm transition-colors">
+        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-theme-accent shadow-sm transition-colors">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
             <span>Cost per KM</span>
             <TrendingUp className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
@@ -146,10 +146,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* 3. Middle Desktop Section: 2 Columns Layout (AI Assistant + Alerts) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Big Prominent AI Chat Card (7 Cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 shadow-md hover:border-yellow-400 dark:hover:border-yellow-400 transition-all space-y-4">
+        <div className="lg:col-span-7 bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 shadow-md hover:border-theme-accent dark:hover:border-theme-accent transition-all space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-yellow-400 text-zinc-950 flex items-center justify-center shadow-md shadow-yellow-400/20 shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-theme-accent text-theme-accent-fg flex items-center justify-center shadow-md shrink-0">
                 <MessageSquare className="w-7 h-7 stroke-[2.4]" />
               </div>
               <div>
@@ -157,7 +157,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <h2 className="text-base md:text-lg font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
                     Fleet AI Assistant
                   </h2>
-                  <span className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-950/60 text-zinc-900 dark:text-yellow-400 text-[10px] font-bold rounded-full border border-yellow-300 dark:border-yellow-800">
+                  <span className="px-2 py-0.5 bg-theme-accent-subtle text-zinc-900 dark:text-zinc-100 text-[10px] font-bold rounded-full border border-theme-accent-border">
                     Multimodal
                   </span>
                 </div>
@@ -169,9 +169,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             <button
               onClick={() => onOpenAiChat()}
-              className="py-3 px-5 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 text-white dark:text-zinc-950 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition shadow-md shadow-zinc-900/10 active:scale-95 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              className="py-3 px-5 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg font-extrabold text-xs uppercase tracking-wider rounded-2xl transition shadow-md shadow-zinc-900/10 active:scale-95 flex items-center justify-center gap-2 cursor-pointer shrink-0"
             >
-              <Sparkles className="w-4 h-4 text-yellow-400 dark:text-zinc-950 fill-current animate-sparkle-loop" />
+              <Sparkles className="w-4 h-4 text-theme-accent dark:text-theme-accent-fg fill-current animate-sparkle-loop" />
               <span>Buka Chat AI</span>
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -185,19 +185,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => onOpenAiChat('Kapan Vario 125 2015 saya harus ganti oli & V-Belt?')}
-                className="px-3 py-2 rounded-xl bg-zinc-50 hover:bg-yellow-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 text-xs font-medium border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-zinc-50 hover:bg-theme-accent-subtle dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 text-xs font-medium border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
               >
                 🛵 Kapan Vario servis CVT?
               </button>
               <button
                 onClick={() => onOpenAiChat('Berapa konsumsi BBM rata-rata armada saya saat ini?')}
-                className="px-3 py-2 rounded-xl bg-zinc-50 hover:bg-yellow-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 text-xs font-medium border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-zinc-50 hover:bg-theme-accent-subtle dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 text-xs font-medium border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
               >
                 ⛽ Cek efisiensi bensin
               </button>
               <button
                 onClick={() => onOpenAiChat('Apakah ada pajak STNK yang mendekati jatuh tempo?')}
-                className="px-3 py-2 rounded-xl bg-zinc-50 hover:bg-yellow-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 text-xs font-medium border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-zinc-50 hover:bg-theme-accent-subtle dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 text-xs font-medium border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
               >
                 📄 Cek jatuh tempo STNK
               </button>
@@ -208,17 +208,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* Right Column: Urgent Alerts & AI Intelligence Summary (5 Cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* Urgent Alert Banner */}
-          <div className="bg-yellow-50 dark:bg-yellow-950/40 border-2 border-yellow-400 dark:border-yellow-700 rounded-3xl p-5 shadow-xs space-y-3">
+          <div className="bg-theme-accent-subtle border-2 border-theme-accent-border rounded-3xl p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 animate-heartbeat-loop" />
+                <AlertTriangle className="w-5 h-5 text-theme-accent animate-heartbeat-loop" />
                 <h4 className="font-extrabold text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                   Peringatan Mendesak
                 </h4>
               </div>
               <button
                 onClick={() => onNavigateTab('service')}
-                className="text-xs font-bold text-zinc-950 dark:text-yellow-400 underline hover:text-black cursor-pointer"
+                className="text-xs font-bold text-theme-accent underline hover:opacity-80 cursor-pointer"
               >
                 Lihat Detail
               </button>

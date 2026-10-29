@@ -743,16 +743,16 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
             type="button"
             onClick={handleDeepAiAnalysis}
             disabled={isDeepAiAnalyzing || !searchQuery.trim()}
-            className="py-3.5 px-5 bg-zinc-950 hover:bg-zinc-800 dark:bg-yellow-400 dark:hover:bg-yellow-300 disabled:opacity-40 text-white dark:text-zinc-950 font-extrabold text-xs uppercase tracking-wider rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0"
+            className="py-3.5 px-5 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover disabled:opacity-40 text-white dark:text-theme-accent-fg font-extrabold text-xs uppercase tracking-wider rounded-2xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer shrink-0"
           >
             {isDeepAiAnalyzing ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-yellow-400 dark:text-zinc-950" />
+                <RefreshCw className="w-4 h-4 animate-spin text-theme-accent dark:text-theme-accent-fg" />
                 <span>AI Menganalisa...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-yellow-400 dark:text-zinc-950 fill-current" />
+                <Sparkles className="w-4 h-4 text-theme-accent dark:text-theme-accent-fg fill-current" />
                 <span>Analisis dengan Gemini AI</span>
               </>
             )}
