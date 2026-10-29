@@ -15,7 +15,7 @@ import {
   Activity,
   Zap
 } from 'lucide-react';
-import { VehicleCategoryIcon } from './VehicleCategoryIcon';
+import { VehicleSlideSelector } from './VehicleSlideSelector';
 
 interface FuelViewProps {
   vehicles: Vehicle[];
@@ -127,40 +127,12 @@ export const FuelView: React.FC<FuelViewProps> = ({
 
   return (
     <div className="space-y-5 pb-24 md:pb-8 pt-2 text-zinc-900 dark:text-zinc-100 transition-colors">
-      {/* Sticky Vehicle Filter Pill Bar */}
-      <div className="bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md -mx-4 md:mx-0 px-4 md:px-0 py-2 border-b md:border-b-0 border-zinc-200 dark:border-zinc-800 transition-colors">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-          <button
-            onClick={() => setSelectedVehicleId('all')}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
-              selectedVehicleId === 'all'
-                ? 'bg-zinc-950 text-theme-accent dark:bg-theme-accent dark:text-theme-accent-fg shadow-sm'
-                : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
-            }`}
-          >
-            Semua Unit ({vehicles.length})
-          </button>
-
-          {vehicles.map((veh) => {
-            const isSelected = selectedVehicleId === veh.id;
-            return (
-              <button
-                key={veh.id}
-                onClick={() => setSelectedVehicleId(veh.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
-                  isSelected
-                    ? 'bg-zinc-950 text-theme-accent dark:bg-theme-accent dark:text-theme-accent-fg shadow-sm'
-                    : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
-                }`}
-              >
-                <VehicleCategoryIcon category={veh.category} isElectric={veh.fuelType === 'Listrik'} className="w-3.5 h-3.5" />
-                <span className="font-mono text-[11px] opacity-80">[{veh.plateNumber}]</span>
-                <span>{veh.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Aesthetic Theme-Aware Vehicle Slide List */}
+      <VehicleSlideSelector
+        vehicles={vehicles}
+        selectedVehicleId={selectedVehicleId}
+        onSelectVehicle={(id) => setSelectedVehicleId(id)}
+      />
 
       {/* Selected Vehicle Headline Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

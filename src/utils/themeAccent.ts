@@ -1,6 +1,7 @@
 /**
  * Application Accent Theme Configuration & Persistence
  * Allows dynamic customization of the primary accent color across the app.
+ * Synchronizes selected theme accent with Android notification bar (status bar) & Android navbar.
  */
 
 export type AccentColorId = 
@@ -117,9 +118,59 @@ export function getSavedAccent(): AccentColorId {
   return exists ? saved : 'yellow';
 }
 
+/**
+ * Updates HTML attributes and meta tags for Android Status Bar & Navbar.
+ * Modern Android Chrome (v93+) and PWAs dynamically apply `theme-color` to both
+ * the top notification status bar and the bottom system navigation bar.
+ */
 export function applyAccentToDocument(accentId: AccentColorId) {
   if (typeof document === 'undefined') return;
+
+  // 1. Set data attribute on documentElement
   document.documentElement.setAttribute('data-accent', accentId);
   localStorage.setItem(ACCENT_STORAGE_KEY, accentId);
-  window.dispatchEvent(new CustomEvent('vms-accent-change', { detail: accentId }));
+
+  // 2. Lookup hex code for chosen accent
+  const preset = ACCENT_PRESETS.find((p) => p.id === accentId);
+  const themeHex = preset ? preset.primaryHex : '#facc15';
+
+  // 3. Update or create meta[name="theme-color"] (Controls Android Status Bar & Navbar)
+  let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (!metaThemeColor) {
+    metaThemeColor = document.createElement('meta');
+    metaThemeColor.setAttribute('name', 'theme-color');
+    document.head.appendChild(metaThemeColor);
+  }
+  metaThemeColor.setAttribute('content', themeHex);
+
+  // 4. Update or create Windows Phone / Edge navbutton color
+  let metaNavColor = document.querySelector('meta[name="msapplication-navbutton-color"]');
+  if (!metaNavColor) {
+    metaNavColor = document.createElement('meta');
+    metaNavColor.setAttribute('name', 'msapplication-navbutton-color');
+    document.head.appendChild(metaNavColor);
+  }
+  metaNavColor.setAttribute('content', themeHex);
+
+  // 5. Update apple-mobile-web-app-status-bar-style
+  let metaAppleStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (!metaAppleStatus) {
+    metaAppleStatus = document.createElement('meta');
+    metaAppleStatus.setAttribute('name', 'apple-mobile-web-app-status-bar-style');
+    document.head.appendChild(metaAppleStatus);
+  }
+  metaAppleStatus.setAttribute('content', 'default');
+
+  // 6. Broadcast event for reactive listeners
+  window.dispatchEvent(new CustomEvent('vms-accent-change', { detail: { accentId, themeHex } }));
+}
+
+// Automatically sync Android bar on initial script execution
+if (typeof window !== 'undefined') {
+  try {
+    const initialAccent = getSavedAccent();
+    applyAccentToDocument(initialAccent);
+  } catch {
+    // Ignore during SSR or static analysis
+  }
 }

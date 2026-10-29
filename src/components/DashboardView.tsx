@@ -1,16 +1,13 @@
 import React from 'react';
+import { AnimatedWalletIcon, AnimatedSpeedometerIcon, AnimatedArrowRiseIcon, AnimatedWrenchIcon } from './DashboardAnimatedIcons';
 import type { Vehicle, FuelLog, SparePart, ServiceRecord } from '../types';
 import { 
   Sparkles, 
   MessageSquare, 
   Camera, 
   Fuel, 
-  Wrench, 
   ChevronRight, 
-  Gauge, 
-  AlertTriangle,
-  Wallet,
-  TrendingUp
+  AlertTriangle 
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -90,7 +87,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-theme-accent shadow-sm transition-colors">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
             <span>Total Biaya</span>
-            <Wallet className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
+            <div className="p-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-xs"><AnimatedWalletIcon className="w-4 h-4" /></div>
           </div>
           <div className="mt-2">
             <span className="text-lg md:text-xl font-black font-mono tracking-tight text-zinc-950 dark:text-zinc-100">
@@ -104,7 +101,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-theme-accent shadow-sm transition-colors">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
             <span>Rata-Rata BBM</span>
-            <Gauge className="w-4 h-4 text-theme-accent" />
+            <div className="p-1.5 rounded-xl bg-theme-accent-subtle text-theme-accent shadow-xs"><AnimatedSpeedometerIcon className="w-4 h-4" /></div>
           </div>
           <div className="mt-2">
             <span className="text-lg md:text-xl font-black font-mono tracking-tight text-zinc-950 dark:text-zinc-100">
@@ -118,7 +115,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-zinc-900 dark:border-b-theme-accent shadow-sm transition-colors">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
             <span>Cost per KM</span>
-            <TrendingUp className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
+            <div className="p-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-xs"><AnimatedArrowRiseIcon className="w-4 h-4" /></div>
           </div>
           <div className="mt-2">
             <span className="text-lg md:text-xl font-black font-mono tracking-tight text-zinc-950 dark:text-zinc-100">
@@ -132,7 +129,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 border-2 border-zinc-200 dark:border-zinc-800 border-b-4 border-b-amber-400 shadow-sm transition-colors">
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 text-[11px] font-bold uppercase">
             <span>Suku Cadang</span>
-            <Wrench className="w-4 h-4 text-amber-500" />
+            <div className="p-1.5 rounded-xl bg-amber-500/15 text-amber-500 shadow-xs"><AnimatedWrenchIcon className="w-4 h-4" /></div>
           </div>
           <div className="mt-2">
             <span className="text-lg md:text-xl font-black font-mono tracking-tight text-zinc-950 dark:text-zinc-100">

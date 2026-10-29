@@ -469,3 +469,177 @@ button.bg-yellow-500:hover {
 
 
 
+
+
+/* ========================================================================== */
+/* DASHBOARD METRIC ICONS ANIMATIONS (WALLET, SPEEDO, ARROW RISE, WRENCH)    */
+/* ========================================================================== */
+
+@keyframes walletFlapAnim {
+  0%, 100% {
+    transform: rotateX(0deg);
+  }
+  30%, 65% {
+    transform: rotateX(-55deg) translateY(-2px);
+  }
+}
+
+.animate-wallet-flap {
+  animation: walletFlapAnim 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: 12px 7px;
+  perspective: 200px;
+}
+
+@keyframes speedometerNeedleSweep {
+  0%, 100% {
+    transform: rotate(-55deg);
+  }
+  25% {
+    transform: rotate(35deg);
+  }
+  45% {
+    transform: rotate(15deg);
+  }
+  70% {
+    transform: rotate(62deg);
+  }
+  85% {
+    transform: rotate(-10deg);
+  }
+}
+
+.animate-speedometer-needle {
+  animation: speedometerNeedleSweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: 12px 15.5px;
+}
+
+@keyframes arrowRiseMotion {
+  0%, 100% {
+    transform: translate3d(0, 3px, 0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate3d(0, -3.5px, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes arrowTrailMotion {
+  0%, 100% {
+    transform: translate3d(0, 4px, 0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate3d(0, -2.5px, 0);
+    opacity: 0.85;
+  }
+}
+
+.animate-arrow-rise {
+  animation: arrowRiseMotion 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-arrow-trail {
+  animation: arrowTrailMotion 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes wrenchTurnMotion {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-35deg);
+  }
+  45% {
+    transform: rotate(-42deg);
+  }
+  70% {
+    transform: rotate(16deg);
+  }
+}
+
+.animate-wrench-turn {
+  animation: wrenchTurnMotion 2.6s ease-in-out infinite;
+  transform-origin: 15px 9px;
+}
+
+/* ========================================================================== */
+/* COOL ANIMATED BOTTOM NAVBAR EFFECTS                                       */
+/* ========================================================================== */
+
+@keyframes navActivePop {
+  0% {
+    transform: scale(0.9);
+  }
+  55% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-nav-pop {
+  animation: navActivePop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes pulseSubtleGlow {
+  0%, 100% {
+    box-shadow: 0 0 14px var(--theme-accent-glow, rgba(250, 204, 21, 0.35));
+  }
+  50% {
+    box-shadow: 0 0 26px var(--theme-accent-glow, rgba(250, 204, 21, 0.65));
+  }
+}
+
+.animate-nav-glow {
+  animation: pulseSubtleGlow 2.4s ease-in-out infinite;
+}
+
+
+/* ========================================================================== */
+/* MODERN AI GEMINI STAR & SATELLITE TWINKLE ANIMATIONS                      */
+/* ========================================================================== */
+
+@keyframes aiStarBreathe {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+.animate-ai-star-breathe {
+  animation: aiStarBreathe 3s ease-in-out infinite;
+}
+
+@keyframes aiSatelliteTwinkle1 {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+}
+
+.animate-ai-satellite-1 {
+  animation: aiSatelliteTwinkle1 2.2s ease-in-out infinite;
+}
+
+@keyframes aiSatelliteTwinkle2 {
+  0%, 100% {
+    transform: scale(1.2);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(0.7);
+    opacity: 0.35;
+  }
+}
+
+.animate-ai-satellite-2 {
+  animation: aiSatelliteTwinkle2 2.6s ease-in-out infinite 0.4s;
+}

@@ -216,16 +216,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         </div>
       )}
 
-      {/* BOTTOM NAVIGATION BAR */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 pb-[env(safe-area-inset-bottom)] shadow-lg transition-colors">
-        <div className="max-w-md mx-auto grid grid-cols-5 px-1 py-1 relative">
+      {/* ANIMATED BOTTOM NAVIGATION BAR */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-t border-zinc-200/80 dark:border-zinc-800/80 pb-[max(env(safe-area-inset-bottom),6px)] pt-1 px-1.5 shadow-2xl transition-colors">
+        <div className="max-w-md mx-auto grid grid-cols-5 px-1 py-1 relative items-center">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             const isChatCenter = item.id === 'chat';
 
             /* ======================================================== */
-            /* SPECIAL CENTER AI BUTTON: PERFECT CIRCLE & PURE WHITE GLOW */
+            /* SPECIAL CENTER AI BUTTON: GLOWING COSMIC PULSE ORB       */
             /* ======================================================== */
             if (isChatCenter) {
               return (
@@ -239,27 +239,30 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                     onTouchEnd={handleAiTouchEnd}
                     aria-label="Fleet Chat AI (Tahan untuk menu pintas)"
                     title="Klik untuk Chat AI, atau tahan untuk Menu Pintas"
-                    className={`relative -top-4 w-13 h-13 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 ring-4 ring-white dark:ring-zinc-950 ${
-                      isHoldingAi ? 'scale-115' : 'hover:scale-105 active:scale-95'
+                    className={`relative -top-5 w-13 h-13 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 ring-4 ring-white dark:ring-zinc-950 ${
+                      isHoldingAi ? 'scale-120' : 'hover:scale-105 active:scale-95'
                     } ${
                       isActive
-                        ? 'bg-zinc-950 dark:bg-zinc-900 text-theme-accent border-2 border-theme-accent shadow-[0_0_20px_rgba(255,255,255,0.7)] dark:shadow-[0_0_25px_rgba(255,255,255,0.45)]'
-                        : 'bg-theme-accent text-theme-accent-fg hover:opacity-90 shadow-[0_0_18px_rgba(255,255,255,0.75)] dark:shadow-[0_0_22px_rgba(255,255,255,0.4)]'
+                        ? 'bg-zinc-950 dark:bg-zinc-900 text-theme-accent border-2 border-theme-accent animate-nav-glow shadow-xl'
+                        : 'bg-theme-accent text-theme-accent-fg hover:opacity-95 shadow-lg shadow-theme-accent/30 animate-nav-glow'
                     }`}
                   >
-                    {/* Holding Pulse Ring Indicator */}
+                    {/* Holding Expanding Radar Wave */}
                     {isHoldingAi && (
                       <span className="absolute inset-0 rounded-full border-2 border-theme-accent animate-ping opacity-75" />
                     )}
 
-                    {/* Perfect Circle Inner Core */}
+                    {/* Ambient Center Glow */}
+                    <span className="absolute inset-1 rounded-full bg-theme-accent/20 filter blur-xs -z-10" />
+
+                    {/* AI Icon */}
                     <div className="w-full h-full rounded-full flex items-center justify-center">
                       <AiChatLineIcon isActive={isActive} className="w-6 h-6" />
                     </div>
                   </button>
 
-                  <span className={`text-[10px] tracking-tight -mt-3 transition-colors ${
-                    isActive ? 'font-black text-theme-accent' : 'font-bold text-zinc-600 dark:text-zinc-400'
+                  <span className={`text-[10px] tracking-tight -mt-4 transition-all duration-200 ${
+                    isActive ? 'font-black text-theme-accent scale-105' : 'font-bold text-zinc-600 dark:text-zinc-400'
                   }`}>
                     Chat AI
                   </span>
@@ -267,7 +270,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               );
             }
 
-            /* STANDARD BOTTOM NAV BUTTONS */
+            /* STANDARD ANIMATED BOTTOM NAV BUTTONS */
             return (
               <button
                 key={item.id}
@@ -275,32 +278,43 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   triggerHaptic('selection');
                   onChangeTab(item.id);
                 }}
-                className={`relative flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all cursor-pointer ${
+                className={`relative flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 cursor-pointer group ${
                   isActive
                     ? 'text-theme-accent font-black'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
                 }`}
               >
+                {/* Active Soft Pill Capsule Backdrop */}
                 {isActive && (
-                  <div className="absolute top-0 w-8 h-[2.5px] bg-theme-accent rounded-full shadow-xs"></div>
+                  <div className="absolute inset-x-1 inset-y-0.5 bg-theme-accent/15 dark:bg-theme-accent/20 rounded-2xl border border-theme-accent/30 -z-10 animate-nav-pop shadow-xs" />
+                )}
+
+                {/* Glowing Top Pip Indicator */}
+                {isActive && (
+                  <div className="absolute -top-1 w-6 h-[3px] bg-theme-accent rounded-full shadow-[0_0_10px_var(--theme-accent)] animate-nav-pop" />
                 )}
 
                 <div className="relative">
                   <Icon
-                    className={`w-5 h-5 transition-transform duration-200 ${
-                      isActive ? 'scale-110 stroke-[2.5] text-theme-accent' : 'stroke-[2] text-zinc-600 dark:text-zinc-400'
+                    className={`w-5 h-5 transition-all duration-300 ${
+                      isActive 
+                        ? 'scale-115 -translate-y-0.5 stroke-[2.5] text-theme-accent ease-[cubic-bezier(0.34,1.56,0.64,1)]' 
+                        : 'stroke-[2] scale-100 translate-y-0 group-hover:scale-105 transition-transform'
                     }`}
                   />
 
+                  {/* Service Badge with Heartbeat animation */}
                   {item.id === 'service' && serviceBadgeCount > 0 && (
-                    <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-[14px] bg-theme-accent text-theme-accent-fg text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
+                    <span className="absolute -top-1.5 -right-2 px-1 min-w-[15px] h-[15px] bg-theme-accent text-theme-accent-fg text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
                       {serviceBadgeCount}
                     </span>
                   )}
                 </div>
 
-                <span className={`text-[10px] tracking-tight mt-1 transition-colors ${
-                  isActive ? 'font-black text-theme-accent' : 'font-semibold text-zinc-600 dark:text-zinc-400'
+                <span className={`text-[10px] tracking-tight mt-1 transition-all duration-200 ${
+                  isActive 
+                    ? 'font-black text-theme-accent scale-105' 
+                    : 'font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200'
                 }`}>
                   {item.label}
                 </span>
