@@ -12,13 +12,25 @@ export const executeThemeTransition = (
   const isDark = currentTheme === 'dark';
   const newTheme = isDark ? 'light' : 'dark';
 
-  // Determine origin coordinates
+  // Determine origin coordinates: prioritize exact center of the triggering button/element
   let x = window.innerWidth / 2;
   let y = window.innerHeight / 2;
 
-  if (event && 'clientX' in event && event.clientX !== undefined && event.clientX > 0) {
-    x = event.clientX;
-    y = event.clientY;
+  if (event) {
+    const rawEvt = event as any;
+    // Prefer the button/element that received the click
+    const targetEl = (rawEvt.currentTarget || rawEvt.target) as HTMLElement | null;
+
+    if (targetEl && typeof targetEl.getBoundingClientRect === 'function') {
+      const rect = targetEl.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        x = Math.round(rect.left + rect.width / 2);
+        y = Math.round(rect.top + rect.height / 2);
+      }
+    } else if (typeof rawEvt.clientX === 'number' && rawEvt.clientX > 0) {
+      x = rawEvt.clientX;
+      y = rawEvt.clientY;
+    }
   }
 
   // Calculate distance to furthest screen corner for full circular reveal
@@ -54,7 +66,7 @@ export const executeThemeTransition = (
           clipPath,
         },
         {
-          duration: 360,
+          duration: 380,
           easing: 'cubic-bezier(0.2, 0, 0, 1)',
           pseudoElement: '::view-transition-new(root)',
         }

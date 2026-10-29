@@ -33,7 +33,7 @@ export const AiChatLineIcon: React.FC<AiChatLineIconProps> = ({
         {/* Dynamic Running Line with Connection Glow */}
         <path
           d={chatBubblePath}
-          stroke={isActive ? '#facc15' : 'currentColor'}
+          stroke={isActive ? 'var(--theme-accent)' : 'currentColor'}
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"

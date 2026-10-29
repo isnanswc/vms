@@ -264,8 +264,8 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
                 className="w-2 rounded-full transition-all duration-75"
                 style={{
                   height: `${lvl}%`,
-                  backgroundColor: lvl > 45 ? '#facc15' : '#71717a',
-                  boxShadow: lvl > 55 ? '0 0 10px #facc15' : 'none',
+                  backgroundColor: lvl > 45 ? 'var(--theme-accent)' : '#71717a',
+                  boxShadow: lvl > 55 ? '0 0 10px var(--theme-accent)' : 'none',
                 }}
               ></div>
             ))}

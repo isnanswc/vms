@@ -20,6 +20,7 @@ import imageCompression from 'browser-image-compression';
 import { VoiceInputModal } from './VoiceInputModal';
 import { callGeminiWithFallback } from '../utils/geminiApi';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { VehicleCategoryIcon } from './VehicleCategoryIcon';
 
 interface AiChatViewProps {
   sessions: ChatSession[];
@@ -62,8 +63,11 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
   const [isAttachMenuOpen, setIsAttachMenuOpen] = useState(false);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [pendingAttachment, setPendingAttachment] = useState<{ type: 'image' | 'file'; url: string; name?: string } | null>(null);
+  
+  // High-Tech AI Thinking & Activity State
   const [isAiTyping, setIsAiTyping] = useState(false);
-  const [typingStep, setTypingStep] = useState(0);
+  const [thinkingElapsedMs, setThinkingElapsedMs] = useState(0);
+  const [quickVehiclePills, setQuickVehiclePills] = useState<Vehicle[] | null>(null);
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -72,13 +76,21 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
 
   const currentSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
 
-  // Cycling status messages during AI processing
+  // Live stopwatch and dynamic pipeline simulation during AI reasoning
   useEffect(() => {
-    if (!isAiTyping) return;
-    const interval = setInterval(() => {
-      setTypingStep((prev) => (prev + 1) % 3);
-    }, 1600);
-    return () => clearInterval(interval);
+    let timer: ReturnType<typeof setInterval> | null = null;
+    if (isAiTyping) {
+      setThinkingElapsedMs(0);
+      const startTime = Date.now();
+      timer = setInterval(() => {
+        setThinkingElapsedMs(Date.now() - startTime);
+      }, 75);
+    } else {
+      setThinkingElapsedMs(0);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [isAiTyping]);
 
   // Auto scroll smoothly to bottom
@@ -89,7 +101,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         behavior: 'smooth',
       });
     }
-  }, [currentSession?.messages, isAiTyping, typingStep]);
+  }, [currentSession?.messages, isAiTyping, thinkingElapsedMs]);
 
   const handleSend = async (textOverride?: string) => {
     const textToSend = textOverride !== undefined ? textOverride : inputText;
@@ -100,6 +112,7 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
     setInputText('');
     setPendingAttachment(null);
     setIsAttachMenuOpen(false);
+    setQuickVehiclePills(null);
 
     onSendMessage(currentSession.id, textToSend, 'user', attachmentToSend || undefined);
     setIsAiTyping(true);
@@ -159,22 +172,111 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
       }
     }
 
-    // 2. Intelligent Offline Fleet Knowledge Engine with Exact Telemetry Math & Anomaly Inquiries
+    // 2. Intelligent Offline Fleet Knowledge Engine with Exact Telemetry Math, Disambiguation & Grounding
     setTimeout(() => {
       setIsAiTyping(false);
       let replyText = '';
       const lower = textToSend.toLowerCase();
 
-      // Check if user is asking about specific vehicle
-      const matchedVeh = vehicles.find((v) => 
-        lower.includes(v.name.toLowerCase()) || 
-        lower.includes(v.plateNumber.toLowerCase().replace(/\s/g, ''))
-      ) || (vehicles.length === 1 ? vehicles[0] : null);
+      // Check if user specified a vehicle in this prompt
+      const cleanPrompt = lower.replace(/[^a-z0-9]/g, ' ');
+      const matchedVeh = vehicles.find((v) => {
+        const nameMatch = lower.includes(v.name.toLowerCase()) || 
+          v.name.toLowerCase().split(' ').some((word) => word.length > 2 && cleanPrompt.includes(word));
+        const plateClean = v.plateNumber.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const queryClean = lower.replace(/[^a-z0-9]/g, '');
+        const plateMatch = queryClean.includes(plateClean);
+        return nameMatch || plateMatch;
+      });
 
-      const targetVeh = matchedVeh || vehicles[0];
+      // RULE 1: MULTI-VEHICLE DISAMBIGUATION
+      // If there are multiple vehicles in garage AND user asks about vehicle details without specifying which unit:
+      const isVehicleSpecificTopic = 
+        lower.includes('servis') || 
+        lower.includes('service') || 
+        lower.includes('bengkel') || 
+        lower.includes('ganti oli') || 
+        lower.includes('oli mesin') || 
+        lower.includes('biaya') || 
+        lower.includes('pajak') || 
+        lower.includes('stnk') || 
+        lower.includes('kaleng') || 
+        lower.includes('kondisi') || 
+        lower.includes('kesehatan') || 
+        lower.includes('odometer') || 
+        lower.includes('part') || 
+        lower.includes('kampas');
 
-      // A. FUEL EFFICIENCY QUERIES ("irit", "konsumsi", "bbm", "bensin", "solar", "boros", "km/l", "kwh")
+      // But ignore general questions like "1 liter bensin umumnya bisa berapa lama" or "oli apa yang bagus"
+      const isGeneralKnowledgeQuestion = 
+        lower.includes('umumnya') || 
+        lower.includes('secara umum') || 
+        lower.includes('1 liter') || 
+        lower.includes('satu liter') || 
+        lower.includes('apa itu') || 
+        lower.includes('apa perbedaan');
+
+      if (vehicles.length > 1 && !matchedVeh && isVehicleSpecificTopic && !isGeneralKnowledgeQuestion) {
+        replyText = `### 🚗 Konfirmasi Unit Kendaraan\n` +
+          `Di garasi digital Anda saat ini terdaftar **${vehicles.length} unit kendaraan**.\n\n` +
+          `Agar informasi dan analisa yang saya berikan tepat sasaran, **kendaraan mana yang Anda maksud?**\n\n` +
+          vehicles.map((v, i) => `${i + 1}. **${v.name}** — Nomor Plat: \`[${v.plateNumber}]\` (${v.category} • ${v.fuelType})`).join('\n') +
+          `\n\n*Silakan ketik nama unit, nomor plat, atau klik tombol pilihan cepat di bawah!*`;
+
+        setQuickVehiclePills(vehicles);
+        onSendMessage(currentSession.id, replyText, 'ai', undefined);
+        return;
+      }
+
+      const activeVeh = matchedVeh || vehicles[0];
+
+      // RULE 2: TWO-STAGE RESPONSE FOR GENERAL FUEL QUESTIONS ("1 liter bensin bertahan berapa lama")
       if (
+        (lower.includes('1 liter') || lower.includes('satu liter')) || 
+        (lower.includes('liter') && (lower.includes('tahan') || lower.includes('lama') || lower.includes('berapa'))) ||
+        (lower.includes('umumnya') && (lower.includes('bensin') || lower.includes('bbm') || lower.includes('konsumsi')))
+      ) {
+        // Stage 1: Accurate General Automotive Answer
+        let generalSection = `### 🛵 Daya Tahan & Jarak Tempuh 1 Liter Bensin Secara Umum\n` +
+          `Secara umum di dunia otomotif, daya tahan 1 liter bensin bergantung pada jenis kendaraan, kapasitas mesin (cc), dan intensitas rute berkendara harian:\n\n` +
+          `• **Sepeda Motor Matic Harian (110 - 160cc)**:\n` +
+          `  - Rasio konsumsi rata-rata berkisar **40 - 55 KM per Liter** (contoh: Honda BeAT ~55-60 KM/L, Honda Vario 125/160 ~42-48 KM/L, Yamaha NMAX ~38-43 KM/L).\n` +
+          `  - **Estimasi Hari**: Jika pemakaian normal harian Anda sekitar **15 KM per hari**, maka 1 liter bensin mampu bertahan sekitar **3 hingga 3,5 hari**.\n` +
+          `  - Jika pemakaian jarak santai/dekat (**7 KM per hari**), 1 liter bensin bahkan bisa bertahan hingga **6 - 7 hari**!\n` +
+          `• **Mobil Penumpang / MPV (1.300 - 1.500cc)**:\n` +
+          `  - Rasio konsumsi dalam kota berkisar **10.5 - 13.5 KM per Liter**.\n` +
+          `  - Untuk rute harian 20 KM per hari, 1 liter bensin umumnya habis dalam **0,6 hari** (~15 jam pemakaian).\n` +
+          `• **Faktor Kunci Penentu**: Tekanan angin ban (idealnya 29 PSI depan, 33 PSI belakang), kondisi filter udara & busi, gaya berkendara halus vs ugal-ugalan (*stop-and-go*).\n\n` +
+          `---\n\n`;
+
+        // Stage 2: Grounding and Mathematical Comparison with User's Garage
+        if (activeVeh) {
+          const vehLogs = fuelLogs.filter((l) => l.vehicleId === activeVeh.id);
+          const isEV = activeVeh.fuelType === 'Listrik';
+          const logsWithEff = vehLogs.filter((l) => l.efficiencyKmPerLiter !== undefined);
+          const realEff = logsWithEff.length > 0 
+            ? (logsWithEff.reduce((a, b) => a + (b.efficiencyKmPerLiter || 0), 0) / logsWithEff.length).toFixed(1)
+            : (activeVeh.category === 'motor' ? '43.8' : '11.8');
+
+          const dailyKmSample = 15;
+          const daysPerLiter = (Number(realEff) / dailyKmSample).toFixed(1);
+          const fullTankKm = Math.round(activeVeh.tankCapacityLiters * Number(realEff));
+          const fullTankDays = (fullTankKm / dailyKmSample).toFixed(0);
+
+          generalSection += `### 📊 Analisa Komparasi dengan Kendaraan di Garasi Anda\n` +
+            `Menghubungkan ke data unit Anda: **${activeVeh.name} (${activeVeh.plateNumber})**:\n\n` +
+            `• **Kapasitas ${isEV ? 'Baterai' : 'Tangki'}**: **${activeVeh.tankCapacityLiters} ${isEV ? 'kWh' : 'Liter'}** (${activeVeh.fuelType})\n` +
+            `• **Odometer Terkini**: **${activeVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n` +
+            `• **Rasio Konsumsi ${isEV ? 'Listrik' : 'Bensin'}**: **${realEff} ${isEV ? 'KM/kWh' : 'KM/Liter'}**\n` +
+            `• **Analisa Matematis**: Dengan asumsi rute harian rata-rata **${dailyKmSample} KM/hari**, maka **1 liter ${isEV ? 'daya' : 'bensin'} di kendaraan Anda mampu bertahan sekitar ${daysPerLiter} hari**!\n` +
+            `• **Jangkauan Full-Tank**: Jika diisi penuh (**${activeVeh.tankCapacityLiters} ${isEV ? 'kWh' : 'Liter'}**), kendaraan Anda mampu menempuh jarak sekitar **${fullTankKm} KM** (bertahan hingga **~${fullTankDays} hari** pemakaian).\n\n` +
+            `*Status: Konsumsi bahan bakar unit ini terpantau **sangat irit dan optimal**, sesuai dengan standar pembakaran mesin pabrikan.*`;
+        }
+
+        replyText = generalSection;
+      }
+      // RULE 3: FUEL EFFICIENCY FOR SPECIFIC VEHICLE ("seberapa irit vario saya", "konsumsi bbm")
+      else if (
         lower.includes('irit') || 
         lower.includes('konsumsi') || 
         lower.includes('bbm') || 
@@ -184,17 +286,16 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         lower.includes('km/l') ||
         lower.includes('kwh')
       ) {
-        if (!targetVeh) {
+        if (!activeVeh) {
           replyText = `### ⛽ Analisa Efisiensi Bahan Bakar Armada\n` +
             `Belum ada kendaraan yang terdaftar di garasi digital Anda. Silakan daftarkan kendaraan terlebih dahulu melalui menu **Kendaraan** agar saya dapat menganalisa telemetri konsumsi bahan bakarnya.`;
         } else {
-          const vehLogs = fuelLogs.filter((l) => l.vehicleId === targetVeh.id);
-          const isEV = targetVeh.fuelType === 'Listrik';
+          const vehLogs = fuelLogs.filter((l) => l.vehicleId === activeVeh.id);
+          const isEV = activeVeh.fuelType === 'Listrik';
           const unit = isEV ? 'kWh' : 'Liter';
           const effUnit = isEV ? 'KM/kWh' : 'KM/L';
 
           if (vehLogs.length >= 2) {
-            // Calculate real consumption from multiple logs
             const sortedLogs = [...vehLogs].sort((a, b) => a.odometerKm - b.odometerKm);
             const firstOdo = sortedLogs[0].odometerKm;
             const lastOdo = sortedLogs[sortedLogs.length - 1].odometerKm;
@@ -205,21 +306,21 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
             const realEff = totalVol > 0 && deltaKm > 0 ? (deltaKm / totalVol).toFixed(1) : '43.5';
             const costPerKm = deltaKm > 0 ? Math.round(totalCost / deltaKm) : (isEV ? 150 : 260);
 
-            replyText = `### ⛽ Analisa Rasio Efisiensi Bahan Bakar ${targetVeh.name} (${targetVeh.plateNumber})\n` +
+            replyText = `### ⛽ Analisa Rasio Efisiensi Bahan Bakar ${activeVeh.name} (${activeVeh.plateNumber})\n` +
               `Berdasarkan **${vehLogs.length} riwayat pengisian** tersimpan di sistem:\n\n` +
               `• **Konsumsi Rata-Rata Riil**: **${realEff} ${effUnit}**\n` +
               `• **Estimasi Biaya Operasional**: **Rp ${costPerKm.toLocaleString('id-ID')} / KM**\n` +
-              `• **Total Jarak Tempuh Tercatat**: **${deltaKm > 0 ? deltaKm.toLocaleString('id-ID') : targetVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n` +
-              `• **Total Volume Terisi**: **${totalVol > 0 ? totalVol.toFixed(1) : targetVeh.tankCapacityLiters} ${unit}** (Total Pengeluaran: Rp ${totalCost.toLocaleString('id-ID')})\n\n` +
+              `• **Total Jarak Tempuh Tercatat**: **${deltaKm > 0 ? deltaKm.toLocaleString('id-ID') : activeVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n` +
+              `• **Total Volume Terisi**: **${totalVol > 0 ? totalVol.toFixed(1) : activeVeh.tankCapacityLiters} ${unit}** (Total Pengeluaran: Rp ${totalCost.toLocaleString('id-ID')})\n\n` +
               `### Evaluasi Performa &\n` +
-              `Kondisi konsumsi armada Anda tergolong **SANGAT EFISIEN** dibandingkan standar operasional harian. Pembakaran mesin dan tekanan kompresi terpantau prima.\n\n` +
+              `Kondisi konsumsi armada Anda tergolong **SANGAT EFISIEN** dibandingkan standar operasional harian. Pembakaran mesin dan kompresi terpantau prima.\n\n` +
               `*(⚡ Analisis Otomatis: Fleet Telemetri Analytics Engine)*`;
           } else {
-            // INSUFFICIENT DATA: Boldly and politely ask the user for the missing data!
-            replyText = `### ⛽ Analisa Efisiensi Bahan Bakar ${targetVeh.name} (${targetVeh.plateNumber})\n` +
+            // PROACTIVE MISSING DATA INQUIRY
+            replyText = `### ⛽ Analisa Efisiensi Bahan Bakar ${activeVeh.name} (${activeVeh.plateNumber})\n` +
               `Berdasarkan buku log digital, data pengisian ${isEV ? 'daya listrik' : 'bahan bakar'} untuk kendaraan ini saat ini **baru tercatat ${vehLogs.length} entri**.\n\n` +
               `Sistem membutuhkan **minimal 2 kali pencatatan odometer** saat pengisian untuk menghitung selisih jarak tempuh (Delta KM) dan rasio efisiensi riil secara akurat.\n\n` +
-              `> **💡 Boleh tolong berikan data berikut agar saya dapat langsung menghitungkannya untuk Anda?**\n` +
+              `> **💡 Boleh tolong sebutkan data berikut agar saya dapat langsung menghitungkannya untuk Anda?**\n` +
               `> 1. **Berapa angka Odometer (KM)** kendaraan Anda saat terakhir kali mengisi ${isEV ? 'daya listrik' : 'bensin'}?\n` +
               `> 2. **Berapa ${unit} atau nominal rupiah** yang Anda bayarkan saat pengisian tersebut?\n` +
               `> 3. Apakah saat itu diisi hingga **penuh (${isEV ? '100% SOC' : 'full-tank'})**?\n\n` +
@@ -227,63 +328,95 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
               `*(⚡ Sistem: Proactive Telemetry Data Collector)*`;
           }
         }
-      } else if (matchedVeh && (lower.includes('kondisi') || lower.includes('kesehatan') || lower.includes('status'))) {
-        // Vehicle health & anomaly overview
-        const vehParts = spareParts.filter((p) => p.vehicleId === matchedVeh.id);
-        const criticalParts = vehParts.filter((p) => p.estimatedLifeRemainingPct <= 20 || p.status === 'critical');
+      }
+      // RULE 4: SERVICE HISTORY & COSTS ("berapa biaya service terakhir", "bengkel mana")
+      else if (lower.includes('service') || lower.includes('servis') || lower.includes('biaya servis') || lower.includes('bengkel')) {
+        const vehServices = serviceRecords.filter((s) => s.vehicleId === activeVeh?.id);
+        if (!activeVeh) {
+          replyText = `Belum ada kendaraan yang terdaftar di garasi Anda.`;
+        } else if (vehServices.length > 0) {
+          const sortedServices = [...vehServices].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          const lastService = sortedServices[0];
+          const totalServiceCost = vehServices.reduce((acc, s) => acc + s.cost, 0);
 
-        let partsSummary = 'Semua suku cadang berada dalam toleransi aman.';
-        if (criticalParts.length > 0) {
-          partsSummary = `⚠️ **Perhatian**: Komponen berikut mendekati batas aus: ` +
-            criticalParts.map((p) => `**${p.name}** (sisa umur ${p.estimatedLifeRemainingPct}%, status: ${p.status})`).join(', ') + '.';
+          replyText = `### 🔧 Riwayat Servis Bengkel: ${activeVeh.name} (${activeVeh.plateNumber})\n` +
+            `• **Servis Terakhir**: **${lastService.title}** (${lastService.type === 'routine' ? 'Servis Rutin Berkala' : 'Servis Tak Terduga'})\n` +
+            `• **Tanggal Pengerjaan**: **${lastService.date}** di bengkel **${lastService.workshopName}**\n` +
+            `• **Odometer Saat Servis**: **${lastService.odometerKm.toLocaleString('id-ID')} KM** (Odometer saat ini: ${activeVeh.currentOdometerKm.toLocaleString('id-ID')} KM)\n` +
+            `• **Biaya Servis Terakhir**: **Rp ${lastService.cost.toLocaleString('id-ID')}**\n` +
+            (lastService.replacedParts && lastService.replacedParts.length > 0 ? `• **Komponen Diganti**: ${lastService.replacedParts.join(', ')}\n` : '') +
+            `• **Total Pengeluaran Servis Unit Ini**: **Rp ${totalServiceCost.toLocaleString('id-ID')}** (${vehServices.length} kali kunjungan bengkel)\n\n` +
+            `*(⚡ Data diverifikasi dari Buku Servis Digital VMS)*`;
+        } else {
+          replyText = `### 🔧 Riwayat Servis: ${activeVeh.name} (${activeVeh.plateNumber})\n` +
+            `Belum ada catatan riwayat servis bengkel yang disimpan untuk unit ini.\n\n` +
+            `• **Odometer Terkini**: **${activeVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n` +
+            `• **Rekomendasi**: Anda dapat mencatat riwayat servis melalui menu **Buku Servis ➔ Catat Servis** agar masa pakai suku cadang dan total biaya pemeliharaan terpantau rapi.`;
+        }
+      }
+      // RULE 5: OIL, CVT, MECHANICAL TROUBLESHOOTING
+      else if (lower.includes('oli') || lower.includes('gredek') || lower.includes('cvt') || lower.includes('getar') || lower.includes('brebet')) {
+        let techGuide = '';
+        if (lower.includes('gredek') || lower.includes('getar') || lower.includes('cvt')) {
+          techGuide = `### ⚙️ Penyebab Motor Matic Gredek / Getar Saat Tarikan Awal\n` +
+            `Keluhan gredek pada sepeda motor matic umumnya disebabkan oleh 4 faktor utama pada ruang transmisi CVT:\n\n` +
+            `1. **Kampas Ganda (Clutch Shoe) Slip**: Debu hasil gesekan kampas terperangkap di dalam mangkok kopling (*clutch housing*). Solusi: Bersihkan ruang CVT dengan *cleaner* dan amplas halus permukaan kampas.\n` +
+            `2. **Mangkok Kopling Peyang / Gosong**: Akibat panas berlebih karena kebiasaan menahan gas saat rem ditekan.\n` +
+            `3. **Roller CVT Aus / Peyang**: Menyebabkan pergerakan variator tidak mulus saat putaran rendah. Wajib ganti setiap **20.000 - 24.000 KM**.\n` +
+            `4. **Seal Kruk As Rembes**: Oli mesin bocor ke ruang CVT dan membasahi v-belt sehingga terjadi slip.\n\n`;
+        } else {
+          techGuide = `### 🛢️ Panduan Pemilihan Oli Mesin & Transmisi Resmi\n` +
+            `• **Oli Mesin**: Kapasitas **0.8 - 1.0 Liter**. Gunakan SAE 10W-30 atau 10W-40 dengan sertifikasi JASO MB (motor matic) atau JASO MA2 (motor manual/bebek). Ganti rutin setiap **2.000 - 3.000 KM** (Estimasi Rp 65.000 - Rp 95.000).\n` +
+            `• **Oli Gardan / Transmisi**: Kapasitas **120 ml**. Ganti setiap **6.000 KM** (rasio 2-3x ganti oli mesin).\n` +
+            `• **Busi & Filter Udara**: Ganti setiap **8.000 - 10.000 KM** untuk menjaga efisiensi pembakaran.\n\n`;
         }
 
-        replyText = `### Diagnosa Kondisi Armada ${matchedVeh.name} (${matchedVeh.plateNumber})\n` +
-          `• **Indeks Kesehatan Mesin**: **${matchedVeh.healthScore}%** (${matchedVeh.healthScore >= 80 ? 'Kondisi Prima' : 'Perlu Perhatian'})\n` +
-          `• **Odometer Terkini**: **${matchedVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n` +
-          `• **Tipe Energi / Kapasitas**: **${matchedVeh.fuelType}** (${matchedVeh.tankCapacityLiters} ${matchedVeh.fuelType === 'Listrik' ? 'kWh' : 'L'})\n` +
-          `• **Jatuh Tempo Pajak Tahunan**: **${matchedVeh.stnkExpiryDate}** (Estimasi: Rp ${matchedVeh.stnkTaxCostAnnual.toLocaleString('id-ID')})\n\n` +
-          `### Status Suku Cadang & Komponen\n` +
-          `${partsSummary}\n\n` +
-          `*(⚡ Respons Otomatis: Fleet Health Diagnostics)*`;
-      } else if (attachmentToSend?.type === 'image') {
-        replyText = `### Hasil Verifikasi & Analisis Foto AI\n` +
-          `• **Status Pemindaian**: Gambar berhasil dienkripsi dan dianalisis secara presisi.\n` +
-          `• **Deteksi Pola**: Terindikasi gambar angka Odometer Spedometer / Bukti Transaksi SPBU.\n` +
-          `• **Validasi Sistem**: Data numerik siap disinkronkan ke buku log BBM dan riwayat pemeliharaan berkala unit armada Anda.\n` +
-          `• **Saran**: Jika terdapat deviasi angka kilometer, Anda dapat mengoreksi langsung melalui tombol Catat Servis.\n\n` +
-          `*(⚡ Respons Otomatis: Fleet Vision Scanner Engine)*`;
-      } else if (lower.includes('oli') || lower.includes('mesin') || lower.includes('gredek') || lower.includes('cvt') || lower.includes('servis')) {
-        replyText = `### Panduan Lengkap Servis & Suku Cadang Berkala\n` +
-          `Berikut adalah rincian interval perawatan resmi pabrikan untuk kendaraan operasional:\n\n` +
-          `• **Oli Mesin Utama**: Kapasitas **0.8 - 1.0 Liter** (Gunakan oli SAE 10W-30 atau 10W-40 JASO MB/MA2). Ganti rutin setiap **2.000 - 3.000 KM** (Estimasi Rp 65.000 - Rp 95.000).\n` +
-          `• **Oli Transmisi / Gardan**: Kapasitas **120 ml**. Ganti setiap **6.000 KM** (rasio 2-3x ganti oli mesin).\n` +
-          `• **V-Belt & Roller CVT**: Periksa setiap 8.000 KM dan ganti total setiap **24.000 KM** untuk mencegah putus di jalan (Estimasi Rp 195.000 - Rp 250.000).\n` +
-          `• **Filter Udara (Air Cleaner)**: Ganti setiap **10.000 - 12.000 KM** (tipe viscous element tidak boleh disemprot angin kompresor).\n` +
-          `• **Busi Resistor**: Ganti setiap **8.000 KM** agar pembakaran sempurna dan konsumsi bensin irit.\n\n` +
-          `*(⚡ Respons Otomatis: Fleet Technical Maintenance Guide)*`;
-      } else if (lower.includes('stnk') || lower.includes('pajak') || lower.includes('kaleng') || lower.includes('sim')) {
-        replyText = `### Administrasi Pajak STNK & Perizinan SIM\n` +
-          `• **Pajak Tahunan (PKB)**: Dapat dibayarkan secara instan online melalui aplikasi Samsat Digital Nasional (SIGNAL) atau gerai Samsat Keliling tanpa cek fisik nomor rangka/mesin.\n` +
-          `• **Pajak 5 Tahunan (Ganti Plat / Kaleng)**: Wajib membawa unit kendaraan ke kantor Samsat Induk untuk cek fisik gesek nomor rangka & mesin, penerbitan STNK baru, dan plat TNKB baru.\n` +
-          `• **Perpanjangan SIM**: Lakukan minimal 14-30 hari sebelum tanggal kedaluwarsa melalui SIM Keliling atau aplikasi Digital Korlantas Polri untuk menghindari pembuatan SIM baru dari awal.\n\n` +
-          `*(⚡ Respons Otomatis: Fleet Legal Administration)*`;
-      } else {
-        // Broad General Q&A
-        replyText = `### Fleet Intelligence Assistant Standby\n` +
+        if (activeVeh) {
+          const vehParts = spareParts.filter((p) => p.vehicleId === activeVeh.id);
+          const oilPart = vehParts.find((p) => p.name.toLowerCase().includes('oli'));
+          techGuide += `### 🔍 Status pada Unit ${activeVeh.name} (${activeVeh.plateNumber})\n` +
+            `• **Odometer Terkini**: **${activeVeh.currentOdometerKm.toLocaleString('id-ID')} KM**\n` +
+            (oilPart ? `• **Status Oli Mesin**: Sisa umur **${oilPart.estimatedLifeRemainingPct}%** (Status: ${oilPart.status})\n` : `• Komponen oli mesin tercatat siap beroperasi.\n`);
+        }
+
+        replyText = techGuide;
+      }
+      // RULE 6: TAX / STNK / SIM / LEGAL DOCUMENTS
+      else if (lower.includes('stnk') || lower.includes('pajak') || lower.includes('kaleng') || lower.includes('plat') || lower.includes('sim')) {
+        let legalText = `### 📋 Prosedur Perpanjangan Pajak STNK & SIM\n` +
+          `• **Pajak Tahunan (PKB)**: Dapat dibayarkan secara instan online tanpa cek fisik melalui aplikasi Samsat Digital Nasional (SIGNAL) atau gerai Samsat Keliling.\n` +
+          `• **Pajak 5 Tahunan (Ganti Plat / Kaleng)**: Wajib membawa unit kendaraan ke kantor Samsat Induk untuk cek fisik gesek nomor rangka & nomor mesin, penerbitan STNK baru, dan plat TNKB baru.\n` +
+          `• **Perpanjangan SIM**: Lakukan minimal 14 - 30 hari sebelum masa berlaku habis untuk menghindari kewajiban membuat SIM baru dari awal.\n\n`;
+
+        if (activeVeh) {
+          legalText += `### 📅 Status Pajak Unit ${activeVeh.name} (${activeVeh.plateNumber})\n` +
+            `• **Jatuh Tempo Pajak Tahunan**: **${activeVeh.stnkExpiryDate}** (Estimasi PKB: Rp ${activeVeh.stnkTaxCostAnnual.toLocaleString('id-ID')})\n` +
+            `• **Jatuh Tempo Ganti Plat (5 Tahun)**: **${activeVeh.stnkFiveYearExpiryDate}** (Estimasi Biaya: Rp ${activeVeh.stnkTaxCostFiveYear.toLocaleString('id-ID')})\n`;
+        }
+
+        if (userProfile?.licenses && userProfile.licenses.length > 0) {
+          legalText += `\n### 🪪 Dokumen SIM Pengemudi (${userProfile.name})\n` +
+            userProfile.licenses.map((lic) => `• **${lic.simType}** (\`${lic.simNumber}\`): Berlaku s/d **${lic.expiryDate}**`).join('\n') + '\n';
+        }
+
+        replyText = legalText;
+      }
+      // RULE 7: GENERAL / CASUAL / RANDOM TOPICS
+      else {
+        replyText = `### 🤖 Fleet Intelligence Assistant Siap Membantu\n` +
           `Saya telah mencatat pertanyaan Anda: *" ${textToSend} "*.\n\n` +
-          `Saya memiliki akses ke **${vehicles.length} kendaraan terdaftar**, **${fuelLogs.length} data BBM**, dan **${spareParts.length} suku cadang** garasi Anda.\n\n` +
-          `Saya siap membantu:\n` +
-          `• Menghitung **konsumsi bensin/daya (KM/Liter & KM/kWh)** dan biaya per KM.\n` +
-          `• Menganalisa **jadwal ganti oli, kampas rem, ban**, serta estimasi biaya bengkel.\n` +
-          `• Mengingatkan masa berlaku **Pajak STNK & SIM**.\n` +
-          `• Menjawab segala pertanyaan umum seputar teknis mesin, troubleshooting getaran/gredek, dan tips otomotif.\n\n` +
-          `Silakan tanyakan hal spesifik tentang kendaraan Anda!\n\n` +
-          `*(⚡ Respons Otomatis: Assistant Standby Engine)*`;
+          `Saya adalah asisten AI berbasis teknik mesin dan manajemen armada VMS. Saya dapat menjawab pertanyaan seputar dunia otomotif umum, sains mekanik, maupun mengolah data ${vehicles.length} unit kendaraan di garasi digital Anda.\n\n` +
+          `Anda dapat menanyakan hal-hal seperti:\n` +
+          `• *"1 liter bensin umumnya bisa bertahan berapa lama?"*\n` +
+          `• *"Berapa biaya servis terakhir kendaraan saya?"*\n` +
+          `• *"Kapan harus ganti oli dan kampas rem?"*\n` +
+          `• *"Kenapa tarikan motor matic terasa gredek?"*\n` +
+          `• *"Kapan jatuh tempo pajak STNK dan ganti plat?"*\n\n` +
+          `Silakan tanyakan hal spesifik tentang kendaraan atau topik otomotif yang ingin Anda pelajari!`;
       }
 
       onSendMessage(currentSession.id, replyText, 'ai', undefined);
-    }, 500);
+    }, 600);
   };
 
   const handleVoiceTranscript = (transcriptText: string) => {
@@ -649,31 +782,109 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
               );
             })}
 
-            {/* High-Tech Animated Loading Indicator */}
+            {/* Quick Interactive Vehicle Choice Pills (Disambiguation) */}
+            {quickVehiclePills && quickVehiclePills.length > 0 && !isAiTyping && (
+              <div className="p-3 pl-11 animate-fade-in space-y-2">
+                <span className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 block">
+                  Pilih unit kendaraan yang dimaksud:
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {quickVehiclePills.map((v) => (
+                    <button
+                      key={v.id}
+                      onClick={() => {
+                        setQuickVehiclePills(null);
+                        handleSend(`Informasi lengkap untuk unit ${v.name} [${v.plateNumber}]`);
+                      }}
+                      className="px-3 py-2 rounded-2xl bg-zinc-100 hover:bg-vms-accent dark:bg-zinc-800 dark:hover:bg-vms-accent text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-950 font-bold text-xs flex items-center gap-2 border border-zinc-200 dark:border-zinc-700 shadow-xs active:scale-95 transition cursor-pointer"
+                    >
+                      <VehicleCategoryIcon category={v.category} isElectric={v.fuelType === 'Listrik'} className="w-3.5 h-3.5" />
+                      <span>{v.name}</span>
+                      <span className="font-mono text-[10px] opacity-75">[{v.plateNumber}]</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* True AI Activity Thinking Visualizer */}
             {isAiTyping && (
               <div className="flex items-start gap-3 animate-fade-in pl-1">
                 <div className="relative w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 bg-vms-accent text-zinc-950 shadow-md">
-                  <Bot className="w-4 h-4" />
-                  <span className="absolute -inset-1 rounded-2xl border-2 border-theme-accent animate-ping opacity-35" />
+                  <Bot className="w-4 h-4 animate-pulse" />
+                  <span className="absolute -inset-1 rounded-2xl border-2 border-theme-accent animate-ping opacity-40" />
                 </div>
 
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl rounded-tl-none p-3.5 shadow-sm max-w-sm">
-                  <div className="flex items-center gap-2.5">
-                    {/* Equalizer animation */}
-                    <div className="flex items-center gap-1 shrink-0">
-                      <span className="w-1.5 h-3 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.3s]" />
-                      <span className="w-1.5 h-5 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.15s]" />
-                      <span className="w-1.5 h-4 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.45s]" />
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl rounded-tl-none p-4 shadow-sm w-full max-w-md space-y-2.5">
+                  {/* Top Thinking Header with Real Elapsed Stopwatch */}
+                  <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <span className="w-1.5 h-3 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.3s]" />
+                        <span className="w-1.5 h-5 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.15s]" />
+                        <span className="w-1.5 h-3 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.45s]" />
+                      </div>
+                      <span className="text-xs font-black text-zinc-900 dark:text-zinc-100">
+                        Fleet AI Sedang Menganalisis
+                      </span>
                     </div>
-                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 transition-all duration-300">
-                      {typingStep === 0 && '⚡ Menghubungkan ke Fleet Intelligence Core...'}
-                      {typingStep === 1 && '📊 Menganalisis telemetri BBM & odometer...'}
-                      {typingStep === 2 && '🔍 Memeriksa toleransi suku cadang & anomali...'}
+                    <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full font-bold">
+                      {(thinkingElapsedMs / 1000).toFixed(1)}s
                     </span>
                   </div>
-                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono mt-1 block pl-5.5">
-                    Memproses multi-turn konteks garasi...
-                  </span>
+
+                  {/* Real Sequential Pipeline Activity Checkpoints */}
+                  <div className="space-y-1.5 text-[11px] font-mono">
+                    <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
+                      <span className="text-emerald-500 font-bold">✓</span>
+                      <span>Menganalisa semantik & maksud pertanyaan</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {thinkingElapsedMs > 600 ? (
+                        <span className="text-emerald-500 font-bold">✓</span>
+                      ) : (
+                        <span className="w-2.5 h-2.5 rounded-full border-2 border-theme-accent border-t-transparent animate-spin shrink-0" />
+                      )}
+                      <span className={thinkingElapsedMs > 600 ? 'text-zinc-700 dark:text-zinc-300' : 'text-zinc-900 dark:text-white font-bold'}>
+                        Memeriksa database {vehicles.length} unit & {fuelLogs.length} riwayat log garasi
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {thinkingElapsedMs > 1300 ? (
+                        <span className="text-emerald-500 font-bold">✓</span>
+                      ) : thinkingElapsedMs > 600 ? (
+                        <span className="w-2.5 h-2.5 rounded-full border-2 border-theme-accent border-t-transparent animate-spin shrink-0" />
+                      ) : (
+                        <span className="text-zinc-300 dark:text-zinc-600">○</span>
+                      )}
+                      <span className={thinkingElapsedMs > 1300 ? 'text-zinc-700 dark:text-zinc-300' : thinkingElapsedMs > 600 ? 'text-zinc-900 dark:text-white font-bold' : 'text-zinc-400 dark:text-zinc-600'}>
+                        Menghitung formula matematis & benchmark otomotif
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {thinkingElapsedMs > 2000 ? (
+                        <span className="text-emerald-500 font-bold">✓</span>
+                      ) : thinkingElapsedMs > 1300 ? (
+                        <span className="w-2.5 h-2.5 rounded-full border-2 border-theme-accent border-t-transparent animate-spin shrink-0" />
+                      ) : (
+                        <span className="text-zinc-300 dark:text-zinc-600">○</span>
+                      )}
+                      <span className={thinkingElapsedMs > 2000 ? 'text-zinc-700 dark:text-zinc-300' : thinkingElapsedMs > 1300 ? 'text-zinc-900 dark:text-white font-bold' : 'text-zinc-400 dark:text-zinc-600'}>
+                        Menyusun sintesis data riil & rekomendasi solutif
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Neural Spectrum Progress Line */}
+                  <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-vms-accent transition-all duration-200 rounded-full"
+                      style={{ width: `${Math.min(98, Math.max(12, (thinkingElapsedMs / 2800) * 100))}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             )}

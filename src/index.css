@@ -375,4 +375,98 @@ html[data-accent="orange"] {
   background-color: var(--theme-accent-hover) !important;
 }
 
+/* ========================================================================== */
+/* REMAP ALL TAILWIND YELLOW PALETTE TO ACTIVE THEME ACCENT                   */
+/* ========================================================================== */
+
+:root {
+  --color-yellow-50: var(--theme-accent-subtle, #fefce8);
+  --color-yellow-100: var(--theme-accent-subtle, #fef9c3);
+  --color-yellow-200: var(--theme-accent-border, #fef08a);
+  --color-yellow-300: var(--theme-accent-hover, #fde047);
+  --color-yellow-400: var(--theme-accent, #facc15);
+  --color-yellow-500: var(--theme-accent-dark, #eab308);
+  --color-yellow-600: var(--theme-accent-dark, #ca8a04);
+}
+
+/* ========================================================================== */
+/* ACCESSIBLE HIGH-CONTRAST TEXT & ACCENT ENFORCEMENT                         */
+/* ========================================================================== */
+
+/* Any element with accent background color */
+.bg-vms-accent,
+button[class*="bg-yellow-400"],
+button[class*="bg-yellow-500"],
+[class*="bg-yellow-400"],
+[class*="bg-yellow-500"],
+[class*="dark:bg-yellow-400"] {
+  background-color: var(--theme-accent) !important;
+  color: var(--theme-accent-fg) !important;
+}
+
+/* Ensure all child text/spans in filled buttons follow high-contrast fg color */
+button[class*="bg-yellow-400"] span,
+button[class*="bg-yellow-500"] span,
+.bg-vms-accent span {
+  color: var(--theme-accent-fg) !important;
+}
+
+/* Icons inside accent-filled buttons or containers */
+.bg-vms-accent svg,
+button[class*="bg-yellow-400"] svg,
+button[class*="bg-yellow-500"] svg,
+[class*="bg-yellow-400"] svg,
+[class*="bg-yellow-500"] svg {
+  color: var(--theme-accent-fg) !important;
+  stroke: currentColor !important;
+}
+
+/* Hover on accent buttons */
+button[class*="bg-yellow-400"]:hover,
+button[class*="bg-yellow-500"]:hover,
+.hover\:bg-vms-accent-hover:hover {
+  background-color: var(--theme-accent-hover) !important;
+  color: var(--theme-accent-fg) !important;
+}
+
+/* Text with accent color */
+.text-vms-accent,
+[class*="text-yellow-400"],
+[class*="text-yellow-500"],
+[class*="dark:text-yellow-400"] {
+  color: var(--theme-accent) !important;
+}
+
+/* Borders with accent color */
+.border-vms-accent,
+[class*="border-yellow-400"],
+[class*="border-yellow-500"],
+[class*="dark:border-yellow-400"],
+[class*="focus:border-yellow-400"]:focus {
+  border-color: var(--theme-accent) !important;
+}
+
+/* Subtle accent badges */
+.bg-vms-accent-subtle,
+[class*="bg-yellow-100"],
+[class*="bg-yellow-50"],
+[class*="dark:bg-yellow-950"] {
+  background-color: var(--theme-accent-subtle) !important;
+  color: var(--theme-accent) !important;
+}
+
+.border-vms-accent-subtle,
+[class*="border-yellow-300"],
+[class*="border-yellow-200"],
+[class*="dark:border-yellow-800"] {
+  border-color: var(--theme-accent-border) !important;
+}
+
+/* Indicator pings and pulses */
+.animate-ping[class*="bg-yellow-"],
+.animate-pulse[class*="bg-yellow-"] {
+  background-color: var(--theme-accent) !important;
+}
+
+
 
