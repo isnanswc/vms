@@ -465,7 +465,13 @@ export function App() {
                     navigateTo({ tab, vehicleId: null, isAdding: false, isProfile: false });
                   }}
                   onOpenQuickScan={() => setIsScanModalOpen(true)}
-                  onOpenAddFuel={() => setIsAddFuelOpen(true)}
+                  onOpenAddFuel={() => {
+                    if (vehicles.length === 0) {
+                      navigateTo({ isAdding: true, isProfile: false, vehicleId: null });
+                    } else {
+                      setIsAddFuelOpen(true);
+                    }
+                  }}
                   onOpenAiChat={handleOpenAiChatWithPrompt}
                 />
               )}

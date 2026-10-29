@@ -504,16 +504,35 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
       ];
     }
 
+    const yearMatch = q.match(/\b(19\d\d|20\d\d)\b/);
+    const extractedYear = yearMatch ? parseInt(yearMatch[1], 10) : 2022;
+
+    let finalName = q.trim();
+    let finalNotes = `Analisa spesifikasi unit armada: ${q.trim()} (Tahun ${extractedYear})`;
+
+    if (q.toLowerCase().includes('beat')) {
+      if (extractedYear <= 2014) {
+        finalName = `Honda Beat FI (${extractedYear})`;
+        finalNotes = 'Skutik 110cc PGM-FI generasi kedua (K25) non-eSAF tangguh harian';
+      } else if (extractedYear < 2020) {
+        finalName = `Honda Beat eSP (${extractedYear})`;
+        finalNotes = 'Skutik 110cc eSP generasi ketiga (K81) non-eSAF';
+      } else {
+        finalName = `Honda Beat Deluxe eSP (${extractedYear})`;
+        finalNotes = 'Skutik 110cc eSP generasi modern eSAF';
+      }
+    }
+
     return {
-      name: q.trim(),
-      year: 2022,
+      name: finalName,
+      year: extractedYear,
       category: cat,
       fuelType: fuel,
-      tankCapacityLiters: isTruck ? 100 : isBike ? 5.0 : isDiesel ? 60 : 45,
+      tankCapacityLiters: isTruck ? 100 : isBike ? 4.2 : isDiesel ? 60 : 45,
       maxCargoWeightKg: isTruck ? 7500 : isBike ? 150 : 700,
-      notes: `Analisa komprehensif AI untuk unit armada: ${q.trim()}`,
-      stnkTaxCostAnnual: isTruck ? 3200000 : isBike ? 285000 : 2500000,
-      stnkTaxCostFiveYear: isTruck ? 4200000 : isBike ? 475000 : 3200000,
+      notes: finalNotes,
+      stnkTaxCostAnnual: isTruck ? 3200000 : isBike ? 245000 : 2500000,
+      stnkTaxCostFiveYear: isTruck ? 4200000 : isBike ? 420000 : 3200000,
       defaultParts: defaultPartsList,
     };
   };
@@ -536,13 +555,37 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
       const q = val.toLowerCase();
       let matched: PresetVehicleSpec[] = [];
 
+      const yearMatch = val.match(/\b(19\d\d|20\d\d)\b/);
+      const extractedYear = yearMatch ? parseInt(yearMatch[1], 10) : null;
+
       for (const key of Object.keys(EXTENDED_VEHICLE_CATALOG)) {
         if (q.includes(key) || key.includes(q)) {
           matched = [...matched, ...EXTENDED_VEHICLE_CATALOG[key]];
         }
       }
 
-      // If user typed at least 3 letters and not found in catalog, generate complete dynamic spec
+      if (extractedYear && matched.length > 0) {
+        matched = matched.map((spec) => {
+          let updatedName = spec.name;
+          if (spec.name.toLowerCase().includes('beat')) {
+            if (extractedYear <= 2014) updatedName = `Honda Beat FI (${extractedYear})`;
+            else if (extractedYear < 2020) updatedName = `Honda Beat eSP (${extractedYear})`;
+            else updatedName = `Honda Beat Deluxe (${extractedYear})`;
+          } else {
+            updatedName = spec.name.replace(/\b20\d\d\b/, String(extractedYear));
+            if (!updatedName.includes(String(extractedYear))) {
+              updatedName = `${updatedName} (${extractedYear})`;
+            }
+          }
+          return {
+            ...spec,
+            year: extractedYear,
+            name: updatedName,
+          };
+        });
+      }
+
+      // If user typed at least 2 letters and not found in catalog, generate complete dynamic spec
       if (matched.length === 0 && val.length >= 2) {
         matched = [generateDynamicHeuristicSpec(val)];
       }
@@ -691,20 +734,53 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
 
   return (
     <div className="space-y-6 pb-24 md:pb-8 pt-1 animate-fade-in text-zinc-900 dark:text-zinc-100 max-w-6xl mx-auto transition-colors">
-      {/* Top Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1.5 py-2 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          <span>Batal & Kembali</span>
-        </button>
+      {/* Aesthetic High-Tech Header Banner */}
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 md:p-5 shadow-xs transition-colors border-b-4 border-b-theme-accent">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="p-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition cursor-pointer active:scale-95 shadow-xs shrink-0"
+              title="Batal & Kembali ke Garasi"
+            >
+              <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+            </button>
 
-        <h2 className="text-sm md:text-base font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-yellow-500 fill-yellow-400" />
-          <span>Tambah Unit Armada (AI Assisted)</span>
-        </h2>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 bg-theme-accent text-theme-accent-fg text-[10px] font-black uppercase tracking-wider rounded-md shadow-xs">
+                  Armada VMS
+                </span>
+                <span className="text-xs text-zinc-400 dark:text-zinc-500">•</span>
+                <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Registrasi Kendaraan Baru
+                </span>
+              </div>
+              <h1 className="text-base md:text-lg font-black text-zinc-900 dark:text-zinc-100 tracking-tight mt-0.5 flex items-center gap-2">
+                <span>Konfigurasi & Pemetaan Spesifikasi Unit</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-theme-accent-subtle text-theme-accent border border-theme-accent-border text-[10px] font-black">
+                  <Sparkles className="w-3 h-3 fill-current" />
+                  AI Powered
+                </span>
+              </h1>
+            </div>
+          </div>
+
+          {/* Quick Breadcrumb Step Indicator */}
+          <div className="hidden lg:flex items-center gap-1.5 p-1 bg-zinc-100 dark:bg-zinc-800/80 rounded-2xl border border-zinc-200 dark:border-zinc-700 text-[11px] font-bold">
+            <span className="px-2.5 py-1 rounded-xl bg-theme-accent text-theme-accent-fg shadow-xs">
+              1. Identifikasi
+            </span>
+            <span className="text-zinc-400">→</span>
+            <span className="px-2.5 py-1 text-zinc-600 dark:text-zinc-400">
+              2. Data Legal
+            </span>
+            <span className="text-zinc-400">→</span>
+            <span className="px-2.5 py-1 text-zinc-600 dark:text-zinc-400">
+              3. Suku Cadang
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* ======================================================== */}

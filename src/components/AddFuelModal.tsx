@@ -38,6 +38,32 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
 
   if (!isOpen) return null;
 
+  if (vehicles.length === 0) {
+    return (
+      <ModalPortal>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/75 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+          <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 shadow-2xl text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-theme-accent-subtle text-theme-accent border border-theme-accent-border flex items-center justify-center mx-auto shadow-xs">
+              <Fuel className="w-7 h-7 stroke-[2.2]" />
+            </div>
+            <div>
+              <h3 className="font-black text-base text-zinc-900 dark:text-zinc-100">Belum Ada Kendaraan</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
+                Pencatatan BBM memerlukan kendaraan terdaftar di garasi. Silakan daftarkan kendaraan terlebih dahulu.
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-full py-3 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg font-black text-xs uppercase tracking-wider rounded-2xl transition shadow-xs cursor-pointer active:scale-95"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </ModalPortal>
+    );
+  }
+
   const currentVehicle = vehicles.find((v) => v.id === vehicleId);
   const isElectric = fuelType === 'Listrik' || currentVehicle?.fuelType === 'Listrik';
 

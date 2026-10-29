@@ -458,24 +458,34 @@ export async function analyzeVehicleWithAI(
   const cleanKey = apiKey?.trim();
   if (!cleanKey) return null;
 
-  const prompt = `Analisa spesifikasi teknis dan suku cadang lengkap untuk kendaraan: "${query}".
-Kembalikan HANYA sebuah JSON valid (RFC 8259) tanpa komentar dan tanpa format markdown backtick (\`\`\`json).
+  // Extract explicit 4-digit year from user query (e.g., 'Beat 2014' -> 2014)
+  const yearMatch = query.match(/\b(19\d\d|20\d\d)\b/);
+  const targetYear = yearMatch ? parseInt(yearMatch[1], 10) : undefined;
+
+  const prompt = `Analisa spesifikasi teknis dan suku cadang lengkap pabrikan (OEM) untuk kendaraan: "${query}".
+PERHATIAN SANGAT PENTING:
+${targetYear 
+  ? `- Pengguna SECARA EKSPLISIT mencari kendaraan tahun ${targetYear}. Anda WAJIB memberikan data teknis, generasi, dan suku cadang asli tahun ${targetYear} tersebut (Contoh: 'Honda Beat ${targetYear}' adalah Beat FI K25 / Karbu, BUKAN Beat 2022/2023 eSAF!).\n- Nilai field 'year' HARUS integer ${targetYear}.` 
+  : '- Identifikasi tahun dan generasi yang paling sesuai dari nama kendaraan yang dicari.'}
+- JANGAN mengarang atau memaksakan ke tahun lain.
+
+Kembalikan HANYA sebuah JSON valid (RFC 8259) tanpa komentar dan tanpa format markdown backtick.
 Gunakan skema JSON berikut:
 {
-  "name": "Nama lengkap resmi kendaraan (contoh: Yamaha NMAX 155 Connected / Toyota All New Avanza 1.5 G)",
-  "brand": "Merk kendaraan",
+  "name": "Nama lengkap resmi kendaraan (sertakan generasi/tahun jika relevan, contoh: Honda Beat FI 110 / Yamaha NMAX 155 Connected)",
+  "brand": "Merk kendaraan (contoh: Honda / Yamaha / Toyota / Mitsubishi)",
   "model": "Model kendaraan",
-  "year": 2022,
+  "year": ${targetYear ? targetYear : 2022},
   "category": "motor" atau "mobil" atau "truk",
   "fuelType": "Pertalite" atau "Pertamax" atau "Pertamax Turbo" atau "Solar" atau "Bio Solar" atau "Dexlite" atau "Listrik",
-  "tankCapacityLiters": 5.5,
+  "tankCapacityLiters": 4.5,
   "maxCargoWeightKg": 150,
-  "notes": "Ringkasan teknis mesin, rekomendasi oli mesin resmi, dan karakteristik pemakaian",
-  "stnkTaxCostAnnual": 350000,
-  "stnkTaxCostFiveYear": 650000,
+  "notes": "Ringkasan teknis mesin generasi ${targetYear || 'ini'}, rekomendasi oli mesin resmi pabrikan, dan karakteristik pemakaian",
+  "stnkTaxCostAnnual": 240000,
+  "stnkTaxCostFiveYear": 400000,
   "defaultParts": [
     {
-      "name": "Nama komponen spesifik beserta spesifikasi teknisnya",
+      "name": "Nama komponen spesifik OEM generasi ini beserta spesifikasinya",
       "intervalKm": 3000,
       "costEstimate": 75000
     }

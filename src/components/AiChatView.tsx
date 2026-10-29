@@ -21,6 +21,8 @@ import { VoiceInputModal } from './VoiceInputModal';
 import { callGeminiWithFallback } from '../utils/geminiApi';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { VehicleCategoryIcon } from './VehicleCategoryIcon';
+import { ModalPortal } from './ModalPortal';
+import { Key, ExternalLink } from 'lucide-react';
 
 interface AiChatViewProps {
   sessions: ChatSession[];
@@ -68,6 +70,13 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [thinkingElapsedMs, setThinkingElapsedMs] = useState(0);
   const [quickVehiclePills, setQuickVehiclePills] = useState<Vehicle[] | null>(null);
+  const [isMissingApiKeyWarningOpen, setIsMissingApiKeyWarningOpen] = useState(() => !settings.apiKey || !settings.apiKey.trim());
+
+  useEffect(() => {
+    if (settings.apiKey?.trim()) {
+      setIsMissingApiKeyWarningOpen(false);
+    }
+  }, [settings.apiKey]);
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -489,6 +498,80 @@ export const AiChatView: React.FC<AiChatViewProps> = ({
         className="hidden"
         onChange={(e) => handleFileCapture(e, 'file')}
       />
+
+      {/* MISSING API KEY WARNING MODAL */}
+      {isMissingApiKeyWarningOpen && (
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-zinc-950/80 backdrop-blur-md animate-fade-in text-zinc-900 dark:text-zinc-100">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 rounded-3xl p-6 shadow-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-xs">
+                  <Key className="w-6 h-6 stroke-[2.3]" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                    Kunci Gemini AI Belum Terpasang
+                  </h3>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                    Aktivasi Fleet AI dengan API Key resmi Google
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-600 dark:text-zinc-300 space-y-2 leading-relaxed">
+                <p>
+                  Asisten AI membutuhkan <strong>Google Gemini API Key</strong> untuk membaca foto spedometer & struk SPBU, serta memberikan analisis jadwal servis armada secara akurat.
+                </p>
+                <div className="space-y-1.5 pt-1 text-[11px]">
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-theme-accent text-theme-accent-fg font-black text-[9px] flex items-center justify-center">1</span>
+                    <span>Klik tombol link Google AI Studio di bawah.</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-theme-accent text-theme-accent-fg font-black text-[9px] flex items-center justify-center">2</span>
+                    <span>Klik <strong>"Create API key"</strong> (100% Gratis dari Google).</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-theme-accent text-theme-accent-fg font-black text-[9px] flex items-center justify-center">3</span>
+                    <span>Salin lalu tempelkan ke menu pengaturan.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenSettings();
+                  }}
+                  className="w-full py-3 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg font-black text-xs uppercase tracking-wider rounded-2xl transition shadow-md cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <Key className="w-4 h-4" />
+                  <span>Pasang Kunci API Sekarang</span>
+                </button>
+
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Dapatkan Kunci di Google AI Studio (Gratis)</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => setIsMissingApiKeyWarningOpen(false)}
+                  className="w-full py-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-xs font-semibold transition cursor-pointer"
+                >
+                  Lanjutkan dengan Mode Offline Terbatas
+                </button>
+              </div>
+            </div>
+          </div>
+        </ModalPortal>
+      )}
 
       {/* MOBILE DRAWER (Slide-Over Session Drawer for Mobile Phones) */}
       {isDrawerOpen && (

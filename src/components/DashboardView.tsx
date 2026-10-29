@@ -43,6 +43,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   const criticalParts = spareParts.filter((p) => p.status === 'critical');
 
+  // Dynamic Cost per KM calculation
+  let totalTrackedDistanceKm = 0;
+  vehicles.forEach((veh) => {
+    const vehLogs = fuelLogs.filter((l) => l.vehicleId === veh.id && l.odometerKm > 0);
+    if (vehLogs.length >= 2) {
+      const sorted = [...vehLogs].sort((a, b) => a.odometerKm - b.odometerKm);
+      totalTrackedDistanceKm += (sorted[sorted.length - 1].odometerKm - sorted[0].odometerKm);
+    }
+  });
+
+  const costPerKm = totalTrackedDistanceKm > 0 && totalExpense > 0
+    ? Math.round(totalExpense / totalTrackedDistanceKm)
+    : 0;
+
   return (
     <div className="space-y-6 pb-24 md:pb-8 pt-2 text-zinc-900 dark:text-zinc-100 transition-colors">
       {/* 1. Desktop Top Bar: Greeting & Key Metric Cards */}
@@ -119,9 +133,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <div className="mt-2">
             <span className="text-lg md:text-xl font-black font-mono tracking-tight text-zinc-950 dark:text-zinc-100">
-              Rp 480 <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">/km</span>
+              {costPerKm > 0 ? `Rp ${costPerKm.toLocaleString('id-ID')}` : 'Rp 0'} <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">/km</span>
             </span>
-            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Estimasi beban riil</p>
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">
+              {costPerKm > 0 ? 'Beban riil biaya / KM' : 'Belum ada jarak & biaya'}
+            </p>
           </div>
         </div>
 
