@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import type { Vehicle } from '../types';
 import { 
   Plus, 
-  Bike, 
   Car, 
-  Truck, 
   Gauge, 
   Fuel, 
   Weight, 
@@ -15,6 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
+import { VehicleCategoryIcon, getCategoryLabel } from './VehicleCategoryIcon';
 
 interface VehiclesViewProps {
   vehicles: Vehicle[];
@@ -31,16 +30,6 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
 }) => {
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'motor':
-        return <Bike className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />;
-      case 'truk':
-        return <Truck className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />;
-      default:
-        return <Car className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />;
-    }
-  };
 
   const getDaysUntilExpiry = (dateStr: string) => {
     const today = new Date('2026-10-21');
@@ -117,9 +106,9 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
                       <div className="px-3 py-1 rounded-lg bg-zinc-950 dark:bg-zinc-800 text-white font-mono font-black text-xs tracking-wider shadow-sm border border-zinc-800 dark:border-zinc-700">
                         {veh.plateNumber}
                       </div>
-                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-950/60 text-zinc-900 dark:text-yellow-400 font-bold uppercase tracking-wider flex items-center gap-1 border border-yellow-300 dark:border-yellow-800">
-                        {getCategoryIcon(veh.category)}
-                        {veh.category}
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-vms-accent-subtle text-zinc-900 dark:text-zinc-100 font-bold uppercase tracking-wider flex items-center gap-1.5 border border-vms-accent-subtle">
+                        <VehicleCategoryIcon category={veh.category} isElectric={veh.fuelType === 'Listrik'} className="w-3.5 h-3.5" />
+                        <span>{getCategoryLabel(veh.category)}</span>
                       </span>
                     </div>
 

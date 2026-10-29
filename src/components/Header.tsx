@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, User, MoreVertical, Moon, Sun, Sparkles, ChevronRight } from 'lucide-react';
+import { Bell, User, MoreVertical, Moon, Sun, Sparkles, ChevronRight, Palette } from 'lucide-react';
 import type { UserProfile } from '../types/user';
 import { triggerHaptic } from '../utils/haptics';
 
@@ -11,6 +11,7 @@ interface HeaderProps {
   onOpenAlerts?: () => void;
   onOpenProfile?: () => void;
   onOpenAiSettings?: () => void;
+  onOpenThemeAccent?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAlerts,
   onOpenProfile,
   onOpenAiSettings,
+  onOpenThemeAccent,
 }) => {
   const [isCornerMenuOpen, setIsCornerMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -191,12 +193,35 @@ export const Header: React.FC<HeaderProps> = ({
 
                     {/* Interactive Switch Pill */}
                     <div className={`w-9 h-5 rounded-full p-0.5 transition-colors ${
-                      theme === 'dark' ? 'bg-yellow-400' : 'bg-zinc-300'
+                      theme === 'dark' ? 'bg-vms-accent' : 'bg-zinc-300'
                     }`}>
                       <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
                         theme === 'dark' ? 'translate-x-4 bg-zinc-950' : 'translate-x-0'
                       }`} />
                     </div>
+                  </button>
+
+                  {/* Option 4: Ganti Aksen Warna */}
+                  <button
+                    onClick={() => {
+                      triggerHaptic('light');
+                      setIsCornerMenuOpen(false);
+                      onOpenThemeAccent?.();
+                    }}
+                    className="w-full flex items-center justify-between p-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer text-left group"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 group-hover:bg-vms-accent transition-colors">
+                        <Palette className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="block text-zinc-900 dark:text-zinc-100">Warna Aksen Tema</span>
+                        <span className="text-[10px] font-normal text-zinc-400 dark:text-zinc-500">
+                          9 Pilihan Warna Estetik
+                        </span>
+                      </div>
+                    </div>
+                    <div className="w-4 h-4 rounded-full bg-vms-accent shadow-xs border border-zinc-300 dark:border-zinc-700" />
                   </button>
                 </div>
               </div>

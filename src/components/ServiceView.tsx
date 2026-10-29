@@ -20,6 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
+import { VehicleCategoryIcon } from './VehicleCategoryIcon';
 
 interface ServiceViewProps {
   vehicles: Vehicle[];
@@ -147,7 +148,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
             onClick={() => setSelectedVehicleId('all')}
             className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
               selectedVehicleId === 'all'
-                ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-sm'
+                ? 'bg-zinc-950 text-vms-accent dark:bg-vms-accent dark:text-zinc-950 shadow-sm'
                 : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
             }`}
           >
@@ -160,12 +161,13 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
               <button
                 key={veh.id}
                 onClick={() => setSelectedVehicleId(veh.id)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                   isSelected
-                    ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-sm'
+                    ? 'bg-zinc-950 text-vms-accent dark:bg-vms-accent dark:text-zinc-950 shadow-sm'
                     : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
                 }`}
               >
+                <VehicleCategoryIcon category={veh.category} isElectric={veh.fuelType === 'Listrik'} className="w-3.5 h-3.5" />
                 <span>{veh.name}</span>
                 <span className="font-mono text-[10px] opacity-70">[{veh.plateNumber}]</span>
               </button>

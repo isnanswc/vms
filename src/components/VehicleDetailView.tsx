@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import type { Vehicle, FuelLog, SparePart, ServiceRecord, TaxPaymentRecord } from '../types';
 import { 
   ChevronLeft, 
-  Car, 
-  Bike, 
-  Truck, 
   Fuel, 
   Wrench, 
   FileText, 
@@ -25,6 +22,7 @@ import {
 } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
 import { triggerHaptic } from '../utils/haptics';
+import { VehicleCategoryIcon, getCategoryLabel } from './VehicleCategoryIcon';
 
 interface VehicleDetailViewProps {
   vehicle: Vehicle;
@@ -156,17 +154,6 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
     onBack();
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'motor':
-        return <Bike className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />;
-      case 'truk':
-        return <Truck className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />;
-      default:
-        return <Car className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />;
-    }
-  };
-
   return (
     <div className="space-y-6 pb-24 md:pb-8 pt-2 animate-fade-in text-zinc-900 dark:text-zinc-100 transition-colors">
       {/* Top Header / Back Bar - Executive Aesthetic Redesign */}
@@ -248,25 +235,25 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="px-3.5 py-1.5 bg-zinc-950 text-white font-mono font-black text-sm tracking-wider rounded-xl shadow-sm">
+              <div className="px-3.5 py-1.5 bg-zinc-950 dark:bg-zinc-800 text-white font-mono font-black text-sm tracking-wider rounded-xl shadow-sm border border-zinc-800 dark:border-zinc-700">
                 {vehicle.plateNumber}
               </div>
-              <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-zinc-900 font-bold uppercase tracking-wider flex items-center gap-1.5 border border-yellow-300">
-                {getCategoryIcon(vehicle.category)}
-                {vehicle.category}
+              <span className="text-xs px-3 py-1 rounded-full bg-vms-accent-subtle text-zinc-900 dark:text-zinc-100 font-bold uppercase tracking-wider flex items-center gap-1.5 border border-vms-accent-subtle">
+                <VehicleCategoryIcon category={vehicle.category} isElectric={vehicle.fuelType === 'Listrik'} className="w-4 h-4" />
+                <span>{getCategoryLabel(vehicle.category)}</span>
               </span>
             </div>
-            <h1 className="text-xl md:text-2xl font-black text-zinc-900 tracking-tight">
+            <h1 className="text-xl md:text-2xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
               {vehicle.name} <span className="text-zinc-400 font-normal text-base">({vehicle.year})</span>
             </h1>
-            <p className="text-xs text-zinc-500 mt-1">{vehicle.notes}</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{vehicle.notes}</p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-right">
+            <div className="px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-right">
               <span className="text-[10px] text-zinc-400 uppercase font-bold block">Status Kesehatan</span>
-              <div className="inline-flex items-center gap-1.5 font-mono font-black text-base text-zinc-950 mt-0.5">
-                <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
+              <div className="inline-flex items-center gap-1.5 font-mono font-black text-base text-zinc-950 dark:text-zinc-100 mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-vms-accent animate-pulse"></span>
                 {vehicle.healthScore}%
               </div>
             </div>
@@ -274,17 +261,19 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
         </div>
 
         {/* Quick Specs Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 pt-4 border-t border-zinc-100 text-xs">
-          <div className="bg-zinc-50 p-3 rounded-2xl">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-xs">
+          <div className="bg-zinc-50 dark:bg-zinc-800 p-3 rounded-2xl">
             <span className="text-[10px] text-zinc-400 uppercase font-bold block">Odometer</span>
-            <span className="font-mono font-bold text-zinc-900 text-sm mt-0.5 block">
+            <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-sm mt-0.5 block">
               {vehicle.currentOdometerKm.toLocaleString('id-ID')} KM
             </span>
           </div>
-          <div className="bg-zinc-50 p-3 rounded-2xl">
-            <span className="text-[10px] text-zinc-400 uppercase font-bold block">Kapasitas Tangki</span>
-            <span className="font-mono font-bold text-zinc-900 text-sm mt-0.5 block">
-              {vehicle.tankCapacityLiters} L ({vehicle.fuelType})
+          <div className="bg-zinc-50 dark:bg-zinc-800 p-3 rounded-2xl">
+            <span className="text-[10px] text-zinc-400 uppercase font-bold block">
+              {vehicle.fuelType === 'Listrik' ? 'Kapasitas Baterai' : 'Kapasitas Tangki'}
+            </span>
+            <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-sm mt-0.5 block">
+              {vehicle.tankCapacityLiters} {vehicle.fuelType === 'Listrik' ? 'kWh' : 'L'} ({vehicle.fuelType})
             </span>
           </div>
           <div className="bg-zinc-50 p-3 rounded-2xl">

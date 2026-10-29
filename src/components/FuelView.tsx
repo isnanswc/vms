@@ -8,12 +8,14 @@ import {
   Droplet, 
   MapPin, 
   Gauge, 
-  Navigation,
-  BarChart3,
-  Calendar,
-  Wallet,
-  Activity
+  Navigation, 
+  BarChart3, 
+  Calendar, 
+  Wallet, 
+  Activity,
+  Zap
 } from 'lucide-react';
+import { VehicleCategoryIcon } from './VehicleCategoryIcon';
 
 interface FuelViewProps {
   vehicles: Vehicle[];
@@ -132,7 +134,7 @@ export const FuelView: React.FC<FuelViewProps> = ({
             onClick={() => setSelectedVehicleId('all')}
             className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
               selectedVehicleId === 'all'
-                ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-sm'
+                ? 'bg-zinc-950 text-vms-accent dark:bg-vms-accent dark:text-zinc-950 shadow-sm'
                 : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
             }`}
           >
@@ -145,12 +147,13 @@ export const FuelView: React.FC<FuelViewProps> = ({
               <button
                 key={veh.id}
                 onClick={() => setSelectedVehicleId(veh.id)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                   isSelected
-                    ? 'bg-zinc-950 text-yellow-400 dark:bg-yellow-400 dark:text-zinc-950 shadow-sm'
+                    ? 'bg-zinc-950 text-vms-accent dark:bg-vms-accent dark:text-zinc-950 shadow-sm'
                     : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
                 }`}
               >
+                <VehicleCategoryIcon category={veh.category} isElectric={veh.fuelType === 'Listrik'} className="w-3.5 h-3.5" />
                 <span className="font-mono text-[11px] opacity-80">[{veh.plateNumber}]</span>
                 <span>{veh.name}</span>
               </button>
@@ -163,7 +166,7 @@ export const FuelView: React.FC<FuelViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-xl font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <span>Manajemen Bahan Bakar</span>
+            <span>{selectedVehicle?.fuelType === 'Listrik' ? 'Manajemen Baterai & Daya EV' : 'Manajemen Bahan Bakar'}</span>
             {selectedVehicle && (
               <span className="text-zinc-500 dark:text-zinc-400 font-mono text-sm font-normal">
                 — {selectedVehicle.name}
@@ -171,7 +174,7 @@ export const FuelView: React.FC<FuelViewProps> = ({
             )}
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {filteredLogs.length} catatan pengisian bensin tercatat
+            {filteredLogs.length} catatan {selectedVehicle?.fuelType === 'Listrik' ? 'charging SPKLU' : 'pengisian bensin'} tercatat
           </p>
         </div>
 
@@ -180,32 +183,32 @@ export const FuelView: React.FC<FuelViewProps> = ({
           <button
             onClick={onScanReceipt}
             className="flex items-center gap-1.5 py-2.5 px-3.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-2xl transition cursor-pointer active:scale-95 shadow-xs"
-            title="Scan Struk SPBU dengan AI"
+            title="Scan Struk SPBU / SPKLU dengan AI"
           >
             <Camera className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             <span>Scan Struk</span>
           </button>
           <button
             onClick={onAddFuelLog}
-            className="flex items-center gap-1.5 py-2.5 px-4 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 text-xs font-black rounded-2xl transition shadow-xs active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 py-2.5 px-4 bg-vms-accent hover:opacity-90 text-zinc-950 text-xs font-black rounded-2xl transition shadow-xs active:scale-95 cursor-pointer"
           >
-            <Plus className="w-4 h-4 stroke-[3]" />
-            <span>CATAT BBM</span>
+            {selectedVehicle?.fuelType === 'Listrik' ? <Zap className="w-4 h-4 stroke-[3]" /> : <Plus className="w-4 h-4 stroke-[3]" />}
+            <span>{selectedVehicle?.fuelType === 'Listrik' ? 'CATAT CHARGING' : 'CATAT BBM'}</span>
           </button>
         </div>
       </div>
 
       {/* Fuel KPI Summary Card with View Switcher */}
-      <div className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-4 border-b-yellow-400 transition-colors">
+      <div className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-4 border-b-theme-accent transition-colors">
         <div>
           <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
-            Total Konsumsi & Pengeluaran Bahan Bakar
+            {selectedVehicle?.fuelType === 'Listrik' ? 'Total Pengisian Daya & Biaya Listrik' : 'Total Konsumsi & Pengeluaran Bahan Bakar'}
           </span>
           <div className="mt-1 font-mono font-black text-2xl md:text-3xl text-zinc-950 dark:text-zinc-100">
             Rp {totalCost.toLocaleString('id-ID')}
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Total {totalLiters.toFixed(1)} Liter bensin terisi • Rata-rata efisiensi {avgEfficiency} km/L
+            Total {totalLiters.toFixed(1)} {selectedVehicle?.fuelType === 'Listrik' ? 'kWh' : 'Liter'} {selectedVehicle?.fuelType === 'Listrik' ? 'daya terisi' : 'bensin terisi'} • Rata-rata efisiensi {avgEfficiency} {selectedVehicle?.fuelType === 'Listrik' ? 'km/kWh' : 'km/L'}
           </p>
         </div>
 
@@ -325,7 +328,7 @@ export const FuelView: React.FC<FuelViewProps> = ({
                               Rp {log.totalCost.toLocaleString('id-ID')}
                             </div>
                             <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono mt-0.5">
-                              {log.liters} L • <span className="font-bold text-zinc-800 dark:text-zinc-200">{log.fuelType}</span>
+                              {log.liters} {log.fuelType === 'Listrik' ? 'kWh' : 'L'} • <span className="font-bold text-zinc-800 dark:text-zinc-200">{log.fuelType}</span>
                             </div>
                           </div>
                         </div>
@@ -338,8 +341,12 @@ export const FuelView: React.FC<FuelViewProps> = ({
                         </div>
 
                         {log.efficiencyKmPerLiter && (
-                          <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-950/60 border border-yellow-300 dark:border-yellow-800 text-zinc-950 dark:text-yellow-400 font-mono font-bold text-xs rounded-full">
-                            <span>{log.efficiencyKmPerLiter} km/L</span>
+                          <div className={`flex items-center gap-1 px-3 py-1 font-mono font-bold text-xs rounded-full border ${
+                            log.fuelType === 'Listrik'
+                              ? 'bg-cyan-100 dark:bg-cyan-950/60 border-cyan-300 dark:border-cyan-800 text-cyan-900 dark:text-cyan-400'
+                              : 'bg-vms-accent-subtle border-vms-accent-subtle text-zinc-950 dark:text-zinc-100'
+                          }`}>
+                            <span>{log.efficiencyKmPerLiter} {log.fuelType === 'Listrik' ? 'km/kWh' : 'km/L'}</span>
                           </div>
                         )}
                       </div>

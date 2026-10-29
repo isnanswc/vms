@@ -1,6 +1,6 @@
 export const APP_VERSION = '1.0.0';
 
-export type VehicleCategory = 'motor' | 'mobil' | 'truk' | 'forklift';
+export type VehicleCategory = 'motor' | 'mobil' | 'truk' | 'forklift' | 'roda3';
 export type FuelType = 'Pertalite' | 'Pertamax' | 'Pertamax Turbo' | 'Bio Solar' | 'Dexlite' | 'Listrik';
 
 export interface TaxPaymentRecord {

@@ -243,13 +243,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                       isHoldingAi ? 'scale-115' : 'hover:scale-105 active:scale-95'
                     } ${
                       isActive
-                        ? 'bg-zinc-950 dark:bg-zinc-900 text-yellow-400 border-2 border-yellow-400 shadow-[0_0_20px_rgba(255,255,255,0.7)] dark:shadow-[0_0_25px_rgba(255,255,255,0.45)]'
-                        : 'bg-yellow-400 text-zinc-950 hover:bg-yellow-300 shadow-[0_0_18px_rgba(255,255,255,0.75)] dark:shadow-[0_0_22px_rgba(255,255,255,0.4)]'
+                        ? 'bg-zinc-950 dark:bg-zinc-900 text-vms-accent border-2 border-theme-accent shadow-[0_0_20px_rgba(255,255,255,0.7)] dark:shadow-[0_0_25px_rgba(255,255,255,0.45)]'
+                        : 'bg-vms-accent text-zinc-950 hover:opacity-90 shadow-[0_0_18px_rgba(255,255,255,0.75)] dark:shadow-[0_0_22px_rgba(255,255,255,0.4)]'
                     }`}
                   >
                     {/* Holding Pulse Ring Indicator */}
                     {isHoldingAi && (
-                      <span className="absolute inset-0 rounded-full border-2 border-yellow-400 animate-ping opacity-75" />
+                      <span className="absolute inset-0 rounded-full border-2 border-theme-accent animate-ping opacity-75" />
                     )}
 
                     {/* Perfect Circle Inner Core */}
@@ -259,7 +259,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   </button>
 
                   <span className={`text-[10px] tracking-tight -mt-3 ${
-                    isActive ? 'font-black text-zinc-950 dark:text-yellow-400' : 'font-bold text-zinc-600 dark:text-zinc-400'
+                    isActive ? 'font-black text-zinc-950 dark:text-theme-accent' : 'font-bold text-zinc-600 dark:text-zinc-400'
                   }`}>
                     Chat AI
                   </span>
@@ -282,24 +282,24 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 }`}
               >
                 {isActive && (
-                  <div className="absolute top-0 w-8 h-[2.5px] bg-yellow-400 rounded-full shadow-xs"></div>
+                  <div className="absolute top-0 w-8 h-[2.5px] bg-theme-accent rounded-full shadow-xs"></div>
                 )}
 
                 <div className="relative">
                   <Icon
                     className={`w-5 h-5 transition-transform duration-200 ${
-                      isActive ? 'scale-110 stroke-[2.5] text-zinc-950 dark:text-yellow-400' : 'stroke-[1.8]'
+                      isActive ? 'scale-110 stroke-[2.5] text-zinc-950 dark:text-theme-accent' : 'stroke-[1.8]'
                     }`}
                   />
 
                   {item.id === 'service' && serviceBadgeCount > 0 && (
-                    <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-[14px] bg-yellow-400 text-zinc-950 text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
+                    <span className="absolute -top-1 -right-2 px-1 min-w-[14px] h-[14px] bg-vms-accent text-zinc-950 text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-heartbeat-loop">
                       {serviceBadgeCount}
                     </span>
                   )}
                 </div>
 
-                <span className={`text-[10px] tracking-tight mt-1 ${isActive ? 'font-bold text-zinc-950 dark:text-yellow-400' : ''}`}>
+                <span className={`text-[10px] tracking-tight mt-1 ${isActive ? 'font-bold text-zinc-950 dark:text-theme-accent' : ''}`}>
                   {item.label}
                 </span>
               </button>

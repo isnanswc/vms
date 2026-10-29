@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Vehicle, FuelLog, FuelType } from '../types';
-import { X, Fuel, Navigation, Loader2 } from 'lucide-react';
+import { X, Fuel, Navigation, Loader2, Zap } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
 
 interface AddFuelModalProps {
@@ -18,13 +18,17 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
   onAddFuelLog,
   defaultVehicleId,
 }) => {
-  const [vehicleId, setVehicleId] = useState(defaultVehicleId || vehicles[0]?.id || '');
+  const initialVeh = vehicles.find((v) => v.id === (defaultVehicleId || vehicles[0]?.id)) || vehicles[0];
+  const [vehicleId, setVehicleId] = useState(initialVeh?.id || '');
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [fuelType, setFuelType] = useState<FuelType>(vehicles[0]?.fuelType || 'Pertamax');
-  const [liters, setLiters] = useState<number>(10);
-  const [totalCost, setTotalCost] = useState<number>(100000);
-  const [odometerKm, setOdometerKm] = useState<number>(vehicles[0]?.currentOdometerKm || 0);
-  const [stationName, setStationName] = useState('SPBU Pertamina');
+  const [fuelType, setFuelType] = useState<FuelType>(initialVeh?.fuelType || 'Pertamax');
+  const [liters, setLiters] = useState<number>(initialVeh?.fuelType === 'Listrik' ? 20 : 10);
+  const [totalCost, setTotalCost] = useState<number>(initialVeh?.fuelType === 'Listrik' ? 50000 : 100000);
+  const [odometerKm, setOdometerKm] = useState<number>(initialVeh?.currentOdometerKm || 0);
+  const [isFullCharge, setIsFullCharge] = useState(true);
+  const [stationName, setStationName] = useState(
+    initialVeh?.fuelType === 'Listrik' ? 'SPKLU PLN Gambir' : 'SPBU Pertamina'
+  );
   const [isLocating, setIsLocating] = useState(false);
   const [gpsLocation, setGpsLocation] = useState<{
     latitude: number;
@@ -33,6 +37,27 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
   } | undefined>(undefined);
 
   if (!isOpen) return null;
+
+  const currentVehicle = vehicles.find((v) => v.id === vehicleId);
+  const isElectric = fuelType === 'Listrik' || currentVehicle?.fuelType === 'Listrik';
+
+  const handleVehicleChange = (newVehId: string) => {
+    setVehicleId(newVehId);
+    const targetVeh = vehicles.find((v) => v.id === newVehId);
+    if (targetVeh) {
+      setFuelType(targetVeh.fuelType);
+      setOdometerKm(targetVeh.currentOdometerKm);
+      if (targetVeh.fuelType === 'Listrik') {
+        setStationName('SPKLU PLN / Home Charger');
+        setLiters(20);
+        setTotalCost(50000);
+      } else {
+        setStationName('SPBU Pertamina');
+        setLiters(10);
+        setTotalCost(100000);
+      }
+    }
+  };
 
   // Handle GPS detection
   const handleGetGpsLocation = () => {
@@ -47,24 +72,27 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
         setIsLocating(false);
         const lat = parseFloat(pos.coords.latitude.toFixed(4));
         const lng = parseFloat(pos.coords.longitude.toFixed(4));
+        const locationType = isElectric ? 'SPKLU' : 'SPBU';
         setGpsLocation({
           latitude: lat,
           longitude: lng,
           addressDescription: `GPS: ${lat}, ${lng} (Terverifikasi)`,
         });
-        setStationName(`SPBU Terdekat (GPS ${lat}, ${lng})`);
+        setStationName(`${locationType} Terdekat (GPS ${lat}, ${lng})`);
       },
       () => {
         setIsLocating(false);
-        // Fallback simulation
         const mockLat = -6.2412;
         const mockLng = 106.8621;
+        const locationDesc = isElectric 
+          ? 'SPKLU PLN Distribusi Jakarta (GPS Aktif)' 
+          : 'SPBU Pertamina MT Haryono (GPS Aktif)';
         setGpsLocation({
           latitude: mockLat,
           longitude: mockLng,
-          addressDescription: 'SPBU Pertamina MT Haryono (GPS Aktif)',
+          addressDescription: locationDesc,
         });
-        setStationName('SPBU Pertamina (Lokasi Terdeteksi)');
+        setStationName(isElectric ? 'SPKLU PLN Terdeteksi' : 'SPBU Pertamina Terdeteksi');
       },
       { timeout: 8000 }
     );
@@ -89,7 +117,7 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
       stationName,
       gpsLocation,
       efficiencyKmPerLiter: eff,
-      fullTank: true,
+      fullTank: isFullCharge,
     };
 
     onAddFuelLog(newLog);
@@ -102,12 +130,17 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
         <div className="w-full max-w-md bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar text-zinc-900 dark:text-zinc-100">
         <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-yellow-400 text-zinc-950">
-              <Fuel className="w-4 h-4 stroke-[2.5]" />
+            <div className={`p-1.5 rounded-lg ${isElectric ? 'bg-cyan-400 text-zinc-950' : 'bg-vms-accent text-zinc-950'}`}>
+              {isElectric ? <Zap className="w-4 h-4 stroke-[2.5]" /> : <Fuel className="w-4 h-4 stroke-[2.5]" />}
             </div>
-            <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900 dark:text-white">
-              Catat Pengisian BBM
-            </h3>
+            <div>
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-zinc-900 dark:text-white">
+                {isElectric ? 'Catat Pengisian Baterai Listrik (EV)' : 'Catat Pengisian BBM'}
+              </h3>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                {isElectric ? 'Log pengisian daya SPKLU / Home Charger' : 'Log transaksi bensin & efisiensi armada'}
+              </p>
+            </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer">
             <X className="w-5 h-5" />
@@ -119,15 +152,15 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
             <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Pilih Kendaraan</label>
             <select
               value={vehicleId}
-              onChange={(e) => setVehicleId(e.target.value)}
-              className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+              onChange={(e) => handleVehicleChange(e.target.value)}
+              className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-theme-accent"
             >
               {vehicles.length === 0 ? (
                 <option value="">Belum ada kendaraan di garasi</option>
               ) : (
                 vehicles.map((v) => (
                   <option key={v.id} value={v.id}>
-                    [{v.plateNumber}] {v.name}
+                    [{v.plateNumber}] {v.name} ({v.fuelType})
                   </option>
                 ))
               )}
@@ -141,16 +174,19 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-theme-accent"
               />
             </div>
             <div>
-              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Jenis BBM</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">
+                {isElectric ? 'Tipe Pengisian' : 'Jenis BBM'}
+              </label>
               <select
                 value={fuelType}
                 onChange={(e) => setFuelType(e.target.value as FuelType)}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-theme-accent"
               >
+                <option value="Listrik">Listrik (SPKLU / Charger)</option>
                 <option value="Pertalite">Pertalite</option>
                 <option value="Pertamax">Pertamax</option>
                 <option value="Pertamax Turbo">Pertamax Turbo</option>
@@ -167,18 +203,20 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
                 type="number"
                 value={totalCost}
                 onChange={(e) => setTotalCost(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-theme-accent"
                 required
               />
             </div>
             <div>
-              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Volume (Liter)</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">
+                {isElectric ? 'Energi Masuk (kWh)' : 'Volume (Liter)'}
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={liters}
                 onChange={(e) => setLiters(Number(e.target.value))}
-                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-theme-accent"
                 required
               />
             </div>
@@ -190,20 +228,22 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
               type="number"
               value={odometerKm}
               onChange={(e) => setOdometerKm(Number(e.target.value))}
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-theme-accent"
               required
             />
           </div>
 
-          {/* SPBU Location & GPS button */}
+          {/* SPBU / SPKLU Location & GPS button */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block font-bold text-zinc-800 dark:text-zinc-200">Lokasi SPBU</label>
+              <label className="block font-bold text-zinc-800 dark:text-zinc-200">
+                {isElectric ? 'Lokasi SPKLU / Stasiun Pengisian' : 'Lokasi SPBU'}
+              </label>
               <button
                 type="button"
                 onClick={handleGetGpsLocation}
                 disabled={isLocating}
-                className="text-[10px] text-zinc-950 font-bold flex items-center gap-1 px-2 py-0.5 bg-yellow-400 hover:bg-yellow-300 rounded-lg cursor-pointer transition shadow-xs"
+                className="text-[10px] text-zinc-950 font-bold flex items-center gap-1 px-2 py-0.5 bg-vms-accent hover:opacity-90 rounded-lg cursor-pointer transition shadow-xs"
               >
                 {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Navigation className="w-3 h-3" />}
                 <span>{isLocating ? 'Mencari GPS...' : 'Ambil Lokasi GPS'}</span>
@@ -211,27 +251,38 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
             </div>
             <input
               type="text"
-              placeholder="Contoh: SPBU Pertamina 31.124 Cilandak"
+              placeholder={isElectric ? 'Contoh: SPKLU PLN Gambir / Home Charger' : 'Contoh: SPBU Pertamina 31.124 Cilandak'}
               value={stationName}
               onChange={(e) => setStationName(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-900 dark:focus:border-theme-accent"
+              required
             />
-            {gpsLocation && (
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono mt-1 block">
-                ✓ Koordinat tersimpan: {gpsLocation.latitude}, {gpsLocation.longitude}
-              </span>
-            )}
+          </div>
+
+          {/* Full Tank / 100% SOC Toggle */}
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+            <input
+              type="checkbox"
+              id="fullChargeCheckbox"
+              checked={isFullCharge}
+              onChange={(e) => setIsFullCharge(e.target.checked)}
+              className="w-4 h-4 rounded text-zinc-900 focus:ring-0 cursor-pointer"
+            />
+            <label htmlFor="fullChargeCheckbox" className="font-bold text-[11px] text-zinc-800 dark:text-zinc-200 cursor-pointer">
+              {isElectric ? 'Pengisian Penuh (100% SOC / Full Battery Charge)' : 'Pengisian Tangki Penuh (Full Tank)'}
+            </label>
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 mt-2 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer"
+            className="w-full py-3 mt-2 bg-vms-accent hover:opacity-90 text-zinc-950 font-black uppercase tracking-wider text-xs rounded-xl transition shadow active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
           >
-            Simpan Log Pengisian
+            {isElectric ? <Zap className="w-4 h-4" /> : <Fuel className="w-4 h-4" />}
+            <span>{isElectric ? 'SIMPAN DATA CHARGING (KWH)' : 'SIMPAN PENGISIAN BBM'}</span>
           </button>
         </form>
       </div>
-    </div>
-  </ModalPortal>
+      </div>
+    </ModalPortal>
   );
 };

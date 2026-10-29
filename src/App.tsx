@@ -30,7 +30,9 @@ import { AddFuelModal } from './components/AddFuelModal';
 import { AddServiceModal } from './components/AddServiceModal';
 import { DigitalServicePdfModal } from './components/DigitalServicePdfModal';
 import { NotificationModal } from './components/NotificationModal';
+import { ThemeAccentModal } from './components/ThemeAccentModal';
 import { executeThemeTransition } from './utils/themeTransition';
+import { getSavedAccent, applyAccentToDocument, type AccentColorId } from './utils/themeAccent';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -63,6 +65,14 @@ export function App() {
       setTheme(newTheme);
     });
   };
+
+  // Accent Theme State
+  const [accentTheme, setAccentTheme] = useState<AccentColorId>(() => getSavedAccent());
+  const [isThemeAccentModalOpen, setIsThemeAccentModalOpen] = useState(false);
+
+  useEffect(() => {
+    applyAccentToDocument(accentTheme);
+  }, [accentTheme]);
 
   // Application Data States (Persistent IndexedDB + LocalStorage)
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => loadInitialData('vehicles', INITIAL_VEHICLES));
@@ -364,6 +374,10 @@ export function App() {
           onBackToHome={handleGoBack}
           settings={aiSettings}
           vehicles={vehicles}
+          fuelLogs={fuelLogs}
+          spareParts={spareParts}
+          serviceRecords={serviceRecords}
+          userProfile={userProfile}
         />
 
         <AiSettingsModal
@@ -404,6 +418,7 @@ export function App() {
             navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
           }}
           onOpenAiSettings={() => setIsAiSettingsOpen(true)}
+          onOpenThemeAccent={() => setIsThemeAccentModalOpen(true)}
         />
 
         {/* Main View Area (Responsive up to 7xl on desktop) */}
@@ -559,6 +574,13 @@ export function App() {
         vehicles={vehicles}
         serviceRecords={serviceRecords}
         spareParts={spareParts}
+      />
+
+      <ThemeAccentModal
+        isOpen={isThemeAccentModalOpen}
+        onClose={() => setIsThemeAccentModalOpen(false)}
+        currentAccent={accentTheme}
+        onSelectAccent={(newAccent) => setAccentTheme(newAccent)}
       />
     </div>
   );
