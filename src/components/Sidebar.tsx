@@ -1,6 +1,7 @@
 import React from 'react';
 import type { TabType } from './BottomNav';
 import type { UserProfile } from '../types/user';
+import appLogo from '../assets/app-logo.png';
 import { 
   LayoutDashboard, 
   CarFront, 
@@ -40,8 +41,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Logo Header */}
       <div className="p-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-white border border-zinc-200 dark:border-zinc-800 p-0.5 shadow-md overflow-hidden">
-            <img src="/app-logo.png" alt="FleetLog" className="w-full h-full object-contain" />
+          <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-white border border-zinc-200 dark:border-zinc-800 p-0.5 shadow-md overflow-hidden shrink-0">
+            <img 
+              src={appLogo} 
+              alt="FleetLog" 
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.currentTarget.src = `${import.meta.env.BASE_URL}app-logo.png`;
+              }}
+            />
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-zinc-950 rounded-full flex items-center justify-center">
               <div className="w-1.5 h-1.5 bg-theme-accent rounded-full animate-ping"></div>
             </div>
