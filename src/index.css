@@ -241,6 +241,109 @@
 }
 
 /* ========================================================================== */
+
+/* ========================================================================== */
+/* LIQUID FUEL TANK WAVE ANIMATION & BUBBLE RISE                              */
+/* ========================================================================== */
+
+@keyframes liquidWaveFlow {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-25%, -2px, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes liquidWaveFlowReverse {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  50% {
+    transform: translate3d(-25%, 2px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes bubbleAscend {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.9;
+    transform: translate3d(2px, -35px, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-1px, -50px, 0) scale(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes techScanSweep {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    top: 95%;
+    opacity: 0;
+  }
+}
+
+@keyframes diagnosticPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(250, 204, 21, 0);
+  }
+}
+
+.animate-liquid-wave-1 {
+  animation: liquidWaveFlow 4.5s cubic-bezier(0.36, 0, 0.66, -0.56) infinite linear;
+}
+
+.animate-liquid-wave-2 {
+  animation: liquidWaveFlowReverse 6s ease-in-out infinite alternate;
+}
+
+.animate-bubble-rise-1 {
+  animation: bubbleAscend 3.2s ease-in infinite;
+}
+
+.animate-bubble-rise-2 {
+  animation: bubbleAscend 4.1s ease-in 1.4s infinite;
+}
+
+.animate-bubble-rise-3 {
+  animation: bubbleAscend 3.7s ease-in 0.7s infinite;
+}
+
+.animate-scan-sweep {
+  animation: techScanSweep 3.2s ease-in-out infinite;
+}
+
+.animate-diagnostic-pulse {
+  animation: diagnosticPulse 2.4s ease-in-out infinite;
+}
+
 /* VIEW TRANSITION CIRCULAR REVEAL WAVE ANIMATION (THEME TOGGLE)              */
 /* ========================================================================== */
 

@@ -8,6 +8,7 @@ interface AddServiceModalProps {
   onClose: () => void;
   vehicles: Vehicle[];
   onAddService: (record: ServiceRecord) => void;
+  defaultVehicleId?: string;
 }
 
 export const AddServiceModal: React.FC<AddServiceModalProps> = ({
@@ -15,12 +16,14 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
   onClose,
   vehicles,
   onAddService,
+  defaultVehicleId,
 }) => {
-  const [vehicleId, setVehicleId] = useState(vehicles[0]?.id || '');
+  const initialVeh = vehicles.find((v) => v.id === (defaultVehicleId || vehicles[0]?.id)) || vehicles[0];
+  const [vehicleId, setVehicleId] = useState(initialVeh?.id || '');
   const [type, setType] = useState<'routine' | 'unexpected'>('routine');
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [odometerKm, setOdometerKm] = useState(vehicles[0]?.currentOdometerKm || 0);
+  const [odometerKm, setOdometerKm] = useState(initialVeh?.currentOdometerKm || 0);
   const [workshopName, setWorkshopName] = useState('');
   const [cost, setCost] = useState(0);
   const [notes, setNotes] = useState('');

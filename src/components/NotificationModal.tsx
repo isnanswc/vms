@@ -15,6 +15,7 @@ import { ModalPortal } from './ModalPortal';
 import { triggerHaptic } from '../utils/haptics';
 import type { Vehicle, SparePart } from '../types';
 import type { UserProfile } from '../types/user';
+import { getSystemNotifications, saveReadNotificationIds } from '../utils/notifications';
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ interface NotificationModalProps {
   vehicles: Vehicle[];
   spareParts: SparePart[];
   userProfile: UserProfile;
+  readIds?: string[];
+  onUpdateReadIds?: (ids: string[]) => void;
   onNavigateToService?: () => void;
   onNavigateToVehicle?: (vehicleId: string) => void;
   onNavigateToProfile?: () => void;
@@ -36,13 +39,15 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   vehicles,
   spareParts,
   userProfile,
+  readIds: parentReadIds,
+  onUpdateReadIds,
   onNavigateToService,
   onNavigateToVehicle,
   onNavigateToProfile,
   onNavigateToAi,
 }) => {
   const [activeCategory, setActiveCategory] = useState<NotificationCategory>('all');
-  const [readIds, setReadIds] = useState<string[]>(() => {
+  const [localReadIds, setLocalReadIds] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('vms_read_notifications');
@@ -54,97 +59,29 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     return [];
   });
 
+  const readIds = parentReadIds !== undefined ? parentReadIds : localReadIds;
+
   if (!isOpen) return null;
 
-  const today = new Date('2026-10-21');
+  const rawItems = getSystemNotifications(vehicles, spareParts, userProfile);
 
-  const getDaysDiff = (dateStr?: string) => {
-    if (!dateStr) return 999;
-    const target = new Date(dateStr);
-    const diff = target.getTime() - today.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  };
-
-  interface NotificationItem {
-    id: string;
-    category: 'service' | 'tax' | 'license';
-    title: string;
-    description: string;
-    urgency: 'critical' | 'warning' | 'info';
-    daysLeft?: number;
-    actionLabel: string;
-    onAction: () => void;
-    timestamp: string;
-  }
-
-  const items: NotificationItem[] = [];
-
-  // 1. Critical and Warning Spareparts
-  spareParts.forEach((part) => {
-    if (part.status === 'critical' || part.status === 'warning') {
-      const veh = vehicles.find((v) => v.id === part.vehicleId);
-      const isCrit = part.status === 'critical';
-      items.push({
-        id: `part-${part.id}`,
-        category: 'service',
-        urgency: isCrit ? 'critical' : 'warning',
-        title: `${isCrit ? 'Penggantian Mendesak' : 'Perhatian Servis'}: ${part.name}`,
-        description: `${veh ? veh.name + ' (' + veh.plateNumber + ')' : 'Armada'} — Sisa masa pakai ${part.estimatedLifeRemainingPct}%. Rekomendasi servis tiap ${part.recommendedIntervalKm.toLocaleString('id-ID')} KM.`,
-        actionLabel: 'Buka Buku Servis',
-        onAction: () => {
-          onClose();
+  const items = rawItems.map((item) => ({
+    ...item,
+    onAction: () => {
+      onClose();
+      if (item.category === 'service') {
+        onNavigateToService?.();
+      } else if (item.category === 'tax') {
+        if (item.vehicleId) {
+          onNavigateToVehicle?.(item.vehicleId);
+        } else {
           onNavigateToService?.();
-        },
-        timestamp: isCrit ? 'Perlu tindakan hari ini' : 'Dalam minggu ini',
-      });
-    }
-  });
-
-  // 2. Tax / STNK Expiry
-  vehicles.forEach((veh) => {
-    if (veh.stnkExpiryDate) {
-      const days = getDaysDiff(veh.stnkExpiryDate);
-      if (days <= 60) {
-        const isUrgent = days <= 14;
-        items.push({
-          id: `tax-annual-${veh.id}`,
-          category: 'tax',
-          urgency: isUrgent ? 'critical' : 'warning',
-          daysLeft: days,
-          title: `Pajak Tahunan STNK: ${veh.plateNumber}`,
-          description: `${veh.name} — Jatuh tempo pada ${new Date(veh.stnkExpiryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} (${days > 0 ? `${days} hari lagi` : 'Sudah lewat!'}).`,
-          actionLabel: 'Kelola Pajak',
-          onAction: () => {
-            onClose();
-            onNavigateToVehicle?.(veh.id);
-          },
-          timestamp: days <= 0 ? 'Kedaluwarsa' : `${days} hari lagi`,
-        });
+        }
+      } else if (item.category === 'license') {
+        onNavigateToProfile?.();
       }
-    }
-  });
-
-  // 3. Driving Licenses (SIM) Expiry
-  userProfile.licenses.forEach((sim) => {
-    const days = getDaysDiff(sim.expiryDate);
-    if (days <= 60) {
-      const isUrgent = days <= 14;
-      items.push({
-        id: `sim-${sim.id}`,
-        category: 'license',
-        urgency: isUrgent ? 'critical' : 'warning',
-        daysLeft: days,
-        title: `Masa Berlaku ${sim.simType}`,
-        description: `No. ${sim.simNumber} a.n. ${sim.holderName} — Berakhir ${new Date(sim.expiryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}.`,
-        actionLabel: 'Lihat Data SIM',
-        onAction: () => {
-          onClose();
-          onNavigateToProfile?.();
-        },
-        timestamp: days <= 0 ? 'Kedaluwarsa' : `${days} hari lagi`,
-      });
-    }
-  });
+    },
+  }));
 
   // Filter items
   const filteredItems = items.filter((item) => {
@@ -157,24 +94,18 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   const handleMarkAllRead = () => {
     triggerHaptic('success');
     const allIds = items.map((i) => i.id);
-    setReadIds(allIds);
-    try {
-      localStorage.setItem('vms_read_notifications', JSON.stringify(allIds));
-    } catch {
-      // ignore
-    }
+    setLocalReadIds(allIds);
+    saveReadNotificationIds(allIds);
+    onUpdateReadIds?.(allIds);
   };
 
   const handleDismissOne = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic('light');
-    const updated = [...readIds, id];
-    setReadIds(updated);
-    try {
-      localStorage.setItem('vms_read_notifications', JSON.stringify(updated));
-    } catch {
-      // ignore
-    }
+    const updated = Array.from(new Set([...readIds, id]));
+    setLocalReadIds(updated);
+    saveReadNotificationIds(updated);
+    onUpdateReadIds?.(updated);
   };
 
   const handleCloseModal = () => {

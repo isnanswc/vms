@@ -30,6 +30,7 @@ import { AddFuelModal } from './components/AddFuelModal';
 import { AddServiceModal } from './components/AddServiceModal';
 import { DigitalServicePdfModal } from './components/DigitalServicePdfModal';
 import { NotificationModal } from './components/NotificationModal';
+import { getSystemNotifications, getReadNotificationIds, saveReadNotificationIds } from './utils/notifications';
 import { ThemeAccentModal } from './components/ThemeAccentModal';
 import { executeThemeTransition } from './utils/themeTransition';
 import { getSavedAccent, applyAccentToDocument, type AccentColorId } from './utils/themeAccent';
@@ -40,6 +41,7 @@ export function App() {
   const [isAddingVehiclePage, setIsAddingVehiclePage] = useState(false);
   const [isViewingProfile, setIsViewingProfile] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [readNotificationIds, setReadNotificationIds] = useState<string[]>(() => getReadNotificationIds());
 
   // Dark Mode Theme State
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -109,6 +111,8 @@ export function App() {
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [isAddFuelOpen, setIsAddFuelOpen] = useState(false);
   const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
+  const [targetVehicleIdForFuel, setTargetVehicleIdForFuel] = useState<string | undefined>(undefined);
+  const [targetVehicleIdForService, setTargetVehicleIdForService] = useState<string | undefined>(undefined);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
   // Handlers for Add Operations
@@ -269,7 +273,8 @@ export function App() {
   };
 
   const criticalPartsCount = spareParts.filter((p) => p.status === 'critical').length;
-  const urgentCount = criticalPartsCount + 1;
+  const systemNotifications = getSystemNotifications(vehicles, spareParts, userProfile);
+  const urgentCount = systemNotifications.filter((n) => !readNotificationIds.includes(n.id)).length;
 
   // Selected vehicle for detail view
   const currentDetailVehicle = vehicles.find((v) => v.id === selectedVehicleIdForDetail);
@@ -465,14 +470,26 @@ export function App() {
                     navigateTo({ tab, vehicleId: null, isAdding: false, isProfile: false });
                   }}
                   onOpenQuickScan={() => setIsScanModalOpen(true)}
-                  onOpenAddFuel={() => {
+                  onOpenAddFuel={(vehId) => {
                     if (vehicles.length === 0) {
                       navigateTo({ isAdding: true, isProfile: false, vehicleId: null });
                     } else {
+                      setTargetVehicleIdForFuel(vehId);
                       setIsAddFuelOpen(true);
                     }
                   }}
+                  onOpenAddService={(vehId) => {
+                    if (vehicles.length === 0) {
+                      navigateTo({ isAdding: true, isProfile: false, vehicleId: null });
+                    } else {
+                      setTargetVehicleIdForService(vehId);
+                      setIsAddServiceOpen(true);
+                    }
+                  }}
                   onOpenAiChat={handleOpenAiChatWithPrompt}
+                  onNavigateToVehicle={(vehicleId) => {
+                    navigateTo({ vehicleId, isProfile: false, isAdding: false });
+                  }}
                 />
               )}
 
@@ -530,6 +547,11 @@ export function App() {
         vehicles={vehicles}
         spareParts={spareParts}
         userProfile={userProfile}
+        readIds={readNotificationIds}
+        onUpdateReadIds={(ids) => {
+          setReadNotificationIds(ids);
+          saveReadNotificationIds(ids);
+        }}
         onNavigateToService={() => {
           navigateTo({ tab: 'service', isProfile: false, isAdding: false, vehicleId: null });
         }}
@@ -564,7 +586,7 @@ export function App() {
         onClose={() => setIsAddFuelOpen(false)}
         vehicles={vehicles}
         onAddFuelLog={handleAddFuelLog}
-        defaultVehicleId={selectedVehicleIdForDetail || undefined}
+        defaultVehicleId={targetVehicleIdForFuel || selectedVehicleIdForDetail || undefined}
       />
 
       <AddServiceModal
@@ -572,6 +594,7 @@ export function App() {
         onClose={() => setIsAddServiceOpen(false)}
         vehicles={vehicles}
         onAddService={handleAddServiceRecord}
+        defaultVehicleId={targetVehicleIdForService || selectedVehicleIdForDetail || undefined}
       />
 
       <DigitalServicePdfModal
