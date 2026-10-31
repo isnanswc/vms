@@ -32,7 +32,7 @@ export const VehiclesView: React.FC<VehiclesViewProps> = ({
 
 
   const getDaysUntilExpiry = (dateStr: string) => {
-    const today = new Date('2026-10-21');
+    const today = new Date();
     const target = new Date(dateStr);
     const diffTime = target.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));

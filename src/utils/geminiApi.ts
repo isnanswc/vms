@@ -169,7 +169,7 @@ export function buildFleetContextPrompt(fleet?: FleetDataContext): string {
 
   // 6. Ringkasan Deteksi Anomali Otomatis
   const anomalies: string[] = [];
-  const today = new Date('2026-10-21');
+  const today = new Date();
 
   // Check spare parts critical wear
   spareParts.forEach((sp) => {

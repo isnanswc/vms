@@ -204,7 +204,7 @@ export function App() {
         totalCost: result.detectedCost,
         odometerKm: result.detectedKm,
         stationName: 'SPBU Pertamina (AI Scan)',
-        efficiencyKmPerLiter: 42.0,
+        efficiencyKmPerLiter: undefined,
         fullTank: true,
       };
       setFuelLogs([newLog, ...fuelLogs]);

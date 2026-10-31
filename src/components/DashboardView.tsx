@@ -66,9 +66,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const logsWithEff = currentFuelLogs.filter((l) => l.efficiencyKmPerLiter !== undefined && (l.efficiencyKmPerLiter || 0) > 0);
   const avgEfficiency = logsWithEff.length > 0
     ? (logsWithEff.reduce((a, b) => a + (b.efficiencyKmPerLiter || 0), 0) / logsWithEff.length).toFixed(1)
-    : selectedVehicle
-      ? (selectedVehicle.category === 'motor' ? '42.0' : selectedVehicle.category === 'mobil' ? '12.5' : '10.0')
-      : '0';
+    : '-';
 
   const criticalParts = currentSpareParts.filter((p) => p.status === 'critical');
 
@@ -194,10 +192,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <div className="mt-2">
             <span className="text-lg md:text-xl font-black font-mono tracking-tight text-zinc-950 dark:text-zinc-100">
-              {avgEfficiency} <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">km/L</span>
+              {avgEfficiency !== '-' ? `${avgEfficiency} ` : '- '}
+              <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">km/L</span>
             </span>
             <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">
-              {selectedVehicle ? `Kapasitas: ${selectedVehicle.tankCapacityLiters}L` : 'Rasio efisiensi armada'}
+              {avgEfficiency !== '-' ? 'Rasio efisiensi konsumsi' : 'Belum ada catatan BBM'}
             </p>
           </div>
         </div>

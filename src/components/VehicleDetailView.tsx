@@ -75,7 +75,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
   const [editTaxCostFiveYear, setEditTaxCostFiveYear] = useState(vehicle.stnkTaxCostFiveYear);
 
   // Form states for manual tax record
-  const [taxDate, setTaxDate] = useState('2026-10-21');
+  const [taxDate, setTaxDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [taxType, setTaxType] = useState<'tahunan' | 'lima_tahunan'>('tahunan');
   const [taxCost, setTaxCost] = useState(vehicle.stnkTaxCostAnnual);
   const [taxValidation, setTaxValidation] = useState('');
@@ -93,9 +93,9 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
   const costPerKm = totalLiters > 0 && vFuelLogs.length > 1
     ? Math.round(totalFuelCost / ((vFuelLogs[0].odometerKm - vFuelLogs[vFuelLogs.length - 1].odometerKm) || 1))
-    : 320;
+    : 0;
 
-  const today = new Date('2026-10-21');
+  const today = new Date();
   const annualExpiry = new Date(vehicle.stnkExpiryDate);
   const fiveYearExpiry = new Date(vehicle.stnkFiveYearExpiryDate);
 

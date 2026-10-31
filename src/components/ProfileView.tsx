@@ -47,7 +47,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [expiryDate, setExpiryDate] = useState('2028-05-10');
   const [issuingCity, setIssuingCity] = useState('');
 
-  const today = new Date('2026-10-21');
+  const today = new Date();
 
   const getDaysUntilExpiry = (dateStr: string) => {
     const target = new Date(dateStr);

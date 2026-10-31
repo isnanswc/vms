@@ -108,17 +108,7 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
       },
       () => {
         setIsLocating(false);
-        const mockLat = -6.2412;
-        const mockLng = 106.8621;
-        const locationDesc = isElectric 
-          ? 'SPKLU PLN Distribusi Jakarta (GPS Aktif)' 
-          : 'SPBU Pertamina MT Haryono (GPS Aktif)';
-        setGpsLocation({
-          latitude: mockLat,
-          longitude: mockLng,
-          addressDescription: locationDesc,
-        });
-        setStationName(isElectric ? 'SPKLU PLN Terdeteksi' : 'SPBU Pertamina Terdeteksi');
+        setGpsLocation(undefined);
       },
       { timeout: 8000 }
     );
@@ -128,8 +118,8 @@ export const AddFuelModal: React.FC<AddFuelModalProps> = ({
     e.preventDefault();
 
     const selectedVeh = vehicles.find((v) => v.id === vehicleId);
-    const lastKm = selectedVeh?.currentOdometerKm || (odometerKm - 150);
-    const kmDiff = odometerKm - lastKm;
+    const lastKm = selectedVeh?.currentOdometerKm;
+    const kmDiff = lastKm !== undefined && odometerKm > lastKm ? odometerKm - lastKm : 0;
     const eff = kmDiff > 0 && liters > 0 ? Number((kmDiff / liters).toFixed(1)) : undefined;
 
     const newLog: FuelLog = {
