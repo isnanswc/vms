@@ -11,7 +11,8 @@ import {
   Sparkles, 
   ChevronRight, 
   X, 
-  Check
+  Check, 
+  AlertCircle
 } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
 import { triggerHaptic } from '../utils/haptics';
@@ -55,7 +56,11 @@ export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
 
   // Web Push Status
   const [pushStatus, setPushStatus] = useState(() => checkNotificationSupport());
-  const [testNotificationNotice, setTestNotificationNotice] = useState<string | null>(null);
+  const [isSendingNotif, setIsSendingNotif] = useState(false);
+  const [testNotificationNotice, setTestNotificationNotice] = useState<{
+    type: 'success' | 'error' | 'info';
+    text: string;
+  } | null>(null);
 
   if (!isOpen) return null;
 
@@ -84,31 +89,67 @@ export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
 
   const handleEnablePush = async () => {
     triggerHaptic('medium');
-    const perm = await requestNotificationPermission();
-    setPushStatus(checkNotificationSupport());
-    if (perm === 'granted') {
-      sendBrowserNotification('Notifikasi VMS Aktif! 🚀', {
-        body: 'Sistem pengingat otomatis servis & pajak STNK armada Anda siap bekerja.',
-      });
-      setTestNotificationNotice('✓ Notifikasi browser berhasil diaktifkan!');
-      setTimeout(() => setTestNotificationNotice(null), 4000);
-    } else {
-      setTestNotificationNotice('Izin notifikasi tidak diberikan di peramban ini.');
-      setTimeout(() => setTestNotificationNotice(null), 4000);
+    setIsSendingNotif(true);
+    try {
+      const perm = await requestNotificationPermission();
+      const current = checkNotificationSupport();
+      setPushStatus(current);
+
+      if (perm === 'granted') {
+        const res = await sendBrowserNotification('Notifikasi VMS Aktif! 🚀', {
+          body: 'Sistem pengingat otomatis servis & pajak STNK armada Anda siap bekerja.',
+        });
+        if (res.success) {
+          setTestNotificationNotice({
+            type: 'success',
+            text: '✓ Izin aktif! Notifikasi sistem berhasil dikirim ke perangkat.',
+          });
+        } else {
+          setTestNotificationNotice({
+            type: 'error',
+            text: res.message || 'Izin diberikan, namun notifikasi sistem gagal ditampilkan.',
+          });
+        }
+      } else if (perm === 'denied') {
+        setTestNotificationNotice({
+          type: 'error',
+          text: 'Izin notifikasi diblokir di browser. Buka setelan izin situs di address bar untuk mengizinkan.',
+        });
+      } else {
+        setTestNotificationNotice({
+          type: 'info',
+          text: 'Izin notifikasi belum disetujui.',
+        });
+      }
+    } finally {
+      setIsSendingNotif(false);
+      setTimeout(() => setTestNotificationNotice(null), 6000);
     }
   };
 
-  const handleSendTestPush = () => {
+  const handleSendTestPush = async () => {
     triggerHaptic('light');
-    const sent = sendBrowserNotification('Uji Coba Pengingat Armada VMS', {
-      body: 'Pengingat otomatis STNK dan suku cadang kritis siap muncul di layar Anda.',
-    });
-    if (sent) {
-      setTestNotificationNotice('✓ Notifikasi uji coba telah dikirim ke perangkat Anda.');
-    } else {
-      setTestNotificationNotice('Gagal mengirim. Pastikan izin notifikasi aktif.');
+    setIsSendingNotif(true);
+    try {
+      const res = await sendBrowserNotification('Uji Coba Pengingat Armada VMS', {
+        body: 'Pengingat otomatis STNK dan suku cadang kritis siap muncul di layar Anda.',
+      });
+
+      if (res.success) {
+        setTestNotificationNotice({
+          type: 'success',
+          text: `✓ Notifikasi berhasil dikirim via ${res.method === 'serviceworker' ? 'Service Worker' : 'Desktop'}!`,
+        });
+      } else {
+        setTestNotificationNotice({
+          type: 'error',
+          text: res.message || 'Gagal mengirim. Periksa izin di setelan browser atau status Jangan Ganggu (Focus Assist).',
+        });
+      }
+    } finally {
+      setIsSendingNotif(false);
+      setTimeout(() => setTestNotificationNotice(null), 6000);
     }
-    setTimeout(() => setTestNotificationNotice(null), 4000);
   };
 
   return (
@@ -292,7 +333,8 @@ export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
                     <button
                       type="button"
                       onClick={handleSendTestPush}
-                      className="py-1.5 px-3 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-zinc-800 dark:text-zinc-200 rounded-xl font-bold text-[10px] transition cursor-pointer"
+                      disabled={isSendingNotif}
+                      className="py-1.5 px-3 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 disabled:opacity-50 text-zinc-800 dark:text-zinc-200 rounded-xl font-bold text-[10px] transition cursor-pointer"
                     >
                       Tes Notif
                     </button>
@@ -300,7 +342,8 @@ export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
                     <button
                       type="button"
                       onClick={handleEnablePush}
-                      className="py-1.5 px-3 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg rounded-xl font-black text-[10px] uppercase tracking-wider transition cursor-pointer active:scale-95 shadow-xs"
+                      disabled={isSendingNotif}
+                      className="py-1.5 px-3 bg-theme-accent hover:bg-theme-accent-hover disabled:opacity-50 text-theme-accent-fg rounded-xl font-black text-[10px] uppercase tracking-wider transition cursor-pointer active:scale-95 shadow-xs"
                     >
                       Aktifkan
                     </button>
@@ -308,10 +351,29 @@ export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
                 </div>
               </div>
 
+              {/* Detailed diagnostic notice if permission denied or insecure context */}
+              {pushStatus.notes && pushStatus.permission !== 'granted' && (
+                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-[11px] font-medium border border-amber-200 dark:border-amber-800/60 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <span>{pushStatus.notes}</span>
+                </div>
+              )}
+
+              {/* Action Feedback Result */}
               {testNotificationNotice && (
-                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold flex items-center gap-1.5 animate-fade-in">
-                  <Check className="w-3.5 h-3.5 shrink-0" />
-                  <span>{testNotificationNotice}</span>
+                <div className={`p-2.5 rounded-xl text-[11px] font-bold flex items-start gap-2 animate-fade-in ${
+                  testNotificationNotice.type === 'success'
+                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                    : testNotificationNotice.type === 'error'
+                    ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+                    : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200'
+                }`}>
+                  {testNotificationNotice.type === 'success' ? (
+                    <Check className="w-4 h-4 shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  )}
+                  <span className="leading-snug">{testNotificationNotice.text}</span>
                 </div>
               )}
             </div>
