@@ -12,10 +12,12 @@ import {
   ChevronRight, 
   X, 
   Check, 
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
 import { triggerHaptic } from '../utils/haptics';
+import { isPwaStandalone } from '../utils/pwa';
 import { 
   checkNotificationSupport, 
   requestNotificationPermission, 
@@ -34,6 +36,7 @@ interface FleetMenuDrawerProps {
   onOpenAdjustFuel: () => void;
   onOpenServicePdf: () => void;
   onOpenAiChat: (prompt?: string) => void;
+  onOpenInstallPwa?: () => void;
 }
 
 export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
@@ -48,6 +51,7 @@ export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
   onOpenAdjustFuel,
   onOpenServicePdf,
   onOpenAiChat,
+  onOpenInstallPwa,
 }) => {
   // Swipe to dismiss gestures
   const [dragY, setDragY] = useState(0);
@@ -302,6 +306,40 @@ export const FleetMenuDrawer: React.FC<FleetMenuDrawerProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* ======================================================== */}
+            {/* GROUP PWA: PASANG APLIKASI (JIKA BELUM PWA STANDALONE)  */}
+            {/* ======================================================== */}
+            {!isPwaStandalone() && onOpenInstallPwa && (
+              <div 
+                onClick={() => {
+                  triggerHaptic('medium');
+                  onClose();
+                  onOpenInstallPwa();
+                }}
+                className="p-3.5 rounded-3xl bg-gradient-to-r from-theme-accent/20 via-theme-accent/10 to-transparent border-2 border-theme-accent hover:border-theme-accent cursor-pointer transition flex items-center justify-between group active:scale-[0.99] shadow-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-2xl bg-theme-accent text-theme-accent-fg shadow-xs shrink-0">
+                    <Download className="w-5 h-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-black text-sm text-zinc-900 dark:text-zinc-100 group-hover:text-black dark:group-hover:text-white">
+                        Pasang Aplikasi FleetLog (PWA)
+                      </h4>
+                      <span className="px-1.5 py-0.2 rounded bg-theme-accent text-theme-accent-fg font-black text-[9px] uppercase">
+                        Rekomendasi
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                      Dapatkan notifikasi sistem resmi berlogo FleetLog & akses offline instan di layar utama
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-theme-accent group-hover:translate-x-0.5 transition-transform shrink-0" />
+              </div>
+            )}
 
             {/* ======================================================== */}
             {/* GROUP 2: WEB PUSH NOTIFICATION (FITUR #5)               */}

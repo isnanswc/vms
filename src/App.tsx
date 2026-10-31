@@ -37,6 +37,8 @@ import { ThemeAccentModal } from './components/ThemeAccentModal';
 import { TripLogModal } from './components/TripLogModal';
 import { PredictiveBudgetModal } from './components/PredictiveBudgetModal';
 import { FleetMenuDrawer } from './components/FleetMenuDrawer';
+import { InstallPwaModal } from './components/InstallPwaModal';
+import { InstallPwaBanner } from './components/InstallPwaBanner';
 import { executeThemeTransition } from './utils/themeTransition';
 import { getSavedAccent, applyAccentToDocument, type AccentColorId } from './utils/themeAccent';
 
@@ -128,6 +130,7 @@ export function App() {
   const [isFleetMenuOpen, setIsFleetMenuOpen] = useState(false);
   const [isTripLogOpen, setIsTripLogOpen] = useState(false);
   const [isPredictiveBudgetOpen, setIsPredictiveBudgetOpen] = useState(false);
+  const [isInstallPwaOpen, setIsInstallPwaOpen] = useState(false);
 
   const handleUpdateSparePart = (updatedPart: SparePart) => {
     const nextParts = spareParts.map((p) => (p.id === updatedPart.id ? updatedPart : p));
@@ -717,6 +720,7 @@ export function App() {
         onOpenAdjustFuel={() => handleOpenAdjustFuel(undefined)}
         onOpenServicePdf={() => setIsPdfModalOpen(true)}
         onOpenAiChat={handleOpenAiChatWithPrompt}
+        onOpenInstallPwa={() => setIsInstallPwaOpen(true)}
       />
 
       <TripLogModal
@@ -739,6 +743,17 @@ export function App() {
         serviceRecords={serviceRecords}
         fuelLogs={fuelLogs}
         defaultVehicleId={selectedVehicleIdForDetail || undefined}
+      />
+
+      {/* Floating Interactive PWA Install Prompt Banner */}
+      <InstallPwaBanner
+        onOpenDetailedModal={() => setIsInstallPwaOpen(true)}
+      />
+
+      {/* Comprehensive PWA Benefits & Install Guide Modal */}
+      <InstallPwaModal
+        isOpen={isInstallPwaOpen}
+        onClose={() => setIsInstallPwaOpen(false)}
       />
     </div>
   );
