@@ -296,9 +296,15 @@ export const FuelView: React.FC<FuelViewProps> = ({
                           </div>
 
                           <div className="text-right">
-                            <div className="font-mono font-black text-base text-zinc-950 dark:text-zinc-100">
-                              Rp {log.totalCost.toLocaleString('id-ID')}
-                            </div>
+                            {log.isInitialCalibration ? (
+                              <span className="inline-block px-2.5 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold text-[10px] uppercase border border-amber-300 dark:border-amber-700">
+                                Kalibrasi Awal
+                              </span>
+                            ) : (
+                              <div className="font-mono font-black text-base text-zinc-950 dark:text-zinc-100">
+                                Rp {log.totalCost.toLocaleString('id-ID')}
+                              </div>
+                            )}
                             <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono mt-0.5">
                               {log.liters} {log.fuelType === 'Listrik' ? 'kWh' : 'L'} • <span className="font-bold text-zinc-800 dark:text-zinc-200">{log.fuelType}</span>
                             </div>

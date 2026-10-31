@@ -551,9 +551,15 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   </div>
 
                   <div className="text-right">
-                    <span className="font-mono font-black text-base text-zinc-950 block">
-                      Rp {log.totalCost.toLocaleString('id-ID')}
-                    </span>
+                    {log.isInitialCalibration ? (
+                      <span className="inline-block px-2.5 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold text-[10px] uppercase border border-amber-300 dark:border-amber-700">
+                        Kalibrasi Awal
+                      </span>
+                    ) : (
+                      <span className="font-mono font-black text-base text-zinc-950 block">
+                        Rp {log.totalCost.toLocaleString('id-ID')}
+                      </span>
+                    )}
                     <span className="text-xs text-zinc-500 font-mono">{log.liters} Liter</span>
                   </div>
                 </div>

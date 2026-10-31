@@ -116,9 +116,16 @@ export function App() {
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
   // Handlers for Add Operations
-  const handleSaveNewVehicleAndParts = (newVeh: Vehicle, newParts: SparePart[]) => {
+  const handleSaveNewVehicleAndParts = (
+    newVeh: Vehicle, 
+    newParts: SparePart[], 
+    initialFuelLog?: FuelLog
+  ) => {
     setVehicles([newVeh, ...vehicles]);
     setSpareParts([...newParts, ...spareParts]);
+    if (initialFuelLog) {
+      setFuelLogs([initialFuelLog, ...fuelLogs]);
+    }
     setIsAddingVehiclePage(false);
     setSelectedVehicleIdForDetail(newVeh.id);
   };

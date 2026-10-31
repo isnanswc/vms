@@ -68,7 +68,9 @@ export const LiquidFuelCard: React.FC<LiquidFuelCardProps> = ({
   let recommendedRefillOdometerKm = 0;
 
   if (hasFuelData && lastFuelLog) {
-    if (lastFuelLog.fullTank) {
+    if (lastFuelLog.totalLitersAfterFill !== undefined && lastFuelLog.totalLitersAfterFill > 0) {
+      startingLiters = Math.min(capacity, lastFuelLog.totalLitersAfterFill);
+    } else if (lastFuelLog.fullTank) {
       startingLiters = capacity;
     } else {
       // If not full tank, starting liters was the recorded liters filled
@@ -353,11 +355,20 @@ export const LiquidFuelCard: React.FC<LiquidFuelCardProps> = ({
                     KM {lastFuelLog.odometerKm.toLocaleString('id-ID')}
                   </span>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                    {lastFuelLog.stationName || 'SPBU'} • +{lastFuelLog.liters} L (Rp {lastFuelLog.totalCost.toLocaleString('id-ID')})
+                    {lastFuelLog.isInitialCalibration ? (
+                      <>
+                        <span className="font-bold text-amber-600 dark:text-amber-400">Kalibrasi Awal</span>
+                        {' '}• {lastFuelLog.liters} {isElectric ? 'kWh' : 'L'} tercatat saat registrasi
+                      </>
+                    ) : (
+                      <>
+                        {lastFuelLog.stationName || 'SPBU'} • +{lastFuelLog.liters} {isElectric ? 'kWh' : 'L'} (Rp {lastFuelLog.totalCost.toLocaleString('id-ID')})
+                      </>
+                    )}
                   </p>
                 </div>
                 <div className="text-xs font-bold text-theme-accent">
-                  {lastFuelLog.fullTank ? '✓ Full Tank' : 'Sebagian'}
+                  {lastFuelLog.isInitialCalibration ? '✓ Terkalibrasi' : lastFuelLog.fullTank ? '✓ Full Tank' : 'Sebagian'}
                 </div>
               </div>
             ) : (

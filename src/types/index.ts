@@ -51,6 +51,9 @@ export interface FuelLog {
   };
   efficiencyKmPerLiter?: number;
   fullTank: boolean;
+  remainingLitersBeforeFill?: number; // Sisa bensin sebelum diisi (misal: 1.0 L)
+  totalLitersAfterFill?: number; // Total bensin dalam tangki setelah pengisian (misal: 1.0 + 2.0 = 3.0 L)
+  isInitialCalibration?: boolean; // Penanda apakah log ini adalah kalibrasi awal saat registrasi kendaraan
 }
 
 export interface SparePart {

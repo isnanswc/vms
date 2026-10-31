@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Vehicle, VehicleCategory, FuelType, SparePart } from '../types';
+import type { Vehicle, VehicleCategory, FuelType, SparePart, FuelLog } from '../types';
 import type { AiSettings } from '../types/chat';
 import { 
   ChevronLeft, 
@@ -13,9 +13,12 @@ import {
   CheckCircle2,
   RefreshCw,
   Cpu,
-  Layers
+  Layers,
+  Fuel,
+  Sliders
 } from 'lucide-react';
 import { analyzeVehicleWithAI } from '../utils/geminiApi';
+import { triggerHaptic } from '../utils/haptics';
 
 interface PresetVehicleSpec {
   name: string;
@@ -402,9 +405,19 @@ const EXTENDED_VEHICLE_CATALOG: Record<string, PresetVehicleSpec[]> = {
 
 interface AddVehiclePageViewProps {
   onBack: () => void;
-  onSaveVehicle: (newVehicle: Vehicle, initialParts: SparePart[]) => void;
+  onSaveVehicle: (newVehicle: Vehicle, initialParts: SparePart[], initialFuelLog?: FuelLog) => void;
   aiSettings?: AiSettings;
 }
+
+interface FormPartItem {
+  id: string;
+  name: string;
+  intervalKm: number;
+  costEstimate: number;
+  conditionPct: number;
+}
+
+type InitialFuelPreset = 'none' | 'reserve' | 'quarter' | 'half' | 'three_quarter' | 'full' | 'custom';
 
 export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
   onBack,
@@ -428,8 +441,16 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
   const [tankCapacityLiters, setTankCapacityLiters] = useState(5.0);
   const [maxCargoWeightKg, setMaxCargoWeightKg] = useState<number | undefined>(150);
   const [currentOdometerKm, setCurrentOdometerKm] = useState(15000);
-  const [stnkExpiryDate, setStnkExpiryDate] = useState('2027-10-21');
-  const [stnkFiveYearExpiryDate, setStnkFiveYearExpiryDate] = useState('2030-10-21');
+  const [stnkExpiryDate, setStnkExpiryDate] = useState(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().split('T')[0];
+  });
+  const [stnkFiveYearExpiryDate, setStnkFiveYearExpiryDate] = useState(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 5);
+    return d.toISOString().split('T')[0];
+  });
   const [stnkTaxCostAnnual, setStnkTaxCostAnnual] = useState(300000);
   const [stnkTaxCostFiveYear, setStnkTaxCostFiveYear] = useState(550000);
   const [stnkNumber, setStnkNumber] = useState('');
@@ -437,13 +458,39 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
   const [engineNumber, setEngineNumber] = useState('');
   const [notes, setNotes] = useState('');
 
+  // Initial Fuel calibration state
+  const [initialFuelPreset, setInitialFuelPreset] = useState<InitialFuelPreset>('half');
+  const [initialFuelLiters, setInitialFuelLiters] = useState<number>(2.5);
+
   // Editable parts mapped by AI
-  const [parts, setParts] = useState<{
-    id: string;
-    name: string;
-    intervalKm: number;
-    costEstimate: number;
-  }[]>([]);
+  const [parts, setParts] = useState<FormPartItem[]>([]);
+
+  const updateFuelByPreset = (preset: InitialFuelPreset, cap: number, customVal?: number) => {
+    setInitialFuelPreset(preset);
+    const safeCap = cap > 0 ? cap : 5;
+    if (preset === 'none') {
+      setInitialFuelLiters(0);
+    } else if (preset === 'reserve') {
+      setInitialFuelLiters(Number((safeCap * 0.15).toFixed(1)));
+    } else if (preset === 'quarter') {
+      setInitialFuelLiters(Number((safeCap * 0.25).toFixed(1)));
+    } else if (preset === 'half') {
+      setInitialFuelLiters(Number((safeCap * 0.50).toFixed(1)));
+    } else if (preset === 'three_quarter') {
+      setInitialFuelLiters(Number((safeCap * 0.75).toFixed(1)));
+    } else if (preset === 'full') {
+      setInitialFuelLiters(Number(safeCap.toFixed(1)));
+    } else if (preset === 'custom' && customVal !== undefined) {
+      setInitialFuelLiters(customVal);
+    }
+  };
+
+  const handleTankCapacityChange = (newCap: number) => {
+    setTankCapacityLiters(newCap);
+    if (initialFuelPreset !== 'custom' && initialFuelPreset !== 'none') {
+      updateFuelByPreset(initialFuelPreset, newCap);
+    }
+  };
 
   // Algorithmic heuristic generator for any vehicle not in catalog
   const generateDynamicHeuristicSpec = (q: string): PresetVehicleSpec => {
@@ -653,20 +700,33 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
     if (spec.stnkTaxCostAnnual) setStnkTaxCostAnnual(spec.stnkTaxCostAnnual);
     if (spec.stnkTaxCostFiveYear) setStnkTaxCostFiveYear(spec.stnkTaxCostFiveYear);
 
-    // Map AI default parts
+    // Update fuel with current preset against new capacity
+    updateFuelByPreset(initialFuelPreset, spec.tankCapacityLiters);
+
+    // Map AI default parts with 100% initial condition
     setParts(
       spec.defaultParts.map((p, idx) => ({
         id: `p-${idx}-${Date.now()}`,
         name: p.name,
         intervalKm: p.intervalKm,
         costEstimate: p.costEstimate,
+        conditionPct: 100,
       }))
     );
 
     setHasSelectedModel(true);
   };
 
-  // Parts management by user
+  // Parts condition & management
+  const handleSetAllPartsCondition = (pct: number) => {
+    triggerHaptic('light');
+    setParts(parts.map((p) => ({ ...p, conditionPct: pct })));
+  };
+
+  const handleUpdatePartCondition = (id: string, conditionPct: number) => {
+    setParts(parts.map((p) => (p.id === id ? { ...p, conditionPct } : p)));
+  };
+
   const handleDeletePart = (id: string) => {
     setParts(parts.filter((p) => p.id !== id));
   };
@@ -683,9 +743,14 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
         name: 'Komponen Suku Cadang Tambahan',
         intervalKm: 5000,
         costEstimate: 100000,
+        conditionPct: 100,
       },
     ]);
   };
+
+  const averageHealth = parts.length > 0
+    ? Math.round(parts.reduce((sum, p) => sum + (p.conditionPct ?? 100), 0) / parts.length)
+    : 100;
 
   // Submit and save
   const handleFinalSave = (e: React.FormEvent) => {
@@ -696,6 +761,7 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
     }
 
     const vehicleId = `veh-${Date.now()}`;
+    const calculatedHealthScore = parts.length > 0 ? averageHealth : 100;
 
     const newVehicle: Vehicle = {
       id: vehicleId,
@@ -707,7 +773,7 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
       tankCapacityLiters: Number(tankCapacityLiters),
       maxCargoWeightKg: maxCargoWeightKg ? Number(maxCargoWeightKg) : undefined,
       currentOdometerKm: Number(currentOdometerKm),
-      healthScore: 100,
+      healthScore: calculatedHealthScore,
       stnkNumber: stnkNumber || undefined,
       chassisNumber: chassisNumber || undefined,
       engineNumber: engineNumber || undefined,
@@ -718,18 +784,45 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
       notes,
     };
 
-    const initialParts: SparePart[] = parts.map((p) => ({
-      id: `sp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      vehicleId,
-      name: p.name,
-      recommendedIntervalKm: Number(p.intervalKm),
-      lastReplacedOdometerKm: Number(currentOdometerKm),
-      estimatedLifeRemainingPct: 100,
-      status: 'optimal',
-      replacementCostEstimate: Number(p.costEstimate),
-    }));
+    const initialParts: SparePart[] = parts.map((p) => {
+      const pct = Math.max(0, Math.min(100, p.conditionPct ?? 100));
+      const usedKm = Math.round(p.intervalKm * (1 - pct / 100));
+      const lastKm = Math.max(0, Number(currentOdometerKm) - usedKm);
+      const status: 'optimal' | 'warning' | 'critical' = 
+        pct <= 20 ? 'critical' : pct <= 40 ? 'warning' : 'optimal';
 
-    onSaveVehicle(newVehicle, initialParts);
+      return {
+        id: `sp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        vehicleId,
+        name: p.name,
+        recommendedIntervalKm: Number(p.intervalKm),
+        lastReplacedOdometerKm: lastKm,
+        estimatedLifeRemainingPct: pct,
+        status,
+        replacementCostEstimate: Number(p.costEstimate),
+      };
+    });
+
+    let initialFuelLog: FuelLog | undefined;
+    if (initialFuelLiters > 0) {
+      initialFuelLog = {
+        id: `fl-init-${Date.now()}`,
+        vehicleId,
+        date: new Date().toISOString().split('T')[0],
+        fuelType,
+        liters: initialFuelLiters,
+        remainingLitersBeforeFill: 0,
+        totalLitersAfterFill: initialFuelLiters,
+        totalCost: 0,
+        odometerKm: Number(currentOdometerKm),
+        stationName: 'Kalibrasi Awal Garasi',
+        efficiencyKmPerLiter: undefined,
+        fullTank: initialFuelPreset === 'full' || initialFuelLiters >= Number(tankCapacityLiters),
+        isInitialCalibration: true,
+      };
+    }
+
+    onSaveVehicle(newVehicle, initialParts, initialFuelLog);
   };
 
   return (
@@ -924,258 +1017,552 @@ export const AddVehiclePageView: React.FC<AddVehiclePageViewProps> = ({
 
           {/* Form Fields: 2 Columns on Desktop */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Section 1: Data Identitas & STNK (6 Cols) */}
-            <div className="lg:col-span-6 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
-              <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                <Layers className="w-4 h-4 text-yellow-500" />
-                <span>1. Identitas Kendaraan & Legalitas</span>
-              </h4>
+            {/* LEFT COLUMN: Data Identitas & Kalibrasi BBM (6 Cols) */}
+            <div className="lg:col-span-6 space-y-6">
+              {/* Section 1: Data Identitas & STNK */}
+              <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
+                <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <Layers className="w-4 h-4 text-yellow-500" />
+                  <span>1. Identitas Kendaraan & Legalitas</span>
+                </h4>
 
-              <div className="space-y-3 text-xs">
-                {/* Nama Model */}
-                <div>
-                  <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nama / Merk Kendaraan</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    required
-                  />
-                </div>
-
-                {/* Plat Nomor & Tahun */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-3 text-xs">
+                  {/* Nama Model */}
                   <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Polisi (Plat)</label>
+                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nama / Merk Kendaraan</label>
                     <input
                       type="text"
-                      placeholder="B 1234 XYZ"
-                      value={plateNumber}
-                      onChange={(e) => setPlateNumber(e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-black focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Tahun Perakitan</label>
-                    <input
-                      type="number"
-                      value={year}
-                      onChange={(e) => setYear(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Kategori & BBM */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Kategori Kendaraan</label>
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value as any)}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    >
-                      <option value="motor">Sepeda Motor</option>
-                      <option value="mobil">Mobil Penumpang / Niaga</option>
-                      <option value="truk">Truk / Kendaraan Berat</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jenis Bahan Bakar</label>
-                    <select
-                      value={fuelType}
-                      onChange={(e) => setFuelType(e.target.value as any)}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    >
-                      <option value="Pertalite">Pertalite</option>
-                      <option value="Pertamax">Pertamax</option>
-                      <option value="Pertamax Turbo">Pertamax Turbo</option>
-                      <option value="Solar">Solar</option>
-                      <option value="Bio Solar">Bio Solar</option>
-                      <option value="Dexlite">Dexlite</option>
-                      <option value="Listrik">Listrik (EV)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Odometer Saat Ini & Kapasitas Tangki */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Odometer Terkini (KM)</label>
-                    <input
-                      type="number"
-                      value={currentOdometerKm}
-                      onChange={(e) => setCurrentOdometerKm(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Kapasitas Tangki (Liter)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={tankCapacityLiters}
-                      onChange={(e) => setTankCapacityLiters(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                      required
+
+                  {/* Plat Nomor & Tahun */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Polisi (Plat)</label>
+                      <input
+                        type="text"
+                        placeholder="B 1234 XYZ"
+                        value={plateNumber}
+                        onChange={(e) => setPlateNumber(e.target.value.toUpperCase())}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-black focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Tahun Perakitan</label>
+                      <input
+                        type="number"
+                        value={year}
+                        onChange={(e) => setYear(Number(e.target.value))}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Kategori & BBM */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Kategori Kendaraan</label>
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value as any)}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      >
+                        <option value="motor">Sepeda Motor</option>
+                        <option value="mobil">Mobil Penumpang / Niaga</option>
+                        <option value="truk">Truk / Kendaraan Berat</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jenis Bahan Bakar</label>
+                      <select
+                        value={fuelType}
+                        onChange={(e) => setFuelType(e.target.value as any)}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      >
+                        <option value="Pertalite">Pertalite</option>
+                        <option value="Pertamax">Pertamax</option>
+                        <option value="Pertamax Turbo">Pertamax Turbo</option>
+                        <option value="Solar">Solar</option>
+                        <option value="Bio Solar">Bio Solar</option>
+                        <option value="Dexlite">Dexlite</option>
+                        <option value="Listrik">Listrik (EV)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Odometer Saat Ini & Kapasitas Tangki */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Odometer Terkini (KM)</label>
+                      <input
+                        type="number"
+                        value={currentOdometerKm}
+                        onChange={(e) => setCurrentOdometerKm(Number(e.target.value))}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Kapasitas Tangki (Liter)</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={tankCapacityLiters}
+                        onChange={(e) => handleTankCapacityChange(Number(e.target.value))}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Legalitas Pajak STNK */}
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jatuh Tempo Pajak Tahunan (PKB)</label>
+                      <input
+                        type="date"
+                        value={stnkExpiryDate}
+                        onChange={(e) => setStnkExpiryDate(e.target.value)}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jatuh Tempo Plat 5 Tahun (Kaleng)</label>
+                      <input
+                        type="date"
+                        value={stnkFiveYearExpiryDate}
+                        onChange={(e) => setStnkFiveYearExpiryDate(e.target.value)}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Estimasi Biaya Pajak Tahunan (Rp)</label>
+                      <input
+                        type="number"
+                        value={stnkTaxCostAnnual}
+                        onChange={(e) => setStnkTaxCostAnnual(Number(e.target.value))}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Biaya Plat 5 Tahun (Rp)</label>
+                      <input
+                        type="number"
+                        value={stnkTaxCostFiveYear}
+                        onChange={(e) => setStnkTaxCostFiveYear(Number(e.target.value))}
+                        className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* No STNK, Rangka & Mesin (Opsional) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Seri STNK</label>
+                      <input
+                        type="text"
+                        placeholder="08392104-JKT"
+                        value={stnkNumber}
+                        onChange={(e) => setStnkNumber(e.target.value)}
+                        className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Rangka / VIN</label>
+                      <input
+                        type="text"
+                        placeholder="MH1JF31..."
+                        value={chassisNumber}
+                        onChange={(e) => setChassisNumber(e.target.value.toUpperCase())}
+                        className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Mesin</label>
+                      <input
+                        type="text"
+                        placeholder="JF31E-10..."
+                        value={engineNumber}
+                        onChange={(e) => setEngineNumber(e.target.value.toUpperCase())}
+                        className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Kalibrasi Level Bahan Bakar Awal */}
+              <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                      <Fuel className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                        2. Kalibrasi Sisa Bahan Bakar Saat Ini
+                      </h4>
+                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                        Berapa perkiraan sisa bensin di tangki kendaraan sekarang?
+                      </p>
+                    </div>
+                  </div>
+
+                  {initialFuelLiters > 0 && (
+                    <span className="px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-mono font-black text-xs border border-amber-200 dark:border-amber-800 shrink-0">
+                      {initialFuelLiters} / {tankCapacityLiters} {fuelType === 'Listrik' ? 'kWh' : 'L'} ({Math.round((initialFuelLiters / (tankCapacityLiters || 1)) * 100)}%)
+                    </span>
+                  )}
+                </div>
+
+                {/* Visual Level Bar */}
+                <div className="space-y-1.5 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60">
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="font-bold text-zinc-600 dark:text-zinc-400">Indikator Level Tangki</span>
+                    <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                      {initialFuelPreset === 'none' ? 'Belum Terdata (0%)' : `${Math.round((initialFuelLiters / (tankCapacityLiters || 1)) * 100)}% Penuh`}
+                    </span>
+                  </div>
+                  <div className="w-full h-3.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden p-0.5">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        initialFuelPreset === 'none'
+                          ? 'w-0 bg-transparent'
+                          : initialFuelLiters / (tankCapacityLiters || 1) <= 0.2
+                            ? 'bg-rose-500 shadow-xs'
+                            : initialFuelLiters / (tankCapacityLiters || 1) <= 0.45
+                              ? 'bg-amber-500 shadow-xs'
+                              : 'bg-emerald-500 shadow-xs'
+                      }`}
+                      style={{ width: `${Math.min(100, Math.max(initialFuelPreset === 'none' ? 0 : 5, (initialFuelLiters / (tankCapacityLiters || 1)) * 100))}%` }}
                     />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-zinc-400 font-mono pt-0.5">
+                    <span>E (0%)</span>
+                    <span>1/4 (25%)</span>
+                    <span>1/2 (50%)</span>
+                    <span>3/4 (75%)</span>
+                    <span>F (100%)</span>
                   </div>
                 </div>
 
-                {/* Legalitas Pajak STNK */}
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jatuh Tempo Pajak Tahunan (PKB)</label>
-                    <input
-                      type="date"
-                      value={stnkExpiryDate}
-                      onChange={(e) => setStnkExpiryDate(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Jatuh Tempo Plat 5 Tahun (Kaleng)</label>
-                    <input
-                      type="date"
-                      value={stnkFiveYearExpiryDate}
-                      onChange={(e) => setStnkFiveYearExpiryDate(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                      required
-                    />
-                  </div>
+                {/* Preset Buttons */}
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      updateFuelByPreset('none', tankCapacityLiters);
+                    }}
+                    className={`p-2 rounded-xl text-center border-2 transition text-[11px] font-bold cursor-pointer ${
+                      initialFuelPreset === 'none'
+                        ? 'bg-zinc-900 text-white dark:bg-yellow-400 dark:text-zinc-950 border-zinc-900 dark:border-yellow-400 shadow-xs'
+                        : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+                    }`}
+                  >
+                    <span className="block text-xs">Kosong</span>
+                    <span className="text-[10px] opacity-75 font-mono">0% (0L)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      updateFuelByPreset('reserve', tankCapacityLiters);
+                    }}
+                    className={`p-2 rounded-xl text-center border-2 transition text-[11px] font-bold cursor-pointer ${
+                      initialFuelPreset === 'reserve'
+                        ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                        : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-rose-400'
+                    }`}
+                  >
+                    <span className="block text-xs">Kedip / E</span>
+                    <span className="text-[10px] opacity-75 font-mono">~15%</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      updateFuelByPreset('quarter', tankCapacityLiters);
+                    }}
+                    className={`p-2 rounded-xl text-center border-2 transition text-[11px] font-bold cursor-pointer ${
+                      initialFuelPreset === 'quarter'
+                        ? 'bg-zinc-900 text-white dark:bg-yellow-400 dark:text-zinc-950 border-zinc-900 dark:border-yellow-400 shadow-xs'
+                        : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+                    }`}
+                  >
+                    <span className="block text-xs">1/4 Bar</span>
+                    <span className="text-[10px] opacity-75 font-mono">25%</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      updateFuelByPreset('half', tankCapacityLiters);
+                    }}
+                    className={`p-2 rounded-xl text-center border-2 transition text-[11px] font-bold cursor-pointer ${
+                      initialFuelPreset === 'half'
+                        ? 'bg-zinc-900 text-white dark:bg-yellow-400 dark:text-zinc-950 border-zinc-900 dark:border-yellow-400 shadow-xs'
+                        : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+                    }`}
+                  >
+                    <span className="block text-xs">1/2 Bar</span>
+                    <span className="text-[10px] opacity-75 font-mono">50%</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      updateFuelByPreset('three_quarter', tankCapacityLiters);
+                    }}
+                    className={`p-2 rounded-xl text-center border-2 transition text-[11px] font-bold cursor-pointer ${
+                      initialFuelPreset === 'three_quarter'
+                        ? 'bg-zinc-900 text-white dark:bg-yellow-400 dark:text-zinc-950 border-zinc-900 dark:border-yellow-400 shadow-xs'
+                        : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+                    }`}
+                  >
+                    <span className="block text-xs">3/4 Bar</span>
+                    <span className="text-[10px] opacity-75 font-mono">75%</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      updateFuelByPreset('full', tankCapacityLiters);
+                    }}
+                    className={`p-2 rounded-xl text-center border-2 transition text-[11px] font-bold cursor-pointer ${
+                      initialFuelPreset === 'full'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                        : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-emerald-400'
+                    }`}
+                  >
+                    <span className="block text-xs">Full</span>
+                    <span className="text-[10px] opacity-75 font-mono">100%</span>
+                  </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Estimasi Biaya Pajak Tahunan (Rp)</label>
-                    <input
-                      type="number"
-                      value={stnkTaxCostAnnual}
-                      onChange={(e) => setStnkTaxCostAnnual(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    />
+                {/* Custom Liter Input & Explanation */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+                  <div className="sm:w-1/2">
+                    <label className="block text-[11px] font-bold text-zinc-600 dark:text-zinc-400 mb-1">
+                      Atau Masukkan Angka Pas (Liter):
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max={tankCapacityLiters}
+                        value={initialFuelLiters || ''}
+                        onChange={(e) => {
+                          const val = Math.max(0, Math.min(tankCapacityLiters, Number(e.target.value) || 0));
+                          setInitialFuelPreset('custom');
+                          setInitialFuelLiters(val);
+                        }}
+                        placeholder="0.0"
+                        className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400 text-xs"
+                      />
+                      <span className="absolute right-3 top-2 text-xs font-mono font-bold text-zinc-400">
+                        {fuelType === 'Listrik' ? 'kWh' : 'Liter'}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Biaya Plat 5 Tahun (Rp)</label>
-                    <input
-                      type="number"
-                      value={stnkTaxCostFiveYear}
-                      onChange={(e) => setStnkTaxCostFiveYear(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    />
-                  </div>
-                </div>
-
-                {/* No STNK, Rangka & Mesin (Opsional) */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Seri STNK</label>
-                    <input
-                      type="text"
-                      placeholder="Contoh: 08392104-JKT"
-                      value={stnkNumber}
-                      onChange={(e) => setStnkNumber(e.target.value)}
-                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Rangka / VIN</label>
-                    <input
-                      type="text"
-                      placeholder="MH1JF31..."
-                      value={chassisNumber}
-                      onChange={(e) => setChassisNumber(e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Nomor Mesin</label>
-                    <input
-                      type="text"
-                      placeholder="JF31E-10..."
-                      value={engineNumber}
-                      onChange={(e) => setEngineNumber(e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                    />
+                  <div className="sm:w-1/2 text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed pt-1">
+                    {initialFuelLiters > 0 ? (
+                      <span>
+                        💡 Dashboard akan langsung menampilkan kartu bensin aktif dan gelombang cairan dengan level <strong>{initialFuelLiters} L</strong>.
+                      </span>
+                    ) : (
+                      <span>
+                        ℹ️ Jika dipilih 0, indikator bensin di Dashboard akan berstatus <em>Belum Terdata</em> sampai pengisian pertama di SPBU.
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Section 2: Pemetaan Sparepart Lengkap oleh AI (6 Cols) */}
+            {/* RIGHT COLUMN: Suku Cadang & Kalibrasi Kondisi Awal (6 Cols) */}
             <div className="lg:col-span-6 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 shadow-sm space-y-4 transition-colors">
-              <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 gap-2">
                 <div>
                   <h4 className="font-black text-xs uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                     <Wrench className="w-4 h-4 text-yellow-500" />
-                    <span>2. Suku Cadang Lengkap Hasil Analisa AI ({parts.length})</span>
+                    <span>3. Suku Cadang & Kalibrasi Kondisi ({parts.length})</span>
                   </h4>
                   <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                    Semua komponen ini dapat Anda ubah interval kilometer atau estimasi harganya.
+                    Tentukan kondisi keausan suku cadang sesuai riwayat pemakaian unit.
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleAddCustomPart}
-                  className="flex items-center gap-1 py-1.5 px-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-bold rounded-xl transition cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-100" />
-                  <span>+ Tambah Part</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <div className="px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold font-mono">
+                    Kesehatan: {averageHealth}%
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomPart}
+                    className="flex items-center gap-1 py-1.5 px-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-bold rounded-xl transition cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-100" />
+                    <span>+ Part</span>
+                  </button>
+                </div>
               </div>
 
-              {/* List Editable Parts */}
-              <div className="space-y-2.5 max-h-[560px] overflow-y-auto pr-1 no-scrollbar">
-                {parts.map((p) => (
-                  <div
-                    key={p.id}
-                    className="p-3 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-2xl space-y-2 text-xs hover:border-yellow-400 dark:hover:border-yellow-400 transition"
+              {/* Global Quick Action Buttons */}
+              <div className="p-2.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="font-bold text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
+                  <Sliders className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Atur Cepat Semua:</span>
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleSetAllPartsCondition(100)}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-300 font-bold text-[10px] border border-emerald-300 dark:border-emerald-800 cursor-pointer transition active:scale-95"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <input
-                        type="text"
-                        value={p.name}
-                        onChange={(e) => handleUpdatePart(p.id, 'name', e.target.value)}
-                        className="flex-1 font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleDeletePart(p.id)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
-                        title="Hapus komponen ini"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    🟢 Semua Baru (100%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSetAllPartsCondition(75)}
+                    className="px-2.5 py-1 rounded-lg bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-950/60 dark:hover:bg-yellow-900 text-yellow-800 dark:text-yellow-300 font-bold text-[10px] border border-yellow-300 dark:border-yellow-800 cursor-pointer transition active:scale-95"
+                  >
+                    🟡 Semua Baik (75%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSetAllPartsCondition(50)}
+                    className="px-2.5 py-1 rounded-lg bg-orange-100 hover:bg-orange-200 dark:bg-orange-950/60 dark:hover:bg-orange-900 text-orange-800 dark:text-orange-300 font-bold text-[10px] border border-orange-300 dark:border-orange-800 cursor-pointer transition active:scale-95"
+                  >
+                    🟠 Semua Sedang (50%)
+                  </button>
+                </div>
+              </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-[11px]">
-                      <div>
-                        <span className="text-zinc-500 dark:text-zinc-400 block mb-0.5">Interval Ganti (KM)</span>
+              {/* List Editable Parts with condition selectors */}
+              <div className="space-y-3 max-h-[640px] overflow-y-auto pr-1 no-scrollbar">
+                {parts.map((p) => {
+                  const cond = p.conditionPct ?? 100;
+                  const usedKm = Math.round(p.intervalKm * (1 - cond / 100));
+                  const remainingKm = Math.round(p.intervalKm * (cond / 100));
+                  const estimatedReplacedKm = Math.max(0, currentOdometerKm - usedKm);
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="p-3 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-2xl space-y-2.5 text-xs hover:border-yellow-400 dark:hover:border-yellow-400 transition"
+                    >
+                      <div className="flex items-center justify-between gap-2">
                         <input
-                          type="number"
-                          value={p.intervalKm}
-                          onChange={(e) => handleUpdatePart(p.id, 'intervalKm', Number(e.target.value))}
-                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                          type="text"
+                          value={p.name}
+                          onChange={(e) => handleUpdatePart(p.id, 'name', e.target.value)}
+                          className="flex-1 font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
                         />
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePart(p.id)}
+                          className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                          title="Hapus komponen ini"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <div>
-                        <span className="text-zinc-500 dark:text-zinc-400 block mb-0.5">Estimasi Biaya (Rp)</span>
-                        <input
-                          type="number"
-                          value={p.costEstimate}
-                          onChange={(e) => handleUpdatePart(p.id, 'costEstimate', Number(e.target.value))}
-                          className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
-                        />
+
+                      <div className="grid grid-cols-2 gap-2 text-[11px]">
+                        <div>
+                          <span className="text-zinc-500 dark:text-zinc-400 block mb-0.5">Interval Ganti (KM)</span>
+                          <input
+                            type="number"
+                            value={p.intervalKm}
+                            onChange={(e) => handleUpdatePart(p.id, 'intervalKm', Number(e.target.value))}
+                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-zinc-500 dark:text-zinc-400 block mb-0.5">Estimasi Biaya (Rp)</span>
+                          <input
+                            type="number"
+                            value={p.costEstimate}
+                            onChange={(e) => handleUpdatePart(p.id, 'costEstimate', Number(e.target.value))}
+                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 font-mono font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-900 dark:focus:border-yellow-400"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Part Initial Condition Selector */}
+                      <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-700/60 space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="font-bold text-zinc-600 dark:text-zinc-400">Kondisi Awal (Sisa Umur):</span>
+                          <span className={`font-mono font-bold px-2 py-0.5 rounded-md text-[10px] ${
+                            cond <= 20
+                              ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300'
+                              : cond <= 50
+                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                                : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                          }`}>
+                            {cond}% {cond === 100 ? 'Baru' : cond >= 75 ? 'Baik' : cond >= 50 ? 'Sedang' : 'Kritis'}
+                          </span>
+                        </div>
+
+                        {/* Condition presets buttons */}
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {[
+                            { label: '100% Baru', val: 100 },
+                            { label: '75% Baik', val: 75 },
+                            { label: '50% Sedang', val: 50 },
+                            { label: '20% Kritis', val: 20 },
+                          ].map((preset) => (
+                            <button
+                              key={preset.val}
+                              type="button"
+                              onClick={() => {
+                                triggerHaptic('light');
+                                handleUpdatePartCondition(p.id, preset.val);
+                              }}
+                              className={`py-1 px-1.5 rounded-lg text-center font-bold text-[10px] border transition cursor-pointer ${
+                                cond === preset.val
+                                  ? preset.val === 100
+                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                    : preset.val === 75
+                                      ? 'bg-yellow-500 text-zinc-950 border-yellow-500 shadow-xs'
+                                      : preset.val === 50
+                                        ? 'bg-orange-500 text-white border-orange-500 shadow-xs'
+                                        : 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                                  : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+                              }`}
+                            >
+                              {preset.label}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Informative Subtitle on wear calculation */}
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono pt-0.5">
+                          <span>Terakhir diganti: KM {estimatedReplacedKm.toLocaleString('id-ID')}</span>
+                          <span>Sisa: ±{remainingKm.toLocaleString('id-ID')} KM lagi</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
