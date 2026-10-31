@@ -10,7 +10,7 @@ import {
   DEFAULT_AI_SETTINGS 
 } from './data/mockChat';
 import { INITIAL_USER_PROFILE, type UserProfile } from './types/user';
-import type { Vehicle, FuelLog, SparePart, ServiceRecord, TaxPaymentRecord, TripLog } from './types';
+import type { Vehicle, FuelLog, SparePart, ServiceRecord, TaxPaymentRecord, TripLog, OdometerLog } from './types';
 import type { ChatSession, AiSettings } from './types/chat';
 import { loadInitialData, saveToStorage, loadFromIndexedDB } from './utils/storage';
 import { Header } from './components/Header';
@@ -34,7 +34,8 @@ import { DigitalServicePdfModal } from './components/DigitalServicePdfModal';
 import { NotificationModal } from './components/NotificationModal';
 import { getSystemNotifications, getReadNotificationIds, saveReadNotificationIds } from './utils/notifications';
 import { ThemeAccentModal } from './components/ThemeAccentModal';
-import { TripLogModal } from './components/TripLogModal';
+import { TripLogPageView } from './components/TripLogPageView';
+import { checkAndTriggerOdometerReminder } from './utils/odometerReminder';
 import { PredictiveBudgetModal } from './components/PredictiveBudgetModal';
 import { FleetMenuDrawer } from './components/FleetMenuDrawer';
 import { InstallPwaModal } from './components/InstallPwaModal';
@@ -47,6 +48,7 @@ export function App() {
   const [selectedVehicleIdForDetail, setSelectedVehicleIdForDetail] = useState<string | null>(null);
   const [isAddingVehiclePage, setIsAddingVehiclePage] = useState(false);
   const [isViewingProfile, setIsViewingProfile] = useState(false);
+  const [isTripLogPage, setIsTripLogPage] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [readNotificationIds, setReadNotificationIds] = useState<string[]>(() => getReadNotificationIds());
 
@@ -92,6 +94,7 @@ export function App() {
   // User Profile & Multi-SIM state
   const [userProfile, setUserProfile] = useState<UserProfile>(() => loadInitialData('userProfile', INITIAL_USER_PROFILE));
   const [tripLogs, setTripLogs] = useState<TripLog[]>(() => loadInitialData('tripLogs', []));
+  const [odometerLogs, setOdometerLogs] = useState<OdometerLog[]>(() => loadInitialData('odometerLogs', []));
 
   // Chat Data States
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => loadInitialData('chatSessions', INITIAL_CHAT_SESSIONS));
@@ -105,6 +108,7 @@ export function App() {
   useEffect(() => { saveToStorage('serviceRecords', serviceRecords); }, [serviceRecords]);
   useEffect(() => { saveToStorage('userProfile', userProfile); }, [userProfile]);
   useEffect(() => { saveToStorage('tripLogs', tripLogs); }, [tripLogs]);
+  useEffect(() => { saveToStorage('odometerLogs', odometerLogs); }, [odometerLogs]);
   useEffect(() => { saveToStorage('chatSessions', chatSessions); }, [chatSessions]);
   useEffect(() => { saveToStorage('aiSettings', aiSettings); }, [aiSettings]);
 
@@ -128,7 +132,6 @@ export function App() {
   const [isAdjustPartOpen, setIsAdjustPartOpen] = useState(false);
   const [selectedPartForAdjust, setSelectedPartForAdjust] = useState<SparePart | null>(null);
   const [isFleetMenuOpen, setIsFleetMenuOpen] = useState(false);
-  const [isTripLogOpen, setIsTripLogOpen] = useState(false);
   const [isPredictiveBudgetOpen, setIsPredictiveBudgetOpen] = useState(false);
   const [isInstallPwaOpen, setIsInstallPwaOpen] = useState(false);
 
@@ -231,6 +234,44 @@ export function App() {
   const handleDeleteTripLog = (tripId: string) => {
     setTripLogs(tripLogs.filter((t) => t.id !== tripId));
   };
+
+  // Handlers for Odometer Logging
+  const handleAddOdometerLog = (newLog: OdometerLog) => {
+    setOdometerLogs([newLog, ...odometerLogs]);
+    setVehicles(vehicles.map((v) => 
+      v.id === newLog.vehicleId && newLog.odometerKm > v.currentOdometerKm
+        ? { ...v, currentOdometerKm: newLog.odometerKm }
+        : v
+    ));
+  };
+
+  const handleDeleteOdometerLog = (logId: string) => {
+    setOdometerLogs(odometerLogs.filter((l) => l.id !== logId));
+  };
+
+  // Pengingat Harian Primetime Spedometer (18:00 - 21:00) 1x Sehari
+  useEffect(() => {
+    // Jalankan pengecekan saat startup
+    checkAndTriggerOdometerReminder(vehicles, odometerLogs, tripLogs, fuelLogs);
+
+    // Pengecekan berkala tiap 60 detik
+    const reminderInterval = setInterval(() => {
+      checkAndTriggerOdometerReminder(vehicles, odometerLogs, tripLogs, fuelLogs);
+    }, 60000);
+
+    // Pengecekan saat tab aktif kembali
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        checkAndTriggerOdometerReminder(vehicles, odometerLogs, tripLogs, fuelLogs);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      clearInterval(reminderInterval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [vehicles, odometerLogs, tripLogs, fuelLogs]);
 
   // Handler for adding tax payment
   const handleAddTaxPayment = (record: TaxPaymentRecord) => {
@@ -349,11 +390,13 @@ export function App() {
     vehicleId?: string | null;
     isAdding?: boolean;
     isProfile?: boolean;
+    isTripLog?: boolean;
   }) => {
     if (options.tab !== undefined) setActiveTab(options.tab);
     if (options.vehicleId !== undefined) setSelectedVehicleIdForDetail(options.vehicleId);
     if (options.isAdding !== undefined) setIsAddingVehiclePage(options.isAdding);
     if (options.isProfile !== undefined) setIsViewingProfile(options.isProfile);
+    if (options.isTripLog !== undefined) setIsTripLogPage(options.isTripLog);
 
     if (typeof window !== 'undefined') {
       window.history.pushState(
@@ -362,6 +405,7 @@ export function App() {
           vehicleId: options.vehicleId !== undefined ? options.vehicleId : selectedVehicleIdForDetail,
           isAdding: options.isAdding !== undefined ? options.isAdding : isAddingVehiclePage,
           isProfile: options.isProfile !== undefined ? options.isProfile : isViewingProfile,
+          isTripLog: options.isTripLog !== undefined ? options.isTripLog : isTripLogPage,
         },
         ''
       );
@@ -382,6 +426,10 @@ export function App() {
     }
     if (isAddingVehiclePage) {
       setIsAddingVehiclePage(false);
+      return;
+    }
+    if (isTripLogPage) {
+      setIsTripLogPage(false);
       return;
     }
     if (selectedVehicleIdForDetail) {
@@ -417,9 +465,11 @@ export function App() {
         setSelectedVehicleIdForDetail(state.vehicleId || null);
         setIsAddingVehiclePage(Boolean(state.isAdding));
         setIsViewingProfile(Boolean(state.isProfile));
+        setIsTripLogPage(Boolean(state.isTripLog));
       } else {
         setIsViewingProfile(false);
         setIsAddingVehiclePage(false);
+        setIsTripLogPage(false);
         setSelectedVehicleIdForDetail(null);
         setActiveTab('dashboard');
       }
@@ -473,7 +523,7 @@ export function App() {
           navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
         }}
         onOpenFleetMenu={() => setIsFleetMenuOpen(true)}
-        onOpenTripLog={() => setIsTripLogOpen(true)}
+        onOpenTripLog={() => navigateTo({ isTripLog: true, isProfile: false, isAdding: false, vehicleId: null })}
         onOpenPredictiveBudget={() => setIsPredictiveBudgetOpen(true)}
       />
 
@@ -508,6 +558,21 @@ export function App() {
               onBack={handleGoBack}
               onSaveVehicle={handleSaveNewVehicleAndParts}
               aiSettings={aiSettings}
+            />
+          ) : isTripLogPage ? (
+            /* VIEW E: TRIP LOGBOOK & SPEDOMETER FULL PAGE */
+            <TripLogPageView
+              vehicles={vehicles}
+              tripLogs={tripLogs}
+              fuelLogs={fuelLogs}
+              odometerLogs={odometerLogs}
+              onBack={handleGoBack}
+              onAddTrip={handleAddTripLog}
+              onToggleReimburse={handleToggleReimburse}
+              onDeleteTrip={handleDeleteTripLog}
+              onAddOdometerLog={handleAddOdometerLog}
+              onDeleteOdometerLog={handleDeleteOdometerLog}
+              initialVehicleId={selectedVehicleIdForDetail || undefined}
             />
           ) : selectedVehicleIdForDetail && currentDetailVehicle ? (
             /* VIEW C: VEHICLE DETAIL (INFO & PAJAK, BBM, SPAREPART) */
@@ -714,25 +779,13 @@ export function App() {
         onNavigateTab={(tab) => {
           navigateTo({ tab, isProfile: false, isAdding: false, vehicleId: null });
         }}
-        onOpenTripLog={() => setIsTripLogOpen(true)}
+        onOpenTripLog={() => navigateTo({ isTripLog: true, isProfile: false, isAdding: false, vehicleId: null })}
         onOpenPredictiveBudget={() => setIsPredictiveBudgetOpen(true)}
         onOpenScanReceipt={() => setIsScanModalOpen(true)}
         onOpenAdjustFuel={() => handleOpenAdjustFuel(undefined)}
         onOpenServicePdf={() => setIsPdfModalOpen(true)}
         onOpenAiChat={handleOpenAiChatWithPrompt}
         onOpenInstallPwa={() => setIsInstallPwaOpen(true)}
-      />
-
-      <TripLogModal
-        isOpen={isTripLogOpen}
-        onClose={() => setIsTripLogOpen(false)}
-        vehicles={vehicles}
-        tripLogs={tripLogs}
-        fuelLogs={fuelLogs}
-        onAddTrip={handleAddTripLog}
-        onToggleReimburse={handleToggleReimburse}
-        onDeleteTrip={handleDeleteTripLog}
-        defaultVehicleId={selectedVehicleIdForDetail || undefined}
       />
 
       <PredictiveBudgetModal

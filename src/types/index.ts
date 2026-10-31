@@ -120,3 +120,14 @@ export interface TripLog {
   notes?: string;
   isReimbursed?: boolean;
 }
+
+export interface OdometerLog {
+  id: string;
+  vehicleId: string;
+  date: string; // YYYY-MM-DD
+  odometerKm: number;
+  source: 'manual' | 'ai_scan' | 'trip' | 'fuel';
+  photoUrl?: string;
+  notes?: string;
+  createdAt: string;
+}
