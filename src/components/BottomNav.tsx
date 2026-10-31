@@ -3,7 +3,7 @@ import {
   LayoutDashboard, 
   CarFront, 
   Fuel, 
-  Wrench, 
+  LayoutGrid, 
   MessageSquarePlus, 
   Camera, 
   Sliders, 
@@ -19,6 +19,8 @@ interface BottomNavProps {
   activeTab: TabType;
   onChangeTab: (tab: TabType) => void;
   serviceBadgeCount?: number;
+  onOpenFleetMenu?: () => void;
+  isFleetMenuOpen?: boolean;
   onOpenQuickScan?: () => void;
   onOpenAiSettings?: () => void;
   onNewChat?: () => void;
@@ -29,6 +31,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   activeTab,
   onChangeTab,
   serviceBadgeCount = 0,
+  onOpenFleetMenu,
+  isFleetMenuOpen = false,
   onOpenQuickScan,
   onOpenAiSettings,
   onNewChat,
@@ -44,7 +48,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     { id: 'vehicles', label: 'Kendaraan', icon: CarFront },
     { id: 'chat', label: 'Fleet AI', icon: () => null }, // Special center circular frame
     { id: 'fuel', label: 'Bahan Bakar', icon: Fuel },
-    { id: 'service', label: 'Buku Servis', icon: Wrench },
+    { id: 'service', label: 'Menu', icon: LayoutGrid },
   ];
 
   // Clean up timers on unmount
@@ -221,7 +225,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         <div className="max-w-md mx-auto grid grid-cols-5 px-1 py-1 relative items-center">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isMenuService = item.id === 'service';
+            const isActive = isMenuService ? (isFleetMenuOpen || activeTab === 'service') : activeTab === item.id;
             const isChatCenter = item.id === 'chat';
 
             /* ======================================================== */
@@ -276,7 +281,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 key={item.id}
                 onClick={() => {
                   triggerHaptic('selection');
-                  onChangeTab(item.id);
+                  if (item.id === 'service') {
+                    onOpenFleetMenu?.();
+                  } else {
+                    onChangeTab(item.id);
+                  }
                 }}
                 className={`relative flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 cursor-pointer group ${
                   isActive

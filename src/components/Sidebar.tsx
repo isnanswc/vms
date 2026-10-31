@@ -10,7 +10,10 @@ import {
   MessageSquare, 
   Sparkles,
   CreditCard,
-  ChevronRight
+  ChevronRight,
+  Navigation,
+  PiggyBank,
+  LayoutGrid
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -19,6 +22,9 @@ interface SidebarProps {
   serviceBadgeCount?: number;
   profile: UserProfile;
   onOpenProfile: () => void;
+  onOpenFleetMenu?: () => void;
+  onOpenTripLog?: () => void;
+  onOpenPredictiveBudget?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -27,6 +33,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   serviceBadgeCount = 0,
   profile,
   onOpenProfile,
+  onOpenFleetMenu,
+  onOpenTripLog,
+  onOpenPredictiveBudget,
 }) => {
   const navItems: { id: TabType; label: string; icon: React.FC<{ className?: string }>; badge?: number }[] = [
     { id: 'dashboard', label: 'Dashboard Beranda', icon: LayoutDashboard },
@@ -128,6 +137,66 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+
+        {/* Layanan Tambahan & Hub Utilitas */}
+        <div className="pt-2">
+          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 px-3 py-1 block">
+            Layanan Pintar
+          </span>
+          <div className="space-y-1">
+            {onOpenTripLog && (
+              <button
+                type="button"
+                onClick={onOpenTripLog}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition font-bold text-xs cursor-pointer group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
+                    <Navigation className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs">Logbook Perjalanan</span>
+                </div>
+                <span className="text-[9px] bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-300 font-bold px-1.5 py-0.5 rounded">
+                  Trip
+                </span>
+              </button>
+            )}
+
+            {onOpenPredictiveBudget && (
+              <button
+                type="button"
+                onClick={onOpenPredictiveBudget}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition font-bold text-xs cursor-pointer group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
+                    <PiggyBank className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs">Prediksi Anggaran</span>
+                </div>
+                <span className="text-[9px] bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 font-bold px-1.5 py-0.5 rounded">
+                  Dana
+                </span>
+              </button>
+            )}
+
+            {onOpenFleetMenu && (
+              <button
+                type="button"
+                onClick={onOpenFleetMenu}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition font-bold text-xs cursor-pointer group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs">Pusat Layanan Hub</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            )}
+          </div>
+        </div>
       </nav>
 
       {/* User Profile Card at Bottom of Sidebar */}

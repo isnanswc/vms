@@ -111,7 +111,7 @@ export async function loadFromIndexedDB<T>(key: string, defaultValue: T): Promis
  */
 export async function resetAllDataToDefault(): Promise<void> {
   if (typeof window === 'undefined') return;
-  const keys = ['vehicles', 'fuelLogs', 'spareParts', 'serviceRecords', 'userProfile', 'chatSessions', 'aiSettings'];
+  const keys = ['vehicles', 'fuelLogs', 'spareParts', 'serviceRecords', 'tripLogs', 'userProfile', 'chatSessions', 'aiSettings'];
   keys.forEach((k) => localStorage.removeItem(`vms_${k}`));
 
   try {

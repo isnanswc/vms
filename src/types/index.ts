@@ -1,5 +1,6 @@
 export const APP_VERSION = '1.0.0';
 
+export type TabType = 'dashboard' | 'vehicles' | 'fuel' | 'service' | 'chat';
 export type VehicleCategory = 'motor' | 'mobil' | 'truk' | 'forklift' | 'roda3';
 export type FuelType = 'Pertalite' | 'Pertamax' | 'Pertamax Turbo' | 'Bio Solar' | 'Dexlite' | 'Listrik';
 
@@ -99,4 +100,23 @@ export interface ServiceRecord {
   notes?: string;
   replacedParts?: string[];
   itemizedDetails?: ServiceItemDetail[]; // Rincian per bagian yang diservis & biayanya
+}
+
+
+export type TripPurpose = 'operasional' | 'antar_barang' | 'meeting' | 'pribadi' | 'dinas';
+
+export interface TripLog {
+  id: string;
+  vehicleId: string;
+  date: string;
+  purpose: TripPurpose;
+  origin: string;
+  destination: string;
+  startOdometerKm: number;
+  endOdometerKm: number;
+  distanceKm: number;
+  estimatedCost: number;
+  driverName?: string;
+  notes?: string;
+  isReimbursed?: boolean;
 }

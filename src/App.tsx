@@ -10,7 +10,7 @@ import {
   DEFAULT_AI_SETTINGS 
 } from './data/mockChat';
 import { INITIAL_USER_PROFILE, type UserProfile } from './types/user';
-import type { Vehicle, FuelLog, SparePart, ServiceRecord, TaxPaymentRecord } from './types';
+import type { Vehicle, FuelLog, SparePart, ServiceRecord, TaxPaymentRecord, TripLog } from './types';
 import type { ChatSession, AiSettings } from './types/chat';
 import { loadInitialData, saveToStorage, loadFromIndexedDB } from './utils/storage';
 import { Header } from './components/Header';
@@ -34,6 +34,9 @@ import { DigitalServicePdfModal } from './components/DigitalServicePdfModal';
 import { NotificationModal } from './components/NotificationModal';
 import { getSystemNotifications, getReadNotificationIds, saveReadNotificationIds } from './utils/notifications';
 import { ThemeAccentModal } from './components/ThemeAccentModal';
+import { TripLogModal } from './components/TripLogModal';
+import { PredictiveBudgetModal } from './components/PredictiveBudgetModal';
+import { FleetMenuDrawer } from './components/FleetMenuDrawer';
 import { executeThemeTransition } from './utils/themeTransition';
 import { getSavedAccent, applyAccentToDocument, type AccentColorId } from './utils/themeAccent';
 
@@ -86,6 +89,7 @@ export function App() {
 
   // User Profile & Multi-SIM state
   const [userProfile, setUserProfile] = useState<UserProfile>(() => loadInitialData('userProfile', INITIAL_USER_PROFILE));
+  const [tripLogs, setTripLogs] = useState<TripLog[]>(() => loadInitialData('tripLogs', []));
 
   // Chat Data States
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => loadInitialData('chatSessions', INITIAL_CHAT_SESSIONS));
@@ -98,6 +102,7 @@ export function App() {
   useEffect(() => { saveToStorage('spareParts', spareParts); }, [spareParts]);
   useEffect(() => { saveToStorage('serviceRecords', serviceRecords); }, [serviceRecords]);
   useEffect(() => { saveToStorage('userProfile', userProfile); }, [userProfile]);
+  useEffect(() => { saveToStorage('tripLogs', tripLogs); }, [tripLogs]);
   useEffect(() => { saveToStorage('chatSessions', chatSessions); }, [chatSessions]);
   useEffect(() => { saveToStorage('aiSettings', aiSettings); }, [aiSettings]);
 
@@ -120,6 +125,9 @@ export function App() {
   const [targetVehicleIdForAdjustFuel, setTargetVehicleIdForAdjustFuel] = useState<string | undefined>(undefined);
   const [isAdjustPartOpen, setIsAdjustPartOpen] = useState(false);
   const [selectedPartForAdjust, setSelectedPartForAdjust] = useState<SparePart | null>(null);
+  const [isFleetMenuOpen, setIsFleetMenuOpen] = useState(false);
+  const [isTripLogOpen, setIsTripLogOpen] = useState(false);
+  const [isPredictiveBudgetOpen, setIsPredictiveBudgetOpen] = useState(false);
 
   const handleUpdateSparePart = (updatedPart: SparePart) => {
     const nextParts = spareParts.map((p) => (p.id === updatedPart.id ? updatedPart : p));
@@ -201,6 +209,24 @@ export function App() {
 
   const handleDeleteServiceRecord = (recordId: string) => {
     setServiceRecords(serviceRecords.filter((r) => r.id !== recordId));
+  };
+
+  // Handlers for Trip Logbook
+  const handleAddTripLog = (newTrip: TripLog) => {
+    setTripLogs([newTrip, ...tripLogs]);
+    setVehicles(vehicles.map((v) => 
+      v.id === newTrip.vehicleId && newTrip.endOdometerKm > v.currentOdometerKm
+        ? { ...v, currentOdometerKm: newTrip.endOdometerKm }
+        : v
+    ));
+  };
+
+  const handleToggleReimburse = (tripId: string) => {
+    setTripLogs(tripLogs.map((t) => t.id === tripId ? { ...t, isReimbursed: !t.isReimbursed } : t));
+  };
+
+  const handleDeleteTripLog = (tripId: string) => {
+    setTripLogs(tripLogs.filter((t) => t.id !== tripId));
   };
 
   // Handler for adding tax payment
@@ -443,6 +469,9 @@ export function App() {
         onOpenProfile={() => {
           navigateTo({ isProfile: true, isAdding: false, vehicleId: null });
         }}
+        onOpenFleetMenu={() => setIsFleetMenuOpen(true)}
+        onOpenTripLog={() => setIsTripLogOpen(true)}
+        onOpenPredictiveBudget={() => setIsPredictiveBudgetOpen(true)}
       />
 
       {/* Main Content Column */}
@@ -573,6 +602,8 @@ export function App() {
             navigateTo({ tab, isProfile: false, isAdding: false, vehicleId: null });
           }}
           serviceBadgeCount={criticalPartsCount}
+          onOpenFleetMenu={() => setIsFleetMenuOpen(true)}
+          isFleetMenuOpen={isFleetMenuOpen}
           onOpenQuickScan={() => setIsScanModalOpen(true)}
           onOpenAiSettings={() => setIsAiSettingsOpen(true)}
           onNewChat={handleNewChat}
@@ -670,6 +701,44 @@ export function App() {
         onClose={() => setIsThemeAccentModalOpen(false)}
         currentAccent={accentTheme}
         onSelectAccent={(newAccent) => setAccentTheme(newAccent)}
+      />
+
+      <FleetMenuDrawer
+        isOpen={isFleetMenuOpen}
+        onClose={() => setIsFleetMenuOpen(false)}
+        vehicles={vehicles}
+        serviceBadgeCount={criticalPartsCount}
+        onNavigateTab={(tab) => {
+          navigateTo({ tab, isProfile: false, isAdding: false, vehicleId: null });
+        }}
+        onOpenTripLog={() => setIsTripLogOpen(true)}
+        onOpenPredictiveBudget={() => setIsPredictiveBudgetOpen(true)}
+        onOpenScanReceipt={() => setIsScanModalOpen(true)}
+        onOpenAdjustFuel={() => handleOpenAdjustFuel(undefined)}
+        onOpenServicePdf={() => setIsPdfModalOpen(true)}
+        onOpenAiChat={handleOpenAiChatWithPrompt}
+      />
+
+      <TripLogModal
+        isOpen={isTripLogOpen}
+        onClose={() => setIsTripLogOpen(false)}
+        vehicles={vehicles}
+        tripLogs={tripLogs}
+        fuelLogs={fuelLogs}
+        onAddTrip={handleAddTripLog}
+        onToggleReimburse={handleToggleReimburse}
+        onDeleteTrip={handleDeleteTripLog}
+        defaultVehicleId={selectedVehicleIdForDetail || undefined}
+      />
+
+      <PredictiveBudgetModal
+        isOpen={isPredictiveBudgetOpen}
+        onClose={() => setIsPredictiveBudgetOpen(false)}
+        vehicles={vehicles}
+        spareParts={spareParts}
+        serviceRecords={serviceRecords}
+        fuelLogs={fuelLogs}
+        defaultVehicleId={selectedVehicleIdForDetail || undefined}
       />
     </div>
   );
