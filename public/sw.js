@@ -54,10 +54,11 @@ self.addEventListener('push', (event) => {
   }
 
   const title = data.title || 'Pemberitahuan Armada VMS FleetLog';
+  const scopeUrl = self.registration.scope;
   const options = {
     body: data.body || 'Pengingat armada membutuhkan perhatian Anda.',
-    icon: './app-logo.png',
-    badge: './favicon.png',
+    icon: new URL('app-logo.png', scopeUrl).href,
+    badge: new URL('favicon.png', scopeUrl).href,
     vibrate: [200, 100, 200],
     data: data,
   };

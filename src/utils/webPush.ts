@@ -154,11 +154,19 @@ export const sendBrowserNotification = async (
     };
   }
 
-  // Tentukan path gambar yang aman terhadap base path (seperti GitHub Pages /vms/)
+  // Tentukan path gambar yang selalu berbentuk URL absolut (wajib untuk Windows Action Center & Android)
   const baseUrl = import.meta.env.BASE_URL || '/';
   const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-  const iconUrl = options?.icon || `${cleanBase}app-logo.png`;
-  const badgeUrl = options?.badge || `${cleanBase}favicon.png`;
+  const origin = window.location.origin;
+
+  const iconUrl = options?.icon 
+    ? (options.icon.startsWith('http') ? options.icon : new URL(options.icon, window.location.href).href)
+    : new URL(`${cleanBase}app-logo.png`, origin).href;
+
+  const badgeUrl = options?.badge 
+    ? (options.badge.startsWith('http') ? options.badge : new URL(options.badge, window.location.href).href)
+    : new URL(`${cleanBase}favicon.png`, origin).href;
+
   const tag = options?.tag || `vms-${Date.now()}`;
 
   const notifOptions: NotificationOptions = {
