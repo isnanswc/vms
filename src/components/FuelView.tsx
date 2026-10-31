@@ -21,6 +21,7 @@ interface FuelViewProps {
   vehicles: Vehicle[];
   fuelLogs: FuelLog[];
   onAddFuelLog: () => void;
+  onOpenAdjustFuel?: () => void;
   onScanReceipt: () => void;
 }
 
@@ -28,6 +29,7 @@ export const FuelView: React.FC<FuelViewProps> = ({
   vehicles,
   fuelLogs,
   onAddFuelLog,
+  onOpenAdjustFuel,
   onScanReceipt,
 }) => {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('all');
@@ -40,8 +42,12 @@ export const FuelView: React.FC<FuelViewProps> = ({
 
   const selectedVehicle = vehicles.find((v) => v.id === selectedVehicleId);
 
-  const totalLiters = filteredLogs.reduce((acc, log) => acc + log.liters, 0);
-  const totalCost = filteredLogs.reduce((acc, log) => acc + log.totalCost, 0);
+  const normalRefills = filteredLogs.filter((l) => l.logType !== 'adjustment_loss' && l.logType !== 'drain');
+  const fuelLossLogs = filteredLogs.filter((l) => l.logType === 'adjustment_loss' || l.logType === 'drain');
+  const totalLiters = normalRefills.reduce((acc, log) => acc + log.liters, 0);
+  const totalCost = normalRefills.reduce((acc, log) => acc + log.totalCost, 0);
+  const totalLossLiters = fuelLossLogs.reduce((acc, l) => acc + l.liters, 0);
+  const totalLossCost = fuelLossLogs.reduce((acc, l) => acc + (l.lossCostEstimate || 0), 0);
   const logsWithEff = filteredLogs.filter((l) => l.efficiencyKmPerLiter !== undefined);
   const avgEfficiency = logsWithEff.length > 0
     ? (logsWithEff.reduce((a, b) => a + (b.efficiencyKmPerLiter || 0), 0) / logsWithEff.length).toFixed(1)
@@ -158,8 +164,20 @@ export const FuelView: React.FC<FuelViewProps> = ({
             title="Scan Struk SPBU / SPKLU dengan AI"
           >
             <Camera className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
-            <span>Scan Struk</span>
+            <span className="hidden sm:inline">Scan Struk</span>
           </button>
+
+          {onOpenAdjustFuel && (
+            <button
+              onClick={onOpenAdjustFuel}
+              className="flex items-center gap-1.5 py-2.5 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800 text-xs font-bold rounded-2xl transition cursor-pointer active:scale-95 shadow-xs"
+              title="Catat kebocoran selang, kuras tangki, atau kehilangan BBM"
+            >
+              <Droplet className="w-4 h-4 fill-current text-rose-500" />
+              <span>Lapor Bocor</span>
+            </button>
+          )}
+
           <button
             onClick={onAddFuelLog}
             className="flex items-center gap-1.5 py-2.5 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black rounded-2xl transition shadow-xs active:scale-95 cursor-pointer"
@@ -169,6 +187,26 @@ export const FuelView: React.FC<FuelViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Anomaly & Leakage Warning Alert if detected */}
+      {totalLossLiters > 0 && (
+        <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-800 rounded-3xl flex items-center justify-between gap-3 text-xs animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-rose-500 text-white shadow-xs shrink-0">
+              <Droplet className="w-5 h-5 fill-current" />
+            </div>
+            <div>
+              <span className="font-black text-rose-950 dark:text-rose-200 block text-sm">
+                Terdeteksi {fuelLossLogs.length} Insiden Anomali / Kebocoran BBM
+              </span>
+              <span className="text-rose-800 dark:text-rose-300">
+                Total kehilangan: <strong>±{totalLossLiters.toFixed(1)} Liter</strong> (Estimasi kerugian finansial: Rp {totalLossCost.toLocaleString('id-ID')}). 
+                Sistem telah <strong>mengisolasi kerugian ini</strong> agar tidak merusak metrik efisiensi pembakaran mesin.
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Fuel KPI Summary Card with View Switcher */}
       <div className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-5 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-4 border-b-theme-accent transition-colors">
@@ -296,7 +334,16 @@ export const FuelView: React.FC<FuelViewProps> = ({
                           </div>
 
                           <div className="text-right">
-                            {log.isInitialCalibration ? (
+                            {log.logType === 'adjustment_loss' || log.logType === 'drain' ? (
+                              <div>
+                                <span className="inline-block px-2.5 py-0.5 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 font-bold text-[10px] uppercase border border-rose-300 dark:border-rose-700">
+                                  ⚠️ Loss / Bocor
+                                </span>
+                                <div className="text-xs text-rose-600 dark:text-rose-400 font-mono mt-0.5 font-bold">
+                                  Rugi: Rp {(log.lossCostEstimate || 0).toLocaleString('id-ID')}
+                                </div>
+                              </div>
+                            ) : log.isInitialCalibration ? (
                               <span className="inline-block px-2.5 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold text-[10px] uppercase border border-amber-300 dark:border-amber-700">
                                 Kalibrasi Awal
                               </span>
@@ -306,7 +353,7 @@ export const FuelView: React.FC<FuelViewProps> = ({
                               </div>
                             )}
                             <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono mt-0.5">
-                              {log.liters} {log.fuelType === 'Listrik' ? 'kWh' : 'L'} • <span className="font-bold text-zinc-800 dark:text-zinc-200">{log.fuelType}</span>
+                              {log.logType === 'adjustment_loss' || log.logType === 'drain' ? `-${log.liters}` : log.liters} {log.fuelType === 'Listrik' ? 'kWh' : 'L'} • <span className="font-bold text-zinc-800 dark:text-zinc-200">{log.fuelType}</span>
                             </div>
                           </div>
                         </div>
@@ -318,7 +365,11 @@ export const FuelView: React.FC<FuelViewProps> = ({
                           <span>Odometer: {log.odometerKm.toLocaleString('id-ID')} KM</span>
                         </div>
 
-                        {log.efficiencyKmPerLiter && (
+                        {log.logType === 'adjustment_loss' || log.logType === 'drain' ? (
+                          <div className="flex items-center gap-1 px-2.5 py-1 font-mono text-[10px] font-bold rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300">
+                            <span>Dikecualikan dari Efisiensi Mesin</span>
+                          </div>
+                        ) : log.efficiencyKmPerLiter && (
                           <div className={`flex items-center gap-1 px-3 py-1 font-mono font-bold text-xs rounded-full border ${
                             log.fuelType === 'Listrik'
                               ? 'bg-cyan-100 dark:bg-cyan-950/60 border-cyan-300 dark:border-cyan-800 text-cyan-900 dark:text-cyan-400'

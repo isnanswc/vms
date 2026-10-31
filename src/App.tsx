@@ -27,6 +27,8 @@ import { AiChatView } from './components/AiChatView';
 import { AiSettingsModal } from './components/AiSettingsModal';
 import { ScanModal } from './components/ScanModal';
 import { AddFuelModal } from './components/AddFuelModal';
+import { AdjustFuelModal } from './components/AdjustFuelModal';
+import { AdjustSparePartModal } from './components/AdjustSparePartModal';
 import { AddServiceModal } from './components/AddServiceModal';
 import { DigitalServicePdfModal } from './components/DigitalServicePdfModal';
 import { NotificationModal } from './components/NotificationModal';
@@ -114,6 +116,32 @@ export function App() {
   const [targetVehicleIdForFuel, setTargetVehicleIdForFuel] = useState<string | undefined>(undefined);
   const [targetVehicleIdForService, setTargetVehicleIdForService] = useState<string | undefined>(undefined);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [isAdjustFuelOpen, setIsAdjustFuelOpen] = useState(false);
+  const [targetVehicleIdForAdjustFuel, setTargetVehicleIdForAdjustFuel] = useState<string | undefined>(undefined);
+  const [isAdjustPartOpen, setIsAdjustPartOpen] = useState(false);
+  const [selectedPartForAdjust, setSelectedPartForAdjust] = useState<SparePart | null>(null);
+
+  const handleUpdateSparePart = (updatedPart: SparePart) => {
+    const nextParts = spareParts.map((p) => (p.id === updatedPart.id ? updatedPart : p));
+    setSpareParts(nextParts);
+
+    // Recalculate healthScore for this vehicle
+    const vParts = nextParts.filter((p) => p.vehicleId === updatedPart.vehicleId);
+    if (vParts.length > 0) {
+      const avgHealth = Math.round(vParts.reduce((sum, p) => sum + p.estimatedLifeRemainingPct, 0) / vParts.length);
+      setVehicles(vehicles.map((v) => (v.id === updatedPart.vehicleId ? { ...v, healthScore: avgHealth } : v)));
+    }
+  };
+
+  const handleOpenAdjustPart = (part: SparePart) => {
+    setSelectedPartForAdjust(part);
+    setIsAdjustPartOpen(true);
+  };
+
+  const handleOpenAdjustFuel = (vehicleId?: string) => {
+    setTargetVehicleIdForAdjustFuel(vehicleId);
+    setIsAdjustFuelOpen(true);
+  };
 
   // Handlers for Add Operations
   const handleSaveNewVehicleAndParts = (
@@ -458,6 +486,8 @@ export function App() {
               serviceRecords={serviceRecords}
               onBack={handleGoBack}
               onAddFuelLog={() => setIsAddFuelOpen(true)}
+              onOpenAdjustFuel={(vehId) => handleOpenAdjustFuel(vehId)}
+              onOpenAdjustPart={handleOpenAdjustPart}
               onAddService={() => setIsAddServiceOpen(true)}
               onOpenAiChat={handleOpenAiChatWithPrompt}
               onAddTaxPayment={handleAddTaxPayment}
@@ -493,6 +523,7 @@ export function App() {
                       setIsAddServiceOpen(true);
                     }
                   }}
+                  onOpenAdjustFuel={(vehId) => handleOpenAdjustFuel(vehId)}
                   onOpenAiChat={handleOpenAiChatWithPrompt}
                   onNavigateToVehicle={(vehicleId) => {
                     navigateTo({ vehicleId, isProfile: false, isAdding: false });
@@ -514,6 +545,7 @@ export function App() {
                   vehicles={vehicles}
                   fuelLogs={fuelLogs}
                   onAddFuelLog={() => setIsAddFuelOpen(true)}
+                  onOpenAdjustFuel={() => handleOpenAdjustFuel(undefined)}
                   onScanReceipt={() => setIsScanModalOpen(true)}
                 />
               )}
@@ -524,6 +556,7 @@ export function App() {
                   spareParts={spareParts}
                   serviceRecords={serviceRecords}
                   onAddService={() => setIsAddServiceOpen(true)}
+                  onOpenAdjustPart={handleOpenAdjustPart}
                   onExportPdf={() => setIsPdfModalOpen(true)}
                   onUpdateService={handleUpdateServiceRecord}
                   onDeleteService={handleDeleteServiceRecord}
@@ -594,6 +627,26 @@ export function App() {
         vehicles={vehicles}
         onAddFuelLog={handleAddFuelLog}
         defaultVehicleId={targetVehicleIdForFuel || selectedVehicleIdForDetail || undefined}
+      />
+
+      <AdjustFuelModal
+        isOpen={isAdjustFuelOpen}
+        onClose={() => setIsAdjustFuelOpen(false)}
+        vehicles={vehicles}
+        fuelLogs={fuelLogs}
+        onAddFuelLog={handleAddFuelLog}
+        defaultVehicleId={targetVehicleIdForAdjustFuel || selectedVehicleIdForDetail || undefined}
+      />
+
+      <AdjustSparePartModal
+        isOpen={isAdjustPartOpen}
+        onClose={() => {
+          setIsAdjustPartOpen(false);
+          setSelectedPartForAdjust(null);
+        }}
+        part={selectedPartForAdjust}
+        vehicle={vehicles.find((v) => v.id === selectedPartForAdjust?.vehicleId)}
+        onUpdateSparePart={handleUpdateSparePart}
       />
 
       <AddServiceModal

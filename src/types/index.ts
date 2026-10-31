@@ -54,6 +54,18 @@ export interface FuelLog {
   remainingLitersBeforeFill?: number; // Sisa bensin sebelum diisi (misal: 1.0 L)
   totalLitersAfterFill?: number; // Total bensin dalam tangki setelah pengisian (misal: 1.0 + 2.0 = 3.0 L)
   isInitialCalibration?: boolean; // Penanda apakah log ini adalah kalibrasi awal saat registrasi kendaraan
+  logType?: 'refill' | 'adjustment_loss' | 'drain' | 'calibration'; // Jenis transaksi: isi bensin normal, kebocoran/kehilangan, kuras tangki, kalibrasi
+  adjustmentReason?: string; // Keterangan penyebab kebocoran/penyesuaian (misal: "Kebocoran selang bensin")
+  lossCostEstimate?: number; // Estimasi kerugian finansial dari bensin yang bocor/hilang
+}
+
+export interface SparePartAdjustment {
+  date: string;
+  previousPct: number;
+  newPct: number;
+  reason: string; // e.g. "Pemasangan part lawas / aus dini", "Hasil inspeksi fisik bengkel"
+  odometerKm: number;
+  notes?: string;
 }
 
 export interface SparePart {
@@ -66,6 +78,7 @@ export interface SparePart {
   status: 'optimal' | 'warning' | 'critical';
   urgencyDays?: number;
   replacementCostEstimate?: number;
+  lastAdjustment?: SparePartAdjustment; // Catatan penyesuaian kondisi terakhir
 }
 
 export interface ServiceItemDetail {

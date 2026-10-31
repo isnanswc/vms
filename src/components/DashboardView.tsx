@@ -24,6 +24,7 @@ interface DashboardViewProps {
   onOpenQuickScan: () => void;
   onOpenAddFuel: (vehicleId?: string) => void;
   onOpenAddService?: (vehicleId?: string) => void;
+  onOpenAdjustFuel?: (vehicleId?: string) => void;
   onOpenAiChat: (initialPrompt?: string) => void;
   onNavigateToVehicle?: (vehicleId: string) => void;
 }
@@ -37,6 +38,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenQuickScan,
   onOpenAddFuel,
   onOpenAddService,
+  onOpenAdjustFuel,
   onOpenAiChat,
   onNavigateToVehicle,
 }) => {
@@ -276,6 +278,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               vehicle={showcaseVehicle}
               fuelLogs={fuelLogs}
               onAddFuel={(vehId) => onOpenAddFuel(vehId)}
+              onOpenFuelAdjustment={(vehId) => onOpenAdjustFuel && onOpenAdjustFuel(vehId)}
               onOpenAiChat={onOpenAiChat}
             />
 

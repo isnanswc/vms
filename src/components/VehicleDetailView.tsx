@@ -18,7 +18,9 @@ import {
   Gauge,
   TrendingUp,
   MapPin,
-  Navigation
+  Navigation,
+  Droplet,
+  Sliders
 } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
 import { triggerHaptic } from '../utils/haptics';
@@ -31,6 +33,8 @@ interface VehicleDetailViewProps {
   serviceRecords: ServiceRecord[];
   onBack: () => void;
   onAddFuelLog: () => void;
+  onOpenAdjustFuel?: (vehicleId: string) => void;
+  onOpenAdjustPart?: (part: SparePart) => void;
   onAddService: () => void;
   onOpenAiChat: (prompt: string) => void;
   onAddTaxPayment: (record: TaxPaymentRecord) => void;
@@ -45,6 +49,8 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
   serviceRecords: _serviceRecords,
   onBack,
   onAddFuelLog,
+  onOpenAdjustFuel,
+  onOpenAdjustPart,
   onAddService: _onAddService,
   onOpenAiChat,
   onAddTaxPayment,
@@ -512,17 +518,30 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
           </div>
 
           {/* Action Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h4 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
               Riwayat Pengisian & Koordinat GPS SPBU
             </h4>
-            <button
-              onClick={onAddFuelLog}
-              className="py-2.5 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black rounded-2xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Catat Pengisian BBM</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {onOpenAdjustFuel && (
+                <button
+                  type="button"
+                  onClick={() => onOpenAdjustFuel(vehicle.id)}
+                  className="py-2.5 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800 text-xs font-bold rounded-2xl transition shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  title="Catat kebocoran selang, kuras tangki, atau koreksi BBM"
+                >
+                  <Droplet className="w-4 h-4 fill-current text-rose-500" />
+                  <span>Lapor Bocor</span>
+                </button>
+              )}
+              <button
+                onClick={onAddFuelLog}
+                className="py-2.5 px-4 bg-theme-accent hover:bg-theme-accent-hover text-theme-accent-fg text-xs font-black rounded-2xl transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4 stroke-[3]" />
+                <span>Catat Pengisian BBM</span>
+              </button>
+            </div>
           </div>
 
           {/* Fuel Transactions Grid (Desktop 2 Cols) */}
@@ -623,14 +642,33 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                       ></div>
                     </div>
                   </div>
+
+                  {part.lastAdjustment && (
+                    <div className="mt-2.5 p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[10px] text-amber-900 dark:text-amber-300 leading-snug">
+                      <span className="font-bold">Penyesuaian ({part.lastAdjustment.date}):</span> {part.lastAdjustment.reason} ({part.lastAdjustment.previousPct}% → {part.lastAdjustment.newPct}%)
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500 font-mono">
-                  <span>Ganti: Tiap {part.recommendedIntervalKm.toLocaleString('id-ID')} KM</span>
-                  {part.replacementCostEstimate && (
-                    <span className="font-bold text-zinc-800">
-                      Rp {part.replacementCostEstimate.toLocaleString('id-ID')}
-                    </span>
+                <div>
+                  <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-500 font-mono">
+                    <span>Ganti: Tiap {part.recommendedIntervalKm.toLocaleString('id-ID')} KM</span>
+                    {part.replacementCostEstimate && (
+                      <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                        Rp {part.replacementCostEstimate.toLocaleString('id-ID')}
+                      </span>
+                    )}
+                  </div>
+
+                  {onOpenAdjustPart && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenAdjustPart(part)}
+                      className="mt-2.5 w-full py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
+                    >
+                      <Sliders className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Sesuaikan Kondisi (Koreksi Aus)</span>
+                    </button>
                   )}
                 </div>
               </div>

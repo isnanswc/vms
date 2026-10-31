@@ -18,6 +18,7 @@ interface LiquidFuelCardProps {
   vehicle: Vehicle;
   fuelLogs: FuelLog[];
   onAddFuel: (vehicleId: string) => void;
+  onOpenFuelAdjustment?: (vehicleId: string) => void;
   onOpenAiChat?: (prompt: string) => void;
 }
 
@@ -25,6 +26,7 @@ export const LiquidFuelCard: React.FC<LiquidFuelCardProps> = ({
   vehicle,
   fuelLogs,
   onAddFuel,
+  onOpenFuelAdjustment,
   onOpenAiChat,
 }) => {
   const isElectric = vehicle.fuelType === 'Listrik';
@@ -204,17 +206,33 @@ export const LiquidFuelCard: React.FC<LiquidFuelCardProps> = ({
           </div>
         </div>
 
-        {/* Quick Action Button */}
-        <button
-          onClick={() => {
-            triggerHaptic('light');
-            onAddFuel(vehicle.id);
-          }}
-          className="flex items-center gap-1.5 px-3 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg text-xs font-black rounded-xl transition cursor-pointer shadow-xs active:scale-95 shrink-0"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Catat BBM</span>
-        </button>
+        {/* Quick Action Buttons */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {onOpenFuelAdjustment && hasFuelData && (
+            <button
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenFuelAdjustment(vehicle.id);
+              }}
+              className="flex items-center gap-1 px-2.5 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800 text-xs font-bold rounded-xl transition cursor-pointer active:scale-95 shadow-xs"
+              title="Laporkan kebocoran selang, kuras tangki, atau koreksi level BBM"
+            >
+              <Droplet className="w-3.5 h-3.5 fill-current" />
+              <span className="hidden sm:inline">Lapor Bocor</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => {
+              triggerHaptic('light');
+              onAddFuel(vehicle.id);
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-theme-accent dark:hover:bg-theme-accent-hover text-white dark:text-theme-accent-fg text-xs font-black rounded-xl transition cursor-pointer shadow-xs active:scale-95 shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Catat BBM</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Content: Left Column (Liquid Tank) + Right Column (Telemetry Insights) */}
@@ -355,7 +373,12 @@ export const LiquidFuelCard: React.FC<LiquidFuelCardProps> = ({
                     KM {lastFuelLog.odometerKm.toLocaleString('id-ID')}
                   </span>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                    {lastFuelLog.isInitialCalibration ? (
+                    {lastFuelLog.logType === 'adjustment_loss' || lastFuelLog.logType === 'drain' ? (
+                      <>
+                        <span className="font-bold text-rose-600 dark:text-rose-400">Anomali / Loss</span>
+                        {' '}• -{lastFuelLog.liters} {isElectric ? 'kWh' : 'L'} ({lastFuelLog.adjustmentReason || 'Kebocoran'})
+                      </>
+                    ) : lastFuelLog.isInitialCalibration ? (
                       <>
                         <span className="font-bold text-amber-600 dark:text-amber-400">Kalibrasi Awal</span>
                         {' '}• {lastFuelLog.liters} {isElectric ? 'kWh' : 'L'} tercatat saat registrasi
@@ -368,7 +391,15 @@ export const LiquidFuelCard: React.FC<LiquidFuelCardProps> = ({
                   </p>
                 </div>
                 <div className="text-xs font-bold text-theme-accent">
-                  {lastFuelLog.isInitialCalibration ? '✓ Terkalibrasi' : lastFuelLog.fullTank ? '✓ Full Tank' : 'Sebagian'}
+                  {lastFuelLog.logType === 'adjustment_loss' || lastFuelLog.logType === 'drain' ? (
+                    <span className="text-rose-600 dark:text-rose-400 font-black">⚠️ Terpotong Loss</span>
+                  ) : lastFuelLog.isInitialCalibration ? (
+                    '✓ Terkalibrasi'
+                  ) : lastFuelLog.fullTank ? (
+                    '✓ Full Tank'
+                  ) : (
+                    'Sebagian'
+                  )}
                 </div>
               </div>
             ) : (

@@ -17,7 +17,8 @@ import {
   X, 
   Trash2, 
   FileText,
-  Check
+  Check,
+  Sliders
 } from 'lucide-react';
 import { ModalPortal } from './ModalPortal';
 import { VehicleSlideSelector } from './VehicleSlideSelector';
@@ -28,6 +29,7 @@ interface ServiceViewProps {
   serviceRecords: ServiceRecord[];
   onAddService: () => void;
   onExportPdf: () => void;
+  onOpenAdjustPart?: (part: SparePart) => void;
   onUpdateService?: (record: ServiceRecord) => void;
   onDeleteService?: (recordId: string) => void;
 }
@@ -38,12 +40,13 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
   serviceRecords,
   onAddService,
   onExportPdf,
+  onOpenAdjustPart,
   onUpdateService,
   onDeleteService,
 }) => {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('all');
   const [selectedRecordForDetail, setSelectedRecordForDetail] = useState<ServiceRecord | null>(null);
-  const [viewMode, setViewMode] = useState<'history_list' | 'analytics'>('history_list');
+  const [viewMode, setViewMode] = useState<'history_list' | 'parts' | 'analytics'>('history_list');
   const [timeRange, setTimeRange] = useState<'30d' | '3m' | '6m' | '1y' | 'all'>('all');
 
   const filteredRecords = selectedVehicleId === 'all'
@@ -195,30 +198,42 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
           </p>
         </div>
 
-        {/* View Switcher: List Transaksi Servis vs Sheet Analitik */}
-        <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 text-xs font-bold">
+        {/* View Switcher: List Transaksi Servis vs Suku Cadang vs Sheet Analitik */}
+        <div className="grid grid-cols-3 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 text-xs font-bold">
           <button
             onClick={() => setViewMode('history_list')}
-            className={`py-2 px-3 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`py-2 px-2.5 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === 'history_list'
                 ? 'bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-100 shadow-xs'
                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
-            <FileCheck className="w-3.5 h-3.5" />
-            <span>Daftar Servis ({filteredRecords.length})</span>
+            <FileCheck className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Servis ({filteredRecords.length})</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode('parts')}
+            className={`py-2 px-2.5 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              viewMode === 'parts'
+                ? 'bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+            }`}
+          >
+            <Wrench className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+            <span className="truncate">Suku Cadang ({registeredPartsCount})</span>
           </button>
 
           <button
             onClick={() => setViewMode('analytics')}
-            className={`py-2 px-3 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`py-2 px-2.5 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === 'analytics'
                 ? 'bg-theme-accent text-theme-accent-fg shadow-xs'
                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Sheet Analitik Servis</span>
+            <BarChart3 className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Analitik</span>
           </button>
         </div>
       </div>
@@ -334,6 +349,124 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
                         <span>Lihat Rincian & Sparepart</span>
                         <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                       </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* VIEW 3: DAFTAR SUKU CADANG & PENYESUAIAN KONDISI (ADJUSTMENT) */}
+      {viewMode === 'parts' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <span>Monitoring & Koreksi Kondisi Suku Cadang</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 text-[10px] font-mono font-bold">
+                  {registeredPartsCount} Komponen
+                </span>
+              </h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Bila terjadi salah pasang suku cadang lawas atau aus dini, klik "Sesuaikan Kondisi" untuk mengoreksi data telematika.
+              </p>
+            </div>
+          </div>
+
+          {registeredPartsCount === 0 ? (
+            <div className="p-8 bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl text-center text-xs text-zinc-400">
+              Belum ada suku cadang terdaftar untuk unit ini.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(selectedVehicleId === 'all'
+                ? spareParts
+                : spareParts.filter((p) => p.vehicleId === selectedVehicleId)
+              ).map((part) => {
+                const veh = vehicles.find((v) => v.id === part.vehicleId);
+                const isCritical = part.status === 'critical';
+                const isWarning = part.status === 'warning';
+
+                return (
+                  <div
+                    key={part.id}
+                    className="bg-white dark:bg-zinc-900 rounded-3xl p-4.5 border-2 border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition"
+                  >
+                    <div>
+                      {/* Top Plate & Status */}
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div>
+                          {selectedVehicleId === 'all' && veh && (
+                            <span className="px-2 py-0.5 bg-zinc-950 dark:bg-zinc-800 text-white font-mono font-bold text-[10px] rounded-md border border-zinc-800 block w-fit mb-1">
+                              {veh.plateNumber}
+                            </span>
+                          )}
+                          <h4 className="font-black text-sm text-zinc-900 dark:text-zinc-100 leading-snug">
+                            {part.name}
+                          </h4>
+                        </div>
+
+                        <span
+                          className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full shrink-0 ${
+                            isCritical
+                              ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+                              : isWarning
+                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                                : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                          }`}
+                        >
+                          {isCritical ? 'Wajib Ganti' : isWarning ? 'Waspada' : 'Optimal'}
+                        </span>
+                      </div>
+
+                      {/* Wear bar */}
+                      <div className="mt-3 space-y-1">
+                        <div className="flex justify-between text-xs text-zinc-600 dark:text-zinc-400">
+                          <span className="font-medium">Sisa Masa Pakai:</span>
+                          <span className="font-mono font-black text-zinc-950 dark:text-zinc-100">
+                            {part.estimatedLifeRemainingPct}%
+                          </span>
+                        </div>
+                        <div className="w-full h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-200 dark:border-zinc-700">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              isCritical ? 'bg-rose-500' : isWarning ? 'bg-amber-400' : 'bg-emerald-500'
+                            }`}
+                            style={{ width: `${Math.max(5, part.estimatedLifeRemainingPct)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Adjustment History Badge if exists */}
+                      {part.lastAdjustment && (
+                        <div className="mt-2.5 p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[10px] text-amber-900 dark:text-amber-300 leading-snug">
+                          <span className="font-bold">Penyesuaian ({part.lastAdjustment.date}):</span> {part.lastAdjustment.reason} ({part.lastAdjustment.previousPct}% → {part.lastAdjustment.newPct}%)
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                      <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-mono mb-2">
+                        <span>Ganti: Tiap {part.recommendedIntervalKm.toLocaleString('id-ID')} KM</span>
+                        {part.replacementCostEstimate && (
+                          <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                            Rp {part.replacementCostEstimate.toLocaleString('id-ID')}
+                          </span>
+                        )}
+                      </div>
+
+                      {onOpenAdjustPart && (
+                        <button
+                          type="button"
+                          onClick={() => onOpenAdjustPart(part)}
+                          className="w-full py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
+                        >
+                          <Sliders className="w-3.5 h-3.5 text-amber-500" />
+                          <span>Sesuaikan Kondisi (Koreksi Aus)</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
