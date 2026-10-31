@@ -40,6 +40,7 @@ interface VehicleDetailViewProps {
   onAddTaxPayment: (record: TaxPaymentRecord) => void;
   onUpdateVehicle?: (updated: Vehicle) => void;
   onDeleteVehicle?: (vehicleId: string) => void;
+  onOpenTripLog?: (vehicleId: string) => void;
 }
 
 export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
@@ -56,6 +57,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
   onAddTaxPayment,
   onUpdateVehicle,
   onDeleteVehicle,
+  onOpenTripLog,
 }) => {
   const [activeTab, setActiveTab] = useState<'info' | 'fuel' | 'parts'>('info');
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
@@ -179,6 +181,21 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
         {/* Right: Cohesive Action Toolbar */}
         <div className="flex items-center gap-2 sm:gap-2.5">
+          {onOpenTripLog && (
+            <button
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenTripLog(vehicle.id);
+              }}
+              className="flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-2xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-bold transition-all cursor-pointer border border-blue-200 dark:border-blue-800 shadow-xs active:scale-95"
+              title="Catat Spedometer & Perjalanan"
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Catat KM / Trip</span>
+              <span className="sm:hidden">KM/Trip</span>
+            </button>
+          )}
+
           {/* Edit Information Button */}
           <button
             onClick={() => {

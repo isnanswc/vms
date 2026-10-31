@@ -112,11 +112,14 @@ export function App() {
   useEffect(() => { saveToStorage('chatSessions', chatSessions); }, [chatSessions]);
   useEffect(() => { saveToStorage('aiSettings', aiSettings); }, [aiSettings]);
 
-  // Reconcile with IndexedDB on initial mount
+  // Reconcile all fleet data with IndexedDB on initial mount (Offline-First resilience)
   useEffect(() => {
-    loadFromIndexedDB<Vehicle[]>('vehicles', INITIAL_VEHICLES).then((v) => {
-      if (v && v.length > 0) setVehicles(v);
-    });
+    loadFromIndexedDB<Vehicle[]>('vehicles', INITIAL_VEHICLES).then((v) => { if (v && v.length > 0) setVehicles(v); });
+    loadFromIndexedDB<FuelLog[]>('fuelLogs', INITIAL_FUEL_LOGS).then((f) => { if (f && f.length > 0) setFuelLogs(f); });
+    loadFromIndexedDB<SparePart[]>('spareParts', INITIAL_SPAREPARTS).then((s) => { if (s && s.length > 0) setSpareParts(s); });
+    loadFromIndexedDB<ServiceRecord[]>('serviceRecords', INITIAL_SERVICE_RECORDS).then((r) => { if (r && r.length > 0) setServiceRecords(r); });
+    loadFromIndexedDB<TripLog[]>('tripLogs', []).then((t) => { if (t && t.length > 0) setTripLogs(t); });
+    loadFromIndexedDB<OdometerLog[]>('odometerLogs', []).then((o) => { if (o && o.length > 0) setOdometerLogs(o); });
   }, []);
 
   // Modal Dialog States
@@ -157,6 +160,38 @@ export function App() {
     setIsAdjustFuelOpen(true);
   };
 
+  // Centralized Odometer Sync: Otomatis hitung degradasi sisa umur suku cadang & healthScore saat KM bertambah
+  const applyOdometerSync = (vehicleId: string, newKm: number) => {
+    const targetVeh = vehicles.find((v) => v.id === vehicleId);
+    if (!targetVeh || newKm <= targetVeh.currentOdometerKm) return;
+
+    // 1. Hitung ulang sisa umur & status seluruh suku cadang armada ini
+    const updatedParts = spareParts.map((part) => {
+      if (part.vehicleId !== vehicleId) return part;
+      const interval = part.recommendedIntervalKm || 5000;
+      const kmUsed = Math.max(0, newKm - part.lastReplacedOdometerKm);
+      const lifeRemainingPct = Math.max(0, Math.min(100, Math.round(((interval - kmUsed) / interval) * 100)));
+      const status: 'optimal' | 'warning' | 'critical' = 
+        lifeRemainingPct <= 15 ? 'critical' : lifeRemainingPct <= 35 ? 'warning' : 'optimal';
+      return {
+        ...part,
+        estimatedLifeRemainingPct: lifeRemainingPct,
+        status,
+      };
+    });
+    setSpareParts(updatedParts);
+
+    // 2. Hitung ulang rata-rata kesehatan armada (Health Score)
+    const vParts = updatedParts.filter((p) => p.vehicleId === vehicleId);
+    const avgHealth = vParts.length > 0 
+      ? Math.round(vParts.reduce((sum, p) => sum + p.estimatedLifeRemainingPct, 0) / vParts.length) 
+      : targetVeh.healthScore;
+
+    setVehicles(vehicles.map((v) => 
+      v.id === vehicleId ? { ...v, currentOdometerKm: newKm, healthScore: avgHealth } : v
+    ));
+  };
+
   // Handlers for Add Operations
   const handleSaveNewVehicleAndParts = (
     newVeh: Vehicle, 
@@ -181,6 +216,8 @@ export function App() {
     setSpareParts(spareParts.filter((p) => p.vehicleId !== vehicleId));
     setFuelLogs(fuelLogs.filter((l) => l.vehicleId !== vehicleId));
     setServiceRecords(serviceRecords.filter((s) => s.vehicleId !== vehicleId));
+    setTripLogs(tripLogs.filter((t) => t.vehicleId !== vehicleId));
+    setOdometerLogs(odometerLogs.filter((o) => o.vehicleId !== vehicleId));
     if (selectedVehicleIdForDetail === vehicleId) {
       setSelectedVehicleIdForDetail(null);
     }
@@ -188,11 +225,7 @@ export function App() {
 
   const handleAddFuelLog = (newLog: FuelLog) => {
     setFuelLogs([newLog, ...fuelLogs]);
-    setVehicles(vehicles.map((v) => 
-      v.id === newLog.vehicleId && newLog.odometerKm > v.currentOdometerKm
-        ? { ...v, currentOdometerKm: newLog.odometerKm }
-        : v
-    ));
+    applyOdometerSync(newLog.vehicleId, newLog.odometerKm);
   };
 
   const handleAddServiceRecord = (newRecord: ServiceRecord) => {
@@ -220,11 +253,7 @@ export function App() {
   // Handlers for Trip Logbook
   const handleAddTripLog = (newTrip: TripLog) => {
     setTripLogs([newTrip, ...tripLogs]);
-    setVehicles(vehicles.map((v) => 
-      v.id === newTrip.vehicleId && newTrip.endOdometerKm > v.currentOdometerKm
-        ? { ...v, currentOdometerKm: newTrip.endOdometerKm }
-        : v
-    ));
+    applyOdometerSync(newTrip.vehicleId, newTrip.endOdometerKm);
   };
 
   const handleToggleReimburse = (tripId: string) => {
@@ -238,11 +267,7 @@ export function App() {
   // Handlers for Odometer Logging
   const handleAddOdometerLog = (newLog: OdometerLog) => {
     setOdometerLogs([newLog, ...odometerLogs]);
-    setVehicles(vehicles.map((v) => 
-      v.id === newLog.vehicleId && newLog.odometerKm > v.currentOdometerKm
-        ? { ...v, currentOdometerKm: newLog.odometerKm }
-        : v
-    ));
+    applyOdometerSync(newLog.vehicleId, newLog.odometerKm);
   };
 
   const handleDeleteOdometerLog = (logId: string) => {
@@ -293,11 +318,7 @@ export function App() {
     detectedCost?: number;
     fuelType?: string;
   }) => {
-    setVehicles(vehicles.map((v) => 
-      v.id === result.vehicleId 
-        ? { ...v, currentOdometerKm: result.detectedKm }
-        : v
-    ));
+    applyOdometerSync(result.vehicleId, result.detectedKm);
 
     if (result.detectedLiters && result.detectedCost) {
       const newLog: FuelLog = {
@@ -573,6 +594,7 @@ export function App() {
               onAddOdometerLog={handleAddOdometerLog}
               onDeleteOdometerLog={handleDeleteOdometerLog}
               initialVehicleId={selectedVehicleIdForDetail || undefined}
+              aiSettings={aiSettings}
             />
           ) : selectedVehicleIdForDetail && currentDetailVehicle ? (
             /* VIEW C: VEHICLE DETAIL (INFO & PAJAK, BBM, SPAREPART) */
@@ -590,6 +612,7 @@ export function App() {
               onAddTaxPayment={handleAddTaxPayment}
               onUpdateVehicle={handleUpdateVehicle}
               onDeleteVehicle={handleDeleteVehicle}
+              onOpenTripLog={(vehId) => navigateTo({ isTripLog: true, isProfile: false, isAdding: false, vehicleId: vehId })}
             />
           ) : (
             /* VIEW D: STANDARD TAB VIEWS */
@@ -625,6 +648,7 @@ export function App() {
                   onNavigateToVehicle={(vehicleId) => {
                     navigateTo({ vehicleId, isProfile: false, isAdding: false });
                   }}
+                  onOpenTripLog={() => navigateTo({ isTripLog: true, isProfile: false, isAdding: false, vehicleId: null })}
                 />
               )}
 

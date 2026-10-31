@@ -536,3 +536,98 @@ Catatan wajib: Sediakan DAFTAR LENGKAP 8 hingga 12 suku cadang esensial pabrikan
 
   return null;
 }
+
+
+export interface OdometerVisionResult {
+  odometer: number;
+  confidence: 'high' | 'medium' | 'low';
+  notes?: string;
+}
+
+/**
+ * Recognizes odometer total kilometer digits from a dashboard photo using Gemini Vision API
+ */
+export async function recognizeOdometerWithGemini(
+  imageDataUrl: string,
+  currentKm: number,
+  apiKey?: string
+): Promise<OdometerVisionResult | null> {
+  const cleanKey = apiKey?.trim();
+  if (!cleanKey) return null;
+
+  // Extract pure base64 and mime type
+  let mimeType = 'image/jpeg';
+  let base64Data = imageDataUrl;
+  if (imageDataUrl.includes(';base64,')) {
+    const parts = imageDataUrl.split(';base64,');
+    mimeType = parts[0].replace('data:', '') || 'image/jpeg';
+    base64Data = parts[1];
+  }
+
+  const prompt = `Anda adalah sistem AI Vision Optical Character Recognition (OCR) spesialis dashboard kendaraan.
+Tugas Anda: Membaca angka total odometer (KM jarak tempuh total) yang tertera pada panel instrumen / spedometer motor atau mobil ini.
+Konteks:
+- Angka KM kendaraan yang tercatat sebelumnya adalah sekitar ${currentKm} KM.
+- Angka baru umumnya sama atau lebih besar dari ${currentKm} KM (kecuali odometer baru diganti).
+- Abaikan trip meter (Trip A/Trip B jika ada), fokuskan pada TOTAL ODOMETER (ODO / TOTAL).
+- Kembalikan HANYA format JSON valid (RFC 8259):
+{
+  "odometer": 42350,
+  "confidence": "high",
+  "notes": "Angka terbaca jelas pada display digital"
+}`;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 14000);
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${cleanKey}`;
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType,
+                  data: base64Data,
+                },
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 256,
+          responseMimeType: 'application/json',
+        },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`AI Odometer Vision fetch failed with HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const partsArray = data.candidates?.[0]?.content?.parts || [];
+    let rawText = partsArray.map((p: any) => p.text || '').join('').trim();
+    if (!rawText) return null;
+
+    rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(rawText) as OdometerVisionResult;
+
+    if (parsed && typeof parsed.odometer === 'number' && parsed.odometer > 0) {
+      return parsed;
+    }
+  } catch (err) {
+    console.warn('[VMS AI Odometer Vision] Gagal membaca gambar dengan Gemini Vision:', err);
+  }
+
+  return null;
+}

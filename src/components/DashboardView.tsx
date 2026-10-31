@@ -8,7 +8,8 @@ import {
   Fuel, 
   ChevronRight, 
   AlertTriangle,
-  Plus
+  Plus,
+  Navigation
 } from 'lucide-react';
 import { VehicleSlideSelector } from './VehicleSlideSelector';
 import { LiquidFuelCard } from './LiquidFuelCard';
@@ -27,6 +28,7 @@ interface DashboardViewProps {
   onOpenAdjustFuel?: (vehicleId?: string) => void;
   onOpenAiChat: (initialPrompt?: string) => void;
   onNavigateToVehicle?: (vehicleId: string) => void;
+  onOpenTripLog?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -41,6 +43,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenAdjustFuel,
   onOpenAiChat,
   onNavigateToVehicle,
+  onOpenTripLog,
 }) => {
   // Vehicle Selection Filter: 'all' or specific vehicleId
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('all');
@@ -138,6 +141,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span className="hidden sm:inline">Scan Spedometer / Struk</span>
             <span className="sm:hidden">Scan AI</span>
           </button>
+
+          {onOpenTripLog && (
+            <button
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenTripLog();
+              }}
+              className="flex items-center gap-2 py-2 px-3 sm:px-4 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-2xl transition cursor-pointer active:scale-95 group shadow-xs"
+            >
+              <Navigation className="w-4 h-4" />
+              <span className="hidden sm:inline">Catat KM & Trip</span>
+              <span className="sm:hidden">KM/Trip</span>
+            </button>
+          )}
           <button
             onClick={() => {
               triggerHaptic('light');
